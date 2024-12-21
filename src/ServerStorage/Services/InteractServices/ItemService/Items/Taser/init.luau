@@ -17,6 +17,9 @@ function TaserServer.__new(self: NexusInstanceTaserServer, itemName: string, too
 
     ItemBase.__new(self, itemName, tool) --Remember to call the parent constructor!
     self.ParticleService = Knit.GetService("ParticleService")
+
+    self:DisableCollisons()
+
 end
 
 function TaserServer.Client.Shoot(self : NexusInstanceTaserServer, player : Player, target : BasePart, hit : Vector3)

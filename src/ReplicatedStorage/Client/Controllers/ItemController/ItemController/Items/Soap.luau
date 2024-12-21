@@ -1,10 +1,9 @@
 local Players = game:GetService('Players')
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
-local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
-
 local ItemBase = require(script.Parent.Parent.ItemBaseClient)
-local BatteryClient = {}
-
+local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
+local SoapClient = {}
+local UserInputService = game:GetService("UserInputService")
 local Fusion = require(ReplicatedStorage.Packages.fusion)
 local Children = Fusion.Children
 
@@ -12,16 +11,16 @@ local ActionButton = require(ReplicatedStorage.Source.Client.Controllers.UIContr
 local Icons = require(ReplicatedStorage.Source.Shared.Icons)
 
 
-BatteryClient.__index = BatteryClient
-setmetatable(BatteryClient, ItemBase) --TestClass1NexusInstance would be returned instead of TestClass1.
+SoapClient.__index = SoapClient
+setmetatable(SoapClient, ItemBase) --TestClass1NexusInstance would be returned instead of TestClass1.
 
-export type BatteryClient = {
+export type SoapClient = {
     TestProperty2: string,
-} & typeof(setmetatable({}, BatteryClient)) & typeof(ItemBase.new())
-export type NexusInstanceBatteryClient = NexusInstance.NexusInstance<BatteryClient>
+} & typeof(setmetatable({}, SoapClient)) & typeof(ItemBase.new())
+export type NexusInstanceSoapClient = NexusInstance.NexusInstance<SoapClient>
 
-function BatteryClient.__new(self: NexusInstanceBatteryClient, itemName: string, tool: Tool, cashedVisual : Model?)
-    print("BatteryClient")
+function SoapClient.__new(self: NexusInstanceSoapClient, itemName: string, tool: Tool, cashedVisual : Model?)
+    print("SoapClient")
     ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 
     local character = Players.LocalPlayer.Character
@@ -46,10 +45,16 @@ function BatteryClient.__new(self: NexusInstanceBatteryClient, itemName: string,
         end
     end
 
+    UserInputService.InputEnded:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.E then
+            self.Server:EatItem()
+        end
+    end)
+
    -- self.Server:DropItem()
 
 end
 
 
 
-return NexusInstance.ToInstance(BatteryClient) :: NexusInstance.NexusInstanceClass<typeof(BatteryClient), (Input1: string, Input2: string) -> (NexusInstanceBatteryClient)>
+return NexusInstance.ToInstance(SoapClient) :: NexusInstance.NexusInstanceClass<typeof(SoapClient), (Input1: string, Input2: string) -> (NexusInstanceSoapClient)>

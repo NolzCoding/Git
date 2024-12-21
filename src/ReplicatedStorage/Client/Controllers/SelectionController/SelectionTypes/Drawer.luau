@@ -8,9 +8,6 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local Drawer = {}
 
-
-
-
 Drawer.Visual = script.Parent.Parent.HighlightVisual
 
 function Drawer:Init(SelectionController)
@@ -33,7 +30,5 @@ function Drawer:Click(Selection : BasePart)
     end)
 
 end
-
-
 
 return Drawer

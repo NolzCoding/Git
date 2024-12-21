@@ -3,8 +3,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local SpawnItems = require(script.SpawnItems)
+local ServerStorage = game:GetService("ServerStorage")
 local Trove = require(ReplicatedStorage.Packages.Trove)
-
+local CharacterBaseServer = require(ServerStorage.Source.Services.CharacterService.CharacterService.CharacterBaseServer)
 local ItemService = Knit.CreateService{Name = "ItemService" , Client = {
     ItemAdded = Knit.CreateSignal(),
 }}
@@ -14,6 +15,8 @@ function ItemService:KnitInit()
 end
 
 function ItemService:KnitStart()
+
+    self.CharacterService = Knit.GetService("CharacterService")
 
     task.delay(10, function()
         SpawnItems:Spawn()
@@ -52,6 +55,15 @@ function ItemService.Client:DropItem(player : Player, tool : Tool, itemName : st
 end
 
 function ItemService:GiveItem(player : Player, itemName : string, equipOnSpawn : boolean)
+
+    local character = self.CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
+
+    if character then
+        if character:GetItemCount() >= character.ItemSlots then
+            warn("Player has too many items")
+            return
+        end
+    end
 
     local class = script.Items[itemName]
 

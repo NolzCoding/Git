@@ -16,7 +16,13 @@ local itemSpawns = {
         Fork = {
             Max = 1,
             Min = 1,
-            Chance = 0.1,
+            Chance = 0.3,
+        },
+
+        Soap = {
+            Max = 1,
+            Min = 1,
+            Chance = 1,
         },
 
         Taser = {

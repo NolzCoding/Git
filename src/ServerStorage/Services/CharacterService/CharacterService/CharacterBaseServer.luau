@@ -1,8 +1,8 @@
 --!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
 
 
 local CharacterBaseServer = {}
@@ -75,7 +75,6 @@ function CharacterBaseServer.__new(self: NexusInstanceCharacterBaseServer, playe
     }
 
     self.DataService = Knit.GetService("DataService")
-
     self.ClientSignal = setmetatable({}, clientSignalMetaTable)
     self.AnimationTracks = {}
     self.ItemSlots = self.ItemSlots or 2
@@ -214,6 +213,21 @@ function CharacterBaseServer.AddTrackFromId(self: NexusInstanceCharacterBaseServ
 end
 
 function CharacterBaseServer.Destroy(self: NexusInstanceCharacterBaseServer): ()
+
+end
+
+function CharacterBaseServer.GetItemCount(self: NexusInstanceCharacterBaseServer): (number)
+
+    local backpack = self.Player:FindFirstChild("Backpack") :: Backpack
+    local toolInCharacter = (self :: any).Player.Character:FindFirstChildOfClass("Tool")
+
+    local count = #backpack:GetChildren()
+
+    if toolInCharacter then
+        count += 1
+    end
+
+    return count
 
 end
 

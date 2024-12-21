@@ -45,6 +45,15 @@ function ItemBase.__new(self: NexusInstanceItemBase, itemName: string, tool: Too
         end
     end
 
+
+end
+
+function ItemBase.DisableCollisons(self: NexusInstanceItemBase): () -- This is a method. duh but what does it do? it disables collisions for the tool.
+    for _, part in ipairs(self.Tool:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+    end
 end
 
 function ItemBase.Equipped(self: NexusInstanceItemBase): ()

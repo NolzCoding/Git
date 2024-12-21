@@ -15,6 +15,8 @@ export type NexusInstanceBatteryServer = NexusInstance.NexusInstance<BatteryServ
 function BatteryServer.__new(self: NexusInstanceBatteryServer, itemName: string, tool: Tool, madeFor : Player)
 
     ItemBase.__new(self, itemName, tool) --Remember to call the parent constructor!
+    self:DisableCollisons()
+
 end
 
 function BatteryServer.Client.EatItem(self : NexusInstanceBatteryServer, player : Player)

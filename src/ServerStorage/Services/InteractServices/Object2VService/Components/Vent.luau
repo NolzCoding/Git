@@ -1,11 +1,11 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local AssetService = game:GetService('AssetService')
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local Component = require(ReplicatedStorage.Packages.Component)
 type self = typeof(Component.new({Tag = "Vent"}))
 local Vent = Component.new({Tag = "Vent"})
-
 print("reqiored")
 
 function Vent:Construct()

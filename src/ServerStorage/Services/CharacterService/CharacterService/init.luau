@@ -2,9 +2,9 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
+local BabyServer = require(script.Characters.BabyServer)
 local CharacterBaseServer = require(script.CharacterBaseServer)
 local ParentServer = require(script.Characters.ParentServer)
-local BabyServer = require(script.Characters.BabyServer)
 
 local CharacterService = Knit.CreateService{
     Name = "CharacterService",
@@ -18,14 +18,14 @@ function CharacterService:KnitInit()
     local count = 0
     Players.PlayerAdded:Connect(function(player)
 
-        --self:NewCharacter(player, "Baby")
+        self:NewCharacter(player, "Baby")
 
-        --if true then return end
+        if true then return end
 
         player.CharacterAdded:Connect(function(character)
 
             if count == 0 then
-                        self:NewCharacter(player, "Parent")
+                self:NewCharacter(player, "Parent")
 
                 --local char = BabyServer.new(player, character)
                 --self.PlayerCharacters[player] = char

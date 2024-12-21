@@ -79,8 +79,6 @@ end
 
 function SelectionVisual:UnHovered(Selection)
 
-
-
     InteractClone.CFrame = CFrame.new() --Selection.CFrame - Vector3.new(0,1,0) * Selection.Size.Y/2
 
     TweenService:Create(InteractImageLabel, HoverTween, {Size = NormalSize}):Play()

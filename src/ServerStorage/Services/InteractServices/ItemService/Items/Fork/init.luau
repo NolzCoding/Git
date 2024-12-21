@@ -15,6 +15,8 @@ export type NexusInstanceForkServer = NexusInstance.NexusInstance<ForkServer>
 function ForkServer.__new(self: NexusInstanceForkServer, itemName: string, tool: Tool, madeFor : Player)
 
     ItemBase.__new(self, itemName, tool) --Remember to call the parent constructor!
+    self:DisableCollisons()
+
 end
 
 function ForkServer.Client.EatItem(self : NexusInstanceForkServer, player : Player)

@@ -15,8 +15,6 @@ DoorCloseSound.PlayOnRemove = true
 
 function Door:Init()
 
-
-
 end
 
 function Door:Triggered(prompt : ProximityPrompt, player : Player)

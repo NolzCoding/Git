@@ -51,7 +51,7 @@ local function ToolBar(
 						VerticalAlignment = Enum.VerticalAlignment.Center,
 					}),
 
-					scope:Computed(function(use)
+					scope:Computed(function(use, scope)
 						local slots = {}
 
 						for i = 1, props.Slots do
@@ -165,20 +165,24 @@ local function ToolBar(
 							})
 
                             slots[i] = hotbar
+							if value.Tool == nil then continue end
+							local clone = value.Tool:Clone()
+
+							local module3d = Module3D:Attach3D(hotbar, clone)
+
+							module3d.Visible = true
+
+							table.insert(scope, clone)
+
+							table.insert(scope, game:GetService("RunService").RenderStepped:Connect(function()
+								module3d:SetCFrame(CFrame.Angles(0,tick() % (math.pi * 2),0) * CFrame.Angles(math.rad(-10),0,0))
+							end))
 
 						end
 
-						--[[value:WaitForChild("Handle")
 
-                        local module3d = Module3D:Attach3D(hotbar, value)
 
-                        module3d.Visible = true
 
-                        table.insert(scope, module3d)
-
-                        table.insert(scope, game:GetService("RunService").RenderStepped:Connect(function()
-                            module3d:SetCFrame(CFrame.Angles(0,tick() % (math.pi * 2),0) * CFrame.Angles(math.rad(-10),0,0))
-                        end))]]
 
 						return slots
 					end),
