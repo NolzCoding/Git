@@ -34,8 +34,8 @@ function SoapClient.__new(self: NexusInstanceSoapClient, itemName: string, tool:
                 Size = UDim2.new(0.1, 0, 0.1, 0),
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundColor3 = Color3.fromRGB(255, 14, 14),
-                ButtonText = "Eat E",
-                KeyCode = Enum.KeyCode.E,
+                ButtonText = "Eat F",
+                KeyCode = Enum.KeyCode.F,
                 Image = Icons.Drop,
                 ImageSize = UDim2.new(0.5, 0, 0.5, 0),
                 ButtonUp = function()
@@ -46,7 +46,7 @@ function SoapClient.__new(self: NexusInstanceSoapClient, itemName: string, tool:
     end
 
     UserInputService.InputEnded:Connect(function(input)
-        if input.KeyCode == Enum.KeyCode.E then
+        if input.KeyCode == Enum.KeyCode.F then
             self.Server:EatItem()
         end
     end)

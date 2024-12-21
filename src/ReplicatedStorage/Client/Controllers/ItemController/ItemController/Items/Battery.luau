@@ -4,7 +4,7 @@ local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInst
 
 local ItemBase = require(script.Parent.Parent.ItemBaseClient)
 local BatteryClient = {}
-
+local UserInputService = game:GetService("UserInputService")
 local Fusion = require(ReplicatedStorage.Packages.fusion)
 local Children = Fusion.Children
 
@@ -35,8 +35,8 @@ function BatteryClient.__new(self: NexusInstanceBatteryClient, itemName: string,
                 Size = UDim2.new(0.1, 0, 0.1, 0),
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundColor3 = Color3.fromRGB(255, 14, 14),
-                ButtonText = "Eat E",
-                KeyCode = Enum.KeyCode.E,
+                ButtonText = "Eat F",
+                KeyCode = Enum.KeyCode.F,
                 Image = Icons.Drop,
                 ImageSize = UDim2.new(0.5, 0, 0.5, 0),
                 ButtonUp = function()
@@ -45,6 +45,12 @@ function BatteryClient.__new(self: NexusInstanceBatteryClient, itemName: string,
             })
         end
     end
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.F then
+            self.Server:EatItem()
+        end
+    end)
 
    -- self.Server:DropItem()
 
