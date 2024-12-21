@@ -1,0 +1,15 @@
+[package]
+name = "noell/projectfish"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
+Knit = "sleitnick/knit@^1.5"
+Timer = "sleitnick/timer@^1.1.0"
+Shake = "sleitnick/shake@1.1.0"
+Signal = "sleitnick/signal@2.0.1"
+BoatTween = "boatbomber/boattween@^1.0.1"
+Trove = "sleitnick/trove@1.1.0"
+fusion = "elttob/fusion@0.3.0"
+Component = "sleitnick/component@2.4.8"
