@@ -30,7 +30,7 @@ export type CharacterClient = {
 } & typeof(setmetatable({}, CharacterClient))
 export type NexusInstanceCharacterClient = NexusInstance.NexusInstance<CharacterClient>
 
-function CharacterClient.__new(self: NexusInstanceCharacterClient, character : Model?): ()
+function CharacterClient.__new(self: NexusInstanceCharacterClient, character : Model, itemSlots : number): ()
 
     character.Destroying:Connect(function()
         print("Calling destroy")
@@ -53,7 +53,7 @@ function CharacterClient.__new(self: NexusInstanceCharacterClient, character : M
         self.ServerSignal[method](self, ...)
     end)
 
-    self.ItemSlots = self.ItemSlots or 2
+    self.ItemSlots = itemSlots or 2
 
     self:CreateUI()
 
@@ -191,12 +191,20 @@ function CharacterClient.CreateUI(self : NexusInstanceCharacterClient): ()
 
     self.scope = Fusion.scoped(Fusion)
 
-    self.Tools = self.scope:Value({{
-        Tool = nil,
-    }, {
+    self.Tools = self.scope:Value({})
 
-        Tool = nil,
-    }})
+    for _ = 1, self.ItemSlots do
+
+        local tools = peek(self.Tools)
+
+        table.insert(tools, {
+            Tool = nil,
+        })
+
+        self.Tools:set(tools)
+
+    end
+
     if not self.BuildUI then
         print("is nil")
         self.BuildUI = function() end
@@ -225,4 +233,4 @@ function CharacterClient.Destroy(self: NexusInstanceCharacterClient): ()
     self.scope:doCleanup()
 end
 
-return NexusInstance.ToInstance(CharacterClient) :: NexusInstance.NexusInstanceClass<typeof(CharacterClient), (Argument: string) -> (NexusInstanceCharacterClient)>
+return NexusInstance.ToInstance(CharacterClient) :: NexusInstance.NexusInstanceClass<typeof(CharacterClient), (character : Model, itemSlots : number) -> (NexusInstanceCharacterClient)>

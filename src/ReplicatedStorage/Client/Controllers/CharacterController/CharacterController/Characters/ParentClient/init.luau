@@ -48,7 +48,7 @@ function ParentClient.__new(self: NexusInstanceParentClient, character : Model?)
         })
     end
 
-    CharacterClientBase.__new(self, character) --Remember to call the parent constructor!
+    CharacterClientBase.__new(self, character :: Model,5) --Remember to call the parent constructor!
 
 end
 

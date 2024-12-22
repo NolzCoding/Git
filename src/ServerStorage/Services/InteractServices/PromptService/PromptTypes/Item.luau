@@ -13,7 +13,11 @@ function Item:Triggered(prompt : ProximityPrompt, player : Player)
 
     local parent = prompt.Parent.Parent
 
-    Knit.GetService("ItemService"):GiveItem(player, prompt.Parent:GetAttribute("ItemName"), true)
+    local class = Knit.GetService("ItemService"):GiveItem(player, prompt.Parent:GetAttribute("ItemName"), true)
+
+    if not class then
+        return -- probably means they dont have enough space to hold the item
+    end
 
     -- for ik
     local newPart = Instance.new("Part")

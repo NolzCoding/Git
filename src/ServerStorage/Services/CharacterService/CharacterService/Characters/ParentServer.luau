@@ -132,6 +132,7 @@ end
 
 function ParentServer.__new(self: NexusInstanceParentServer, player : Player, character : Model): ()
     assert(character, "Character is nil")
+    self.ItemSlots = 5
     CharacterServerBase.__new(self, player, character) --Remember to call the parent constructor!
 
     self:SetupCharacter(character)

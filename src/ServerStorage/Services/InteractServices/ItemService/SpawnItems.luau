@@ -59,7 +59,9 @@ function SpawnItems:HandleObject(object, type)
             if not visual then continue end
 
             local clone = visual:Clone()
-            clone:PivotTo(object:GetPivot())
+            local size = object.Size
+
+            clone:PivotTo(object:GetPivot() + Vector3.new(math.random(-size.X/2, size.X/2), 0, math.random(-size.Z/2, size.Z/2))) -- Randomize the position
             clone.Parent = workspace
             local newWeldConstraint = Instance.new("WeldConstraint")
             newWeldConstraint.Parent = clone

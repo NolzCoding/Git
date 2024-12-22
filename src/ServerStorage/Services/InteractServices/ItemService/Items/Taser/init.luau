@@ -24,6 +24,12 @@ end
 
 function TaserServer.Client.Shoot(self : NexusInstanceTaserServer, player : Player, target : BasePart, hit : Vector3)
 
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://7554632797"
+    sound.Parent = self.Tool
+    sound.PlayOnRemove = true
+    sound:Destroy()
+
     if not target then
         local props = {
             Parent = workspace,
@@ -36,6 +42,7 @@ function TaserServer.Client.Shoot(self : NexusInstanceTaserServer, player : Play
 
         return
     end
+
 
     local RaycastParams = RaycastParams.new()
     RaycastParams.FilterDescendantsInstances = {player.Character, self.Tool}
