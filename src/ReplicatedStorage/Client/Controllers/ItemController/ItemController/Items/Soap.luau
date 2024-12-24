@@ -34,7 +34,7 @@ function SoapClient.__new(self: NexusInstanceSoapClient, itemName: string, tool:
                 Size = UDim2.new(0.1, 0, 0.1, 0),
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundColor3 = Color3.fromRGB(255, 14, 14),
-                ButtonText = "Eat F",
+                ButtonText = "Bathe in Soap F",
                 KeyCode = Enum.KeyCode.F,
                 Image = Icons.Drop,
                 ImageSize = UDim2.new(0.5, 0, 0.5, 0),

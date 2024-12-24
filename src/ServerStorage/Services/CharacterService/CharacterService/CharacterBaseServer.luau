@@ -98,6 +98,7 @@ function CharacterBaseServer.__new(self: NexusInstanceCharacterBaseServer, playe
     self.ParticleService = Knit.GetService("ParticleService")
 
     self.EffectHandlers["Burn"] = function(duration : number, multiplier : number)
+        multiplier = multiplier or 1
         local humanoid = character:WaitForChild("Humanoid") :: Humanoid
         local damagepersecond = 10
         local damage = damagepersecond * multiplier
@@ -241,8 +242,14 @@ function CharacterBaseServer.ApplyEffect(self: NexusInstanceCharacterBaseServer,
         return
     end
 
-    effectHandler(duration, multiplier :: number)
+    task.spawn(function()
+        effectHandler(duration, multiplier :: number)
+    end)
+
     self.ActiveEffects[effect] = multiplier :: number
+    task.delay(duration, function()
+        self.ActiveEffects[effect] = nil
+    end)
 
     --self.RemoteEvent:FireClient(self.Player, "ApplyEffect", effect, duration)
 end

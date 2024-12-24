@@ -31,7 +31,18 @@ local itemSpawns = {
             Chance = 0.3,
         },
 
-    }
+    },
+
+    Locker = {
+        Battery = {
+            Max = 1,
+            Min = 1,
+            Chance = 1,
+        },
+
+
+    },
+
 
 }
 
@@ -59,13 +70,21 @@ function SpawnItems:HandleObject(object, type)
             if not visual then continue end
 
             local clone = visual:Clone()
+            local pivot = object:GetPivot()
             local size = object.Size
 
-            clone:PivotTo(object:GetPivot() + Vector3.new(math.random(-size.X/2, size.X/2), 0, math.random(-size.Z/2, size.Z/2))) -- Randomize the position
+            local insides = object:FindFirstChild("Insides")
+
+            if insides then
+                pivot = insides:GetPivot()
+                size = insides.Size
+            end
+            math.randomseed(tick())
+            clone:PivotTo(pivot + Vector3.new(math.random(-size.X/2, size.X/2), 0, math.random(-size.Z/2, size.Z/2))) -- Randomize the position
             clone.Parent = workspace
             local newWeldConstraint = Instance.new("WeldConstraint")
             newWeldConstraint.Parent = clone
-            newWeldConstraint.Part0 = object
+            newWeldConstraint.Part0 = insides or object
             newWeldConstraint.Part1 = clone.PrimaryPart
 
             local proximityPrompt = clone.PrimaryPart:WaitForChild("ProximityPrompt") :: ProximityPrompt

@@ -19,6 +19,12 @@ function Baby:Triggered(prompt : ProximityPrompt, player : Player)
     if not babyCharacterClass or not parentCharacterClass then
         return
     end
+
+    if babyCharacterClass.ActiveEffects["Slippery"] then
+        print("Baby is slippery")
+        return
+    end
+
     parentCharacterClass:PickupPlayer(babyCharacterClass)
 
 end

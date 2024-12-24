@@ -213,6 +213,34 @@ function UIController:UnBindUi(name : string)
 
 end
 
+function UIController:OpenWindow(name : string)
+
+    local window = self.WindowInstances[name]
+
+    if window then
+        window.Open:set(true)
+    end
+
+end
+
+function UIController:CloseWindow(name : string)
+
+    local window = self.WindowInstances[name]
+
+    if window then
+        window.Open:set(false)
+    end
+
+end
+
+function UIController:CloseAllWindows()
+
+    for _, window in pairs(self.WindowInstances) do
+        window.Open:set(false)
+    end
+
+end
+
 
 
 return UIController

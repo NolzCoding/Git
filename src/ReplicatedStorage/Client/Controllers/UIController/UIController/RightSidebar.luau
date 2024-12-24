@@ -41,6 +41,14 @@ local function RightSideBar(scope : typeof(Fusion.scoped(Fusion)), props : {
             }),
 
             ImageButton(scope, {
+                Image = Icons.EmptyHeart,
+                Size = UDim2.fromScale(0.3, 0.3),
+                ButtonUp = function()
+                    props.OpenWindow("RollItem")
+                end
+            }),
+
+            ImageButton(scope, {
                 Image = Icons.ShoppingBasket,
                 Size = UDim2.fromScale(0.3, 0.3),
                 ButtonUp = function()

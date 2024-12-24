@@ -18,7 +18,7 @@ function CharacterService:KnitInit()
     local count = 0
     Players.PlayerAdded:Connect(function(player)
 
-        self:NewCharacter(player, "Parent")
+        self:NewCharacter(player, "Baby")
 
         if true then return end
 

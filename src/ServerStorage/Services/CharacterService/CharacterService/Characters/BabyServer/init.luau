@@ -5,7 +5,7 @@ local Overhead = require(script.Overhead)
 local Fusion = require(ReplicatedStorage.Packages.fusion)
 local CharacterServerBase = require(script.Parent.Parent.CharacterBaseServer)
 --Define TestClass1 (potentially in a ModuleScript).
-
+local sounds = require(ReplicatedStorage.Source.Shared.Sounds)
 local ragDollModule = require(game.ServerStorage.Source.Utils.Ragdoll)
 
 --Define TestClass2 (potentially in a different ModuleScript).
@@ -21,6 +21,21 @@ export type BabyServer = {
     --SetupCharacter: (character : Model) -> (),
 } & typeof(setmetatable({}, BabyServer)) & CharacterServerBase.CharacterBaseServer
 export type NexusInstanceBabyServer = NexusInstance.NexusInstance<BabyServer>
+
+
+function BabyServer.BabyDamaged(self: NexusInstanceBabyServer) : ()
+
+    local randomBabySound = sounds.Baby.CryNoises[math.random(1, #sounds.Baby.CryNoises)]
+
+    local sound = Instance.new("Sound")
+    sound.SoundId = randomBabySound
+    sound.Parent = self.Player.Character:WaitForChild("Head") :: BasePart
+    sound:Play()
+    sound.Ended:Connect(function()
+        sound:Destroy()
+    end)
+
+end
 
 function BabyServer.SetupCharacter(self: NexusInstanceBabyServer, character : Model): ()
     -- do setup for the character
@@ -93,6 +108,9 @@ function BabyServer.SetupCharacter(self: NexusInstanceBabyServer, character : Mo
         humanoid:SetAttribute(name, v)
 
         humanoid:GetAttributeChangedSignal(name):Connect(function() -- check if playerISDead
+            print("Attribute Changed" .. name)
+            self:BabyDamaged()
+
             local totalheatlh = 0
             for name, v in pairs(healthAttributes) do
                 totalheatlh += humanoid:GetAttribute(name) :: number
@@ -124,7 +142,6 @@ function BabyServer.SetupCharacter(self: NexusInstanceBabyServer, character : Mo
         -- check velocity
         local root = character:WaitForChild("HumanoidRootPart") :: Part
         local velocity = root.AssemblyLinearVelocity
-        print(velocity.Magnitude)
         if velocity.Magnitude > 70 then
             ragDollModule:RagDollCharacter(character, self.Player)
             task.delay(5, function()
@@ -133,6 +150,37 @@ function BabyServer.SetupCharacter(self: NexusInstanceBabyServer, character : Mo
         end
     end)
 
+end
+
+function BabyServer.SetupEffects(self: NexusInstanceBabyServer): ()
+    self.EffectHandlers["Slippery"] = function(duration : number, multiplier : number)
+        multiplier = multiplier or 1
+        local character = self.Player.Character :: Model
+        local startTime = tick()
+        local endTime = startTime + duration
+
+        type props = {
+            Parent : Instance?,
+            Position : Vector3?,
+            Particle : Instance,
+            Duration : number?,
+            EmitAmount : number?,
+        }
+
+        self.ParticleService:PlayParticle( {
+            Parent = (character :: any).HumanoidRootPart,
+            Position = nil, -- empty position = center of the parent
+            Duration = duration,
+            EmitAmount = 0,
+            Particle = ReplicatedStorage.Source.Data.Particles.Bubbles,
+        } :: props)
+
+
+        while tick() < endTime do
+            task.wait(1)
+        end
+
+    end
 end
 
 function BabyServer.PickedUp(self : NexusInstanceBabyServer, byPlayerClass : CharacterServerBase.CharacterBaseServer): ()
@@ -163,6 +211,7 @@ end
 function BabyServer.__new(self: NexusInstanceBabyServer, player : Player, character : Model): ()
     CharacterServerBase.__new(self, player, character) --Remember to call the parent constructor!
     self:SetupCharacter(character)
+    self:SetupEffects()
     print("BabyServer")
 
 end

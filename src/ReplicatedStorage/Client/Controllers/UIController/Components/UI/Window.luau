@@ -4,6 +4,8 @@ local Fusion = require(ReplicatedStorage.Packages.fusion)
 local Children = Fusion.Children
 local ImageButton = require(script.Parent.Parent.Buttons.ImageButton)
 local Window = {}
+local SoundService = game:GetService("SoundService")
+local Sounds = require(ReplicatedStorage.Source.Shared.Sounds)
 
 local function Window(scope: typeof(Fusion.scoped(Fusion)), props: {
 
@@ -16,6 +18,27 @@ local function Window(scope: typeof(Fusion.scoped(Fusion)), props: {
     Size : UDim2?,
 
 })
+
+
+	local openSound = Instance.new("Sound")
+	openSound.SoundId = Sounds.OpenWindow
+	openSound.Parent = SoundService
+
+	local closeSound = Instance.new("Sound")
+	closeSound.SoundId = Sounds.CloseWindow
+	closeSound.Parent = SoundService
+
+	scope:Observer(props.Open):onChange(function()
+
+		local open = Fusion.peek(props.Open)
+		print("Hello?")
+		if open then
+			SoundService:PlayLocalSound(openSound)
+		else
+			SoundService:PlayLocalSound(closeSound)
+		end
+
+	end)
 
     local desiredSize = scope:Computed(function(use)
         local openSize = props.Size or UDim2.fromScale(0.321, 0.431)

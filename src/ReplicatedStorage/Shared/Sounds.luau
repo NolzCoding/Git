@@ -10,6 +10,9 @@ return {
             "rbxassetid://138983735998908",
             "rbxassetid://121708803426801",
         }
-    }
+    },
+    UnlockItem = "rbxassetid://873617644",
+    CloseWindow = "rbxassetid://10128766965",
+    OpenWindow = "rbxassetid://15675037413",
 
 }

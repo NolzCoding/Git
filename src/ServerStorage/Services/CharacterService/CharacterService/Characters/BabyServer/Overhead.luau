@@ -25,7 +25,8 @@ local function OverHead(scope, props: {
 
     local humanoid = (props :: any).Player.Character:WaitForChild("Humanoid") :: Humanoid
 
-    for i, attributeName in ipairs(healths) do
+    for i, table in ipairs(healths) do
+		local attributeName = table.AttributeName
         humanoid:GetAttributeChangedSignal("attributeName"):Connect(function()
             healths[i].Value:set(humanoid:GetAttribute(attributeName))
         end)
