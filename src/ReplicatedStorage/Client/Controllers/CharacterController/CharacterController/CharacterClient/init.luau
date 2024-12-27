@@ -114,15 +114,20 @@ end
 
 function CharacterClient.HandleToolKeycodes(self : NexusInstanceCharacterClient)
 
-    UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    table.insert(self.Connections, UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+
+        print(input)
 
         for i = 1, self.ItemSlots do
             if Enum.KeyCode[_numberToWord(i)] == input.KeyCode then
+                print(i)
                 self:EquipToolFromSlot(i)
             end
         end
 
-    end)
+    end))
+
+
 
 end
 
@@ -220,6 +225,7 @@ function CharacterClient.CreateUI(self : NexusInstanceCharacterClient): ()
                 Tools = self.Tools,
                 EquippedTool = self.EquippedTool,
                 ClickedTool = function(index)
+                        print(index)
                         self:EquipToolFromSlot(index)
                 end,
             }),

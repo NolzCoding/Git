@@ -31,7 +31,7 @@ end
 
 function GameService:KnitStart()
 
-    if true then return end
+    --if true then return end
 
 
     self.CharacterService = Knit.GetService("CharacterService")

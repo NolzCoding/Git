@@ -53,7 +53,6 @@ local function TopTimer(
 
         futureTimeText:set(string.format("%02d:%02d", minutes, seconds))
 
-        print("a")
         scale:set(1.1)
         wait(0.1)
         scale:set(1)
