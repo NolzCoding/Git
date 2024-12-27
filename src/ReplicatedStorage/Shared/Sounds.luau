@@ -19,6 +19,7 @@ return {
         Light = "rbxassetid://18507693047",
         Click = "rbxassetid://9121005783",
 
-    }
+    },
+    Pickup = "rbxassetid://622660787"
 
 }

@@ -5,6 +5,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local Players = game:GetService("Players")
 local Knit = require(ReplicateStorage.Packages.Knit)
 local Trove = require(ReplicateStorage.Packages.Trove)
+local Promise = require(Knit.Util.Promise)
 local CharacterBaseServer = require(game.ServerStorage.Source.Services.CharacterService.CharacterService.CharacterBaseServer)
 local SpawnItems = require(ServerStorage.Source.Services.InteractServices.ItemService.SpawnItems)
 local GamemodeBase = {}
@@ -16,6 +17,7 @@ export type GamemodeBase = {
     Players: {Player},
     Map : Model,
     UpdateState: (stateName : string, stateText : string, time : number) -> (),
+    StartBabyBucks: () -> (),
     OnGameEnded: NexusInstance.TypedEvent<
         Team,
         {
@@ -31,6 +33,8 @@ export type GamemodeBase = {
     OnParentDied: NexusInstance.TypedEvent<Player>,
     BabyTeam: Team,
     ParentTeam: Team,
+    BabyBucksFolder: Folder,
+    BabyBuckPromise: Promise,
     ParentSpawn : SpawnLocation,
     BabySpawn : SpawnLocation,
     Parents: {
@@ -62,6 +66,7 @@ function GamemodeBase.__new(self: NexusInstanceGamemodeBase, players : {Player},
     self.Players = players
     self.Map = Map
     self.CharacterService = Knit.GetService("CharacterService")
+    self.AwardService = Knit.GetService("AwardService")
 
     local randomPlayerAsParent = players[math.random(1, #players)]
 
@@ -81,6 +86,8 @@ function GamemodeBase.__new(self: NexusInstanceGamemodeBase, players : {Player},
     self.BabyTeam.Name = "Babies"
     self.BabyTeam.Parent = Teams
     self.BabyTeam.AutoAssignable = false
+
+    self.BabyBucksFolder = self.Map:FindFirstChild("BabyBucks") :: Folder
 
     self.ParentSpawn = self.Map.Spawns.Parents :: SpawnLocation --! be careful with naming becasue parent is a reserved property of instances in roblox
     self.BabySpawn = self.Map.Spawns.Babies :: SpawnLocation
@@ -144,6 +151,8 @@ function GamemodeBase.__new(self: NexusInstanceGamemodeBase, players : {Player},
 
     UpdateState("GameStart", "Game Started", self.TIME + workspace:GetServerTimeNow(), self.Parents, self.Babies)
 
+    self:StartBabyBucks()
+
 end
 
 function GamemodeBase.BabyDied(self : NexusInstanceGamemodeBase, player : Player)
@@ -159,6 +168,65 @@ function GamemodeBase.BabyDied(self : NexusInstanceGamemodeBase, player : Player
     if #self.Babies.Alive == 0 then
         self:EndGame(self.BabyTeam)
     end
+
+end
+
+function GamemodeBase.StartBabyBucks(self : NexusInstanceGamemodeBase)
+
+    local babybuck = script.Parent.BabyBuck
+
+    local function _spawnBabyBucks()
+        for _,v in ipairs(self.BabyBucksFolder:GetChildren()) do
+
+            local maxBabyBucks = v:GetAttribute("Max") or 1 :: number
+            if #self.BabyBucksFolder:GetChildren() >= maxBabyBucks then
+                continue
+            end
+
+            local newBabyBuck = babybuck:Clone()
+            newBabyBuck.Parent = v
+
+            local randomPosBySize = Vector3.new(math.random(-v.Size.X/2, v.Size.X/2), math.random(-v.Size.Y/2, v.Size.Y/2), math.random(-v.Size.Z/2, v.Size.Z/2))
+            newBabyBuck.Position = v.Position + randomPosBySize
+
+            local debounce = false
+
+            newBabyBuck.Touched:Connect(function(part: BasePart)
+                if part.Name ~= "HumanoidRootPart" then return end
+                if debounce then return end
+
+                local player = Players:GetPlayerFromCharacter(part.Parent)
+                if not player then return end
+
+                debounce = true
+
+                local playerTeam = player.Team
+                if playerTeam == self.ParentTeam then
+                    --return
+                end
+
+                newBabyBuck:Destroy()
+
+                self.AwardService:GiveAward(player, "Cash", 100)
+
+            end)
+
+        end
+    end
+
+    self.BabyBuckPromise = Promise.new(function(resolve, reject)
+
+        local TIME = 20
+
+        while true do
+            print("Spawning")
+            _spawnBabyBucks()
+
+            task.wait(TIME)
+
+        end
+
+    end)
 
 end
 
@@ -188,6 +256,9 @@ end
 --The version returned by NexusInstance.ToInstance will always have a Destroy method.
 function GamemodeBase.Destroy(self: NexusInstanceGamemodeBase): ()
     self.Trove:Clean()
+
+    self.BabyBuckPromise:Cancel()
+
     --Clear resources.
 end
 

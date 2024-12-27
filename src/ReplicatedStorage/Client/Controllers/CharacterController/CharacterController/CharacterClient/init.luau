@@ -116,8 +116,6 @@ function CharacterClient.HandleToolKeycodes(self : NexusInstanceCharacterClient)
 
     table.insert(self.Connections, UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 
-        print(input)
-
         for i = 1, self.ItemSlots do
             if Enum.KeyCode[_numberToWord(i)] == input.KeyCode then
                 print(i)
