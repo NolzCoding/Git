@@ -224,10 +224,10 @@ local function unRagdollMe(character : Model)
 	end
 
 	table.remove(module.ActiveRagdolls, table.find(module.ActiveRagdolls, character))
-	local humanoid = character:FindFirstChildOfClass("Humanoid")
-	humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
-	local root = character:FindFirstChild("HumanoidRootPart")
-	root.CFrame = root.CFrame + Vector3.new(0, 1, 0)
+	--local humanoid = character:FindFirstChildOfClass("Humanoid")
+	--humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
+	--local root = character:FindFirstChild("HumanoidRootPart")
+	--root.CFrame = root.CFrame + Vector3.new(0, 1, 0)
 
 end
 

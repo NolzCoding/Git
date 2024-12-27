@@ -15,6 +15,10 @@ setmetatable(BabyServer, CharacterServerBase) --TestClass1NexusInstance would be
 
 export type BabyServer = {
     scope : any,
+    Abilities : {
+        [string] : () -> (),
+    },
+    SetupAbilities : () -> (),
     PickedUp: (byPlayerClass : CharacterServerBase.CharacterBaseServer) -> (),
     Released: (byPlayerClass : CharacterServerBase.CharacterBaseServer) -> (),
     BabyDied: () -> (),
@@ -181,6 +185,91 @@ function BabyServer.SetupEffects(self: NexusInstanceBabyServer): ()
         end
 
     end
+
+    self.EffectHandlers["Gasoline"] = function(duration : number, multiplier : number)
+        multiplier = multiplier or 1
+        local character = self.Player.Character :: Model
+        local startTime = tick()
+        local endTime = startTime + duration
+
+        type props = {
+            Parent : Instance?,
+            Position : Vector3?,
+            Particle : Instance,
+            Duration : number?,
+            EmitAmount : number?,
+        }
+
+        self.ParticleService:PlayParticle( {
+            Parent = (character :: any).HumanoidRootPart,
+            Position = nil, -- empty position = center of the parent
+            Duration = duration,
+            EmitAmount = 0,
+            Particle = ReplicatedStorage.Source.Data.Particles.Smoke,
+        } :: props)
+
+
+        while tick() < endTime do
+            task.wait(1)
+        end
+
+    end
+
+end
+
+function BabyServer.SetupAbilities(self : NexusInstanceBabyServer): ()
+
+    self.Abilities["Invisibility"] = function()
+
+        local character = self.Player.Character :: Model
+
+        for _, part in ipairs(character:GetChildren()) do
+            if part:IsA("BasePart") or part:IsA("Decal") then
+
+                if not part:GetAttribute("Transparency") then
+                    part:SetAttribute("Transparency", part.Transparency)
+                end
+                (part :: Part).Transparency = 1
+            end
+        end
+
+        task.delay(15, function()
+            for _, part in ipairs(character:GetChildren()) do
+                if part:IsA("BasePart") or part:IsA("Decal") then
+                    (part :: Part).Transparency = (part :: Part):GetAttribute("Transparency") :: number
+                end
+            end
+        end)
+
+    end
+
+    self.Abilities["Jump"] = function()
+        --[[local character = game.Players.LocalPlayer.Character
+        local humanoid = character:FindFirstChild("Humanoid") :: Humanoid
+
+        local root = character:FindFirstChild("HumanoidRootPart") :: Part
+
+        humanoid:ChangeState(Enum.HumanoidStateType.Flying)
+
+        local newVelocity = root.CFrame.LookVector * 50 + Vector3.new(0, 50, 0)
+
+        root.AssemblyLinearVelocity += newVelocity]]
+
+    end
+
+    self.Abilities["Speed"] = function()
+
+        local character = game.Players.LocalPlayer.Character
+        local humanoid = character:FindFirstChild("Humanoid") :: Humanoid
+
+        humanoid.WalkSpeed = 50
+
+        task.delay(5, function()
+            humanoid.WalkSpeed = 20
+        end)
+
+    end
+
 end
 
 function BabyServer.PickedUp(self : NexusInstanceBabyServer, byPlayerClass : CharacterServerBase.CharacterBaseServer): ()
@@ -210,8 +299,10 @@ end
 
 function BabyServer.__new(self: NexusInstanceBabyServer, player : Player, character : Model): ()
     CharacterServerBase.__new(self, player, character) --Remember to call the parent constructor!
+    self.Abilities = {}
     self:SetupCharacter(character)
     self:SetupEffects()
+    self:SetupAbilities()
     print("BabyServer")
 
 end
@@ -219,6 +310,30 @@ end
 function BabyServer.Destroy(self: NexusInstanceBabyServer): ()
     self.scope:doCleanup()
     CharacterServerBase.Destroy(self)
+
+end
+
+
+function BabyServer.Client.UseAbility(self: NexusInstanceBabyServer,player, abilityName): ()
+    print("Ability Used server", abilityName)
+
+    local ability = self.Abilities[abilityName]
+    if not ability then
+        warn("Ability not found ", abilityName)
+        return
+    end
+
+    local data = self.DataService:GetData(self.Player)
+    local amount = data.Abilities.OwnedAbilities[abilityName] or 0
+    if amount <= 0 then
+        return
+    end
+
+    data.Abilities.OwnedAbilities[abilityName] = amount - 1
+
+    self.DataService:SetData(self.Player, "Abilities", data.Abilities)
+
+    ability()
 
 end
 

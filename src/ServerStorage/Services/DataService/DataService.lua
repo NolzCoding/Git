@@ -18,17 +18,43 @@ local StarterData =
         Baby = {
             CurrentSkin = "Baby",
             OwnedSkins = {
-                Baby = true
+                Baby = 1
             }
         },
         Parent = {
             CurrentSkin = "Parent",
             OwnedSkins = {
-                Parent = true,
-                Mom = true,
+                Parent = 1,
             }
         }
-    }
+    },
+    Inventory = {
+        Crates = {
+            ["Skin Crate"] = 1,
+            ["Ability Crate"] = 1,
+        },
+    },
+    Abilities = {
+        MaxAbilities = 2, -- max amount of abilities a player can have
+        LastSwitched = 1, -- the index of the ability that was last switched
+        OwnedAbilities = {
+            ["Speed"] = 1,
+            ["Jump"] = 1,
+        },
+        CurrentAbilities = {
+            [1] = "Speed",
+            [2] = "Jump",
+        }
+    },
+    Items = { -- just needs to be a table of items can put in any item ingame no equipping required
+        OwnedItems = {
+
+        },
+    },
+    Levels = {
+        CurrentLevel = 1,
+        Experience = 0,
+    },
 }
 
 local DataService = Knit.CreateService{
@@ -64,9 +90,26 @@ function DataService:OnPlayerAdded(player : Player)
 
             self.Profiles[player] = PlayerProfile
 
+            local Cloned = table.clone(StarterData)
+
+            for _, data in pairs(Cloned) do -- enables us to add new data to the player when we update the starter data
+
+                if not PlayerProfile.Data[_] then
+
+                    PlayerProfile.Data[_] = data
+
+                end
+
+            end
+
+
             self.Client.DataProperty:SetFor(player, PlayerProfile.Data)
 
             print(PlayerProfile.Data)
+
+            for _,v in pairs(PlayerProfile.Data) do
+                self:SetData(player, _, v)
+            end
 
             --[[local DataReplica = ReplicaService.NewReplica({
                 ClassToken = ReplicaService.NewClassToken("DataToken_"..player.UserId), -- since a player's user id is unique, we will name it according to their user id to create a unique name for the class token.

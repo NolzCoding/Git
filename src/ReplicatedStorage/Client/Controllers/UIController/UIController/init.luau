@@ -47,7 +47,8 @@ function UIController:BuildWindows()
         windowModule:Start()
 
         local windowInstance = {
-            Open = self.scope:Value(false)
+            Open = self.scope:Value(false),
+            Module = windowModule,
         }
 
         windowInstance.Build = windowModule:Build(self.scope, windowInstance.Open)
@@ -68,6 +69,19 @@ function UIController:KnitStart()
     local parentPlayers = self.scope:Value({Alive = {}, Dead = {}})
 
     local GameService = Knit.GetService("GameService")
+
+    self.DataService = Knit.GetService("DataService")
+    self.DataController = Knit.GetController("DataController")
+
+    local _ready, data = self.DataService.DataProperty:OnReady():await()
+
+
+
+    local cash = self.scope:Value(data.Cash)
+
+	self.DataController:OnDataChanged("Cash", function(_cash)
+        cash:set(_cash)
+    end)
 
     GameService.StateSignal:Connect(function(stateName : string, stateText : string, time : number, ...)
 
@@ -153,12 +167,19 @@ function UIController:KnitStart()
               },
 
             RightSidebar(self.scope, {
-                OpenWindow = function(name : string)
-                    local window = self.WindowInstances[name]
+                Cash = cash,
+                OpenWindow = function(name : string, ...)
+
+                    self:CloseAllWindows()
+
+                    --[[local window = self.WindowInstances[name]
 
                     if window then
                         window.Open:set(true)
-                    end
+                    end]]
+
+                    self:OpenWindow(name, ...)
+
                 end
             }),
 
@@ -213,22 +234,29 @@ function UIController:UnBindUi(name : string)
 
 end
 
-function UIController:OpenWindow(name : string)
+function UIController:OpenWindow(name : string, ...)
 
     local window = self.WindowInstances[name]
 
     if window then
         window.Open:set(true)
+        if window.Module.OnOpen then
+            window.Module:OnOpen(...)
+        end
     end
 
 end
 
-function UIController:CloseWindow(name : string)
+function UIController:CloseWindow(name : string, ...)
 
     local window = self.WindowInstances[name]
 
     if window then
         window.Open:set(false)
+
+        if window.Module.OnClose then
+            window.Module:OnClose(...)
+        end
     end
 
 end

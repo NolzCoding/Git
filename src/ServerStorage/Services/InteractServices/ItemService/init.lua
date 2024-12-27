@@ -18,10 +18,6 @@ function ItemService:KnitStart()
 
     self.CharacterService = Knit.GetService("CharacterService")
 
-    task.delay(10, function()
-        SpawnItems:Spawn()
-    end)
-
 end
 
 function ItemService:DropItem(player : Player, tool : Tool, itemName : string)

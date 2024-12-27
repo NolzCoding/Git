@@ -4,7 +4,7 @@ local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInst
 local CharacterClientBase = require(script.Parent.Parent.CharacterClient)
 --Define TestClass1 (potentially in a ModuleScript).
 local ActionButton = require(ReplicatedStorage.Source.Client.Controllers.UIController.Components.Buttons.ActionButton)
-
+local CollectionService = game:GetService("CollectionService")
 
 --Define TestClass2 (potentially in a different ModuleScript).
 local ParentClient = {}
@@ -49,6 +49,17 @@ function ParentClient.__new(self: NexusInstanceParentClient, character : Model?)
     end
 
     CharacterClientBase.__new(self, character :: Model,5) --Remember to call the parent constructor!
+
+    -- enable baby proximity prompts
+
+    local babyPrompts = CollectionService:GetTagged("Baby")
+
+    for _, promptParent in ipairs(babyPrompts) do
+        local prompt = promptParent:FindFirstChild("ProximityPrompt") :: ProximityPrompt
+
+        prompt.Enabled = true
+
+    end
 
 end
 

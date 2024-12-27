@@ -231,6 +231,10 @@ end
 
 function CharacterClient.Destroy(self: NexusInstanceCharacterClient): ()
     self.scope:doCleanup()
+
+    for _, connection in pairs(self.Connections) do
+        connection:Disconnect()
+    end
 end
 
 return NexusInstance.ToInstance(CharacterClient) :: NexusInstance.NexusInstanceClass<typeof(CharacterClient), (character : Model, itemSlots : number) -> (NexusInstanceCharacterClient)>

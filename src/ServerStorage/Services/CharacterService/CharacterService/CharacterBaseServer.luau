@@ -129,10 +129,6 @@ function CharacterBaseServer.__new(self: NexusInstanceCharacterBaseServer, playe
         end
 
     end
-
-    task.delay(10, function()
-        self:ApplyEffect("Burn", 5, 1)
-    end)
 end
 
 function CharacterBaseServer.GetIKControl(self: NexusInstanceCharacterBaseServer, name : string): (IKControl)

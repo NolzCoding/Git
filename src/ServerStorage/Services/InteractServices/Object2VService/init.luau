@@ -17,7 +17,7 @@ function Object2VService:KnitStart()
 
         Vent = require(script.Components.Vent);
         Oven = require(script.Components.Oven);
-
+        Gasoline = require(script.Components.Gasoline);
     }
 
 

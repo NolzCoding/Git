@@ -17,6 +17,9 @@ local function Window(scope: typeof(Fusion.scoped(Fusion)), props: {
     AnchorPoint : Vector2?,
     Size : UDim2?,
 
+	HeaderSize : UDim2?,
+	HeaderPosition : UDim2?,
+
 })
 
 
@@ -107,8 +110,8 @@ local function Window(scope: typeof(Fusion.scoped(Fusion)), props: {
 				BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 				BackgroundTransparency = 1,
 				BorderColor3 = Color3.fromRGB(27, 42, 53),
-				Position = UDim2.fromScale(0.23, -0.0753),
-				Size = UDim2.fromScale(0.538, 0.286),
+				Position = props.HeaderPosition or UDim2.fromScale(0.23, -0.0753),
+				Size = props.HeaderSize or UDim2.fromScale(0.538, 0.286),
 				ZIndex = 4,
 
 				[Children] = {

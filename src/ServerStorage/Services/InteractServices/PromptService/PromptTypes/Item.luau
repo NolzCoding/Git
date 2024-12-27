@@ -16,6 +16,12 @@ function Item:Triggered(prompt : ProximityPrompt, player : Player)
     local class = Knit.GetService("ItemService"):GiveItem(player, prompt.Parent:GetAttribute("ItemName"), true)
 
     if not class then
+        Knit.GetService("NotificationService"):NotifyPlayer("TextNImage", {
+            Text = "Inventory Full",
+            Image = "",
+            Color = Color3.fromRGB(255, 0, 0),
+            Time = 5,
+        }, player)
         return -- probably means they dont have enough space to hold the item
     end
 

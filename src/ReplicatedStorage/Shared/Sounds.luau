@@ -14,5 +14,11 @@ return {
     UnlockItem = "rbxassetid://873617644",
     CloseWindow = "rbxassetid://10128766965",
     OpenWindow = "rbxassetid://15675037413",
+    Notification = "rbxassetid://6647898215",
+    Lighter = {
+        Light = "rbxassetid://18507693047",
+        Click = "rbxassetid://9121005783",
+
+    }
 
 }

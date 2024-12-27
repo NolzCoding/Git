@@ -3,7 +3,7 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Fusion = require(ReplicatedStorage.Packages.fusion)
-local Children = Fusion.Children
+local Children, peek = Fusion.Children, Fusion.peek
 local computed = Fusion.Computed
 local Card = require(script.Parent.Parent.Parent.Components.UI.Card)
 local Window = require(script.Parent.Parent.Parent.Components.UI.Window)
@@ -14,6 +14,7 @@ local Icons = require(ReplicatedStorage.Source.Shared.Icons)
 local Item = require(script.Item)
 local Sounds = require(ReplicatedStorage.Source.Shared.Sounds)
 local SoundService = game:GetService("SoundService")
+local RNGData = require(ReplicatedStorage.Source.Shared.RNGData)
 function Shop:Start() -- knit start
 
 end
@@ -26,6 +27,24 @@ local rarityColors = {
 	["Legendary"] = Color3.fromRGB(255, 153, 0),
 }
 
+function Shop:OnOpen(...)
+
+	local crate = ...
+
+	print(crate)
+
+	if crate then
+		self.ActiveCrate:set(crate)
+	end
+
+end
+
+function Shop:OnClose()
+
+
+
+end
+
 function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 
 	local rollSignal = Signal.new()
@@ -37,8 +56,19 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 	unlockSound.SoundId = Sounds.UnlockItem
 	unlockSound.Parent = SoundService
 
+	self.RNGService = Knit.GetService("RNGService")
+	self.NotificationController = Knit.GetController("NotificationController")
+	self.DataService = Knit.GetService("DataService")
+	self.DataController = Knit.GetController("DataController")
+	local ready, data = self.DataService.DataProperty:OnReady():await()
 
-	local Path2D = ReplicatedStorage.Data:WaitForChild("Path2D") :: Path2D
+    local crates = scope:Value(data.Inventory.Crates)
+
+	self.DataController:OnDataChanged("Inventory", function(inventory)
+        crates:set(inventory.Crates)
+    end)
+
+
 
 	local rollTable = {
 		{
@@ -73,6 +103,13 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 		},
 	}
 
+	rollTable = RNGData.RNGTable["Starter Crate"]
+
+	self.ActiveCrate = scope:Value("None")
+
+
+
+
 	local display1 = scope:Value({
 		Name = "Item 1",
 		RarityColor = rarityColors["Common"],
@@ -91,7 +128,46 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 		Image = "rbxassetid://127092089997800",
 	})
 
+	scope:Observer(self.ActiveCrate):onChange(function()
+
+		rollTable = RNGData.RNGTable[peek(self.ActiveCrate)]
+
+		-- display random items from new crate
+
+		local display1tbl = rollTable[math.random(1, #rollTable)]
+		display1tbl.RarityColor = rarityColors[display1tbl.Rarity]
+		local display2tbl = rollTable[math.random(1, #rollTable)]
+		display2tbl.RarityColor = rarityColors[display2tbl.Rarity]
+		local display3tbl = rollTable[math.random(1, #rollTable)]
+		display3tbl.RarityColor = rarityColors[display3tbl.Rarity]
+
+		display1:set(display1tbl)
+		display2:set(display2tbl)
+		display3:set(display3tbl)
+
+	end)
+
 	local function roll()
+
+		-- check if player has enough crates
+
+		local currentCrate = peek(self.ActiveCrate)
+		local crates = peek(crates)
+
+		local curretCrateAmount = crates[currentCrate] or 0
+
+		if curretCrateAmount <= 0 then
+
+			self.NotificationController:TextNImage({
+				Text = "You don't have any " .. currentCrate .. " crates",
+				Image = Icons.Emojis.Skull,
+				Color = Color3.new(1.000000, 0.090196, 0.090196),
+				Time = 5,
+			})
+
+			return
+		end
+
 		-- actuall winning item
 		local winningItem = nil
 		local roll = math.random()
@@ -117,11 +193,21 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 			fillerItems[#fillerItems + 1] = fillerItem
 		end
 
-		-- insert winning item in index 2
-		winningItem.RarityColor = rarityColors[winningItem.Rarity]
-		table.insert(fillerItems, 2, winningItem)
 
-		print(" you won...",winningItem)
+
+		-- insert winning item in index 2
+
+		self.RNGService:OpenCrate(Fusion.peek(self.ActiveCrate)):andThen(function(item)
+			winningItem = item
+
+			winningItem.RarityColor = rarityColors[winningItem.Rarity]
+			table.insert(fillerItems, 2, winningItem)
+			print(" you won...",winningItem)
+
+		end)
+
+
+
 
 		-- animate the roll
 
@@ -163,6 +249,13 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 		end
 
 
+		self.NotificationController:TextNImage({
+			Text = "x1 " .. winningItem.Rarity .. " " .. winningItem.Name,
+			Image = winningItem.Image,
+			Color = rarityColors[winningItem.Rarity],
+			Time = 5,
+		})
+
 		-- unlock the item
 		unlockSound:Play()
 
@@ -178,7 +271,8 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 	end
 
 	return Window(scope, {
-		HeaderText = "Roll",
+		HeaderText = self.ActiveCrate,
+		Size = UDim2.fromScale(0.5, 0.5),
 		Open = open,
 		Build = function(scope)
 			return {
@@ -253,6 +347,23 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 											TextSize = 14,
 											TextWrapped = true,
 											ButtonUp = function()
+
+												local currentCrate = peek(self.ActiveCrate)
+												local crates = peek(crates)
+												local curretCrateAmount = crates[currentCrate] or 0
+
+												if curretCrateAmount <= 0 then
+
+													self.NotificationController:TextNImage({
+														Text = "You don't have any " .. currentCrate .. " crates",
+														Image = Icons.Emojis.Skull,
+														Color = Color3.new(1.000000, 0.133333, 0.133333),
+														Time = 5,
+													})
+
+													return
+												end
+
 												roll()
 											end,
 

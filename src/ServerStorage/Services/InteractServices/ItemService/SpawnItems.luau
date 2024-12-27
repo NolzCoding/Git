@@ -10,25 +10,31 @@ local itemSpawns = {
         Battery = {
             Max = 1,
             Min = 1,
-            Chance = 0.3,
+            Chance = 0.1,
         },
 
         Fork = {
             Max = 1,
             Min = 1,
-            Chance = 0.3,
+            Chance = 0.2,
         },
 
         Soap = {
             Max = 1,
             Min = 1,
-            Chance = 1,
+            Chance = 0.2,
+        },
+
+        Lighter = {
+            Max = 1,
+            Min = 1,
+            Chance = 0.5,
         },
 
         Taser = {
             Max = 1,
             Min = 1,
-            Chance = 0.3,
+            Chance = 0.05,
         },
 
     },
@@ -37,7 +43,13 @@ local itemSpawns = {
         Battery = {
             Max = 1,
             Min = 1,
-            Chance = 1,
+            Chance = 0.5,
+        },
+
+        Lighter = {
+            Max = 1,
+            Min = 1,
+            Chance = 0.2,
         },
 
 

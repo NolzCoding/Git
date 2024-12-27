@@ -1,10 +1,12 @@
 local NexusInstance = require(game.ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
 local Teams = game:GetService("Teams")
 local ReplicateStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
 local Players = game:GetService("Players")
 local Knit = require(ReplicateStorage.Packages.Knit)
 local Trove = require(ReplicateStorage.Packages.Trove)
 local CharacterBaseServer = require(game.ServerStorage.Source.Services.CharacterService.CharacterService.CharacterBaseServer)
+local SpawnItems = require(ServerStorage.Source.Services.InteractServices.ItemService.SpawnItems)
 local GamemodeBase = {}
 GamemodeBase.__index = GamemodeBase
 
@@ -134,7 +136,11 @@ function GamemodeBase.__new(self: NexusInstanceGamemodeBase, players : {Player},
 
     end)
 
-    self.TIME = self.TIME or 20
+    self.TIME = self.TIME or 100
+
+    -- spawn items
+
+    SpawnItems:Spawn()
 
     UpdateState("GameStart", "Game Started", self.TIME + workspace:GetServerTimeNow(), self.Parents, self.Babies)
 

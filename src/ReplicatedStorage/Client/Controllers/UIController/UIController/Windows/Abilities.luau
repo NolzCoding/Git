@@ -1,4 +1,4 @@
-local Skins = {}
+local Abilities = {}
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -18,29 +18,23 @@ local Sticker = require(script.Parent.Parent.Parent.Components.UI.Sticker)
 local TextLabelWithStroke = require(script.Parent.Parent.Parent.Components.Text.TextLabelWithStroke)
 local Icons = require(ReplicatedStorage.Source.Shared.Icons)
 local Section = require(script.Parent.Parent.Parent.Components.UI.Section)
-local SkinsInfo = require(ReplicatedStorage.Source.Shared.Skins)
-function Skins:Start() -- knit start
+local AbilitiesInfo = require(ReplicatedStorage.Source.Shared.Abilities)
+function Abilities:Start() -- knit start
 
 end
 
-local skinsInShop = {
-    Baby = {
-        "Scary Noob Baby",
-        "Batman",
-        "Adventure Baby"
-    },
-    Parent = {
-
-    }
+local abilitiesInShop = {
+    "Invisibility",
+    "Speed",
+    "Jump",
 }
 
-function skin (scope, props : {
+function abilityItem (scope, props : {
     RarityColor : Color3,
-    SkinName : string,
+    Name : string,
     Clicked : () -> (),
     Equipped : boolean,
     Amount : number,
-    TypeOfSkin : "Baby" | "Parent",
 })
 
     return scope:New "Frame" {
@@ -57,9 +51,9 @@ function skin (scope, props : {
                 [Children] = {
 
                     scope:New "ImageLabel" {
-                        Image = SkinsInfo.Skins[props.TypeOfSkin][props.SkinName].Image,
-                        Size = UDim2.fromScale(1.2, 1.2),
-                        Position = UDim2.fromScale(0.5, 0.65),
+                        Image = AbilitiesInfo.Abilities[props.Name].Image,
+                        Size = UDim2.fromScale(1, 1),
+                        Position = UDim2.fromScale(0.5, 0.5),
                         AnchorPoint = Vector2.new(0.5, 0.5),
                         BackgroundTransparency = 1,
                     },
@@ -104,70 +98,37 @@ function skin (scope, props : {
 
 end
 
-function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
+function Abilities:Build(scope : typeof(Fusion.scoped(Fusion)), open)
 
-    local selectedCatagory = scope:Value("Baby")
 
     self.DataController = Knit.GetController("DataController")
     self.DataService = Knit.GetService("DataService")
-    self.SkinService = Knit.GetService("SkinService")
+    self.AbilitiesService = Knit.GetService("AbilitiesService")
 
     local ready, data = self.DataService.DataProperty:OnReady():await()
     print(data, "Recived")
-    local skinsData = scope:Value(data.Skins)
+    local abilitiesData = scope:Value(data.Abilities)
+    local abilities = scope:Value(data.Abilities.OwnedAbilities)
 
-    local babySkins = scope:Value(data.Skins.Baby.OwnedSkins)
-    local parentSkins = scope:Value(data.Skins.Parent.OwnedSkins)
-
-    self.DataController:OnDataChanged("Skins", function(data)
-        skinsData:set(data)
-        babySkins:set(data.Baby.OwnedSkins)
-        parentSkins:set(data.Parent.OwnedSkins)
-
+    self.DataController:OnDataChanged("Abilities", function(data)
+        abilitiesData:set(data)
+        abilities:set(data.OwnedAbilities)
     end)
 
-    local highlightedSkin = scope:Value(
+    local highlightedAbility = scope:Value(
         "None"
     )
 
     print("Data ready", data)
 
     local tobeReturned = Window(scope, {
-		HeaderText = "Skins",
+		HeaderText = "Abilities",
         Size = UDim2.fromScale(0.6, 0.6),
 		Open = open,
         HeaderSize = UDim2.fromScale(0.3, 0.2),
         HeaderPosition = UDim2.fromScale(0.2, -0.05),
 		Build = function(scope)
 			return {
-
-                DefaultButton(scope, {
-                    Position = UDim2.fromScale(0, 0.25),
-                    Size = UDim2.fromScale(0.2, 0.2),
-                    Text = "Parent",
-                    Visible = true,
-                    ZIndex = 4,
-                    ButtonUp = function()
-                        selectedCatagory:set("Parent")
-                    end,
-                    ButtonDown = function()
-                    end,
-                }),
-
-                DefaultButton(scope, {
-
-                    Position = UDim2.fromScale(0, 0.5),
-                    Size = UDim2.fromScale(0.2, 0.2),
-                    Text = "Baby",
-                    Visible = true,
-                    ZIndex = 4,
-                    ButtonUp = function()
-                        print("Selected Baby")
-                        selectedCatagory:set("Baby")
-                    end,
-                    ButtonDown = function()
-                    end,
-                }),
 
                 scope:New "ImageLabel" {
                     ZIndex = 3,
@@ -180,30 +141,31 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                     [Children] = {
                         scope:Computed(function(use, scope)
 
-                            use(skinsData)
+                            use(abilities)
 
-                            local highlightedSkinValue = use(highlightedSkin)
-                            local skinData = SkinsInfo.Skins[peek(selectedCatagory)][highlightedSkinValue]
+                            local highlightedAbilityValue = use(highlightedAbility)
+                            local abilityData = AbilitiesInfo.Abilities[highlightedAbilityValue]
 
-                            local ownsSkin = scope:Computed(function(use, scope)
-                                local skins = use(skinsData)[peek(selectedCatagory)].OwnedSkins
-                                return (skins[highlightedSkinValue] or 0) > 0
+                            local ownsAbility = scope:Computed(function(use, scope)
+                                local ownedAbilities = use(abilities)
+                                return (ownedAbilities[highlightedAbilityValue] or 0) > 0
                             end)
 
                             local isEquipped = scope:Computed(function(use, scope)
-                                return use(skinsData)[peek(selectedCatagory)].CurrentSkin == highlightedSkinValue
+                                local currentAbilities = use(abilitiesData).CurrentAbilities
+                                return nil ~= table.find(currentAbilities, highlightedAbilityValue)
                             end)
 
-                            if not skinData then
+                            if not abilityData then
                                 return
                             end
 
-                            local rarityColor = SkinsInfo.RarityColors[skinData.Rarity]
+                            local rarityColor = AbilitiesInfo.RarityColors[abilityData.Rarity]
 
                             return {
 
                                 scope:New "ImageLabel" {
-                                    Image = skinData.Image,
+                                    Image = abilityData.Image,
                                     AnchorPoint = Vector2.new(0.5, 0.5),
                                     Size = UDim2.fromScale(0.8, 0.8),
                                     Position = UDim2.fromScale(0.5, 0.5),
@@ -222,7 +184,7 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                                     AnchorPoint = Vector2.new(0.5, 0.5),
                                     [Children] = {
                                         TextLabelWithStroke(scope, {
-                                            Text = skinData.Rarity,
+                                            Text = abilityData.Rarity,
                                             Size = UDim2.fromScale(0.8, 0.8),
                                             Position = UDim2.fromScale(0.5, 0.5),
                                             AnchorPoint = Vector2.new(0.5, 0.5),
@@ -245,14 +207,14 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
 
                                     end,
                                     ButtonUp = function()
-                                        self.SkinService:UnequipSkin(highlightedSkinValue, peek(selectedCatagory))
+                                        self.AbilitiesService:UnequipAbility(highlightedAbilityValue)
                                     end,
                                     Visible = isEquipped,
                                 }),
 
                                 DefaultButton(scope, {
                                     Visible = scope:Computed(function(use, scope)
-                                        return use(ownsSkin) and not use(isEquipped)
+                                        return use(ownsAbility) and not use(isEquipped)
                                     end),
                                     Text = "Equip",
                                     Position = UDim2.fromScale(0.5, 0.8),
@@ -261,22 +223,23 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
 
                                     end,
                                     ButtonUp = function()
-                                        self.SkinService:EquipSkin(highlightedSkinValue, peek(selectedCatagory))
+                                        self.AbilitiesService:EquipAbility(highlightedAbilityValue)
                                     end,
                                 }),
 
                                 DefaultButton(scope, {
                                     Visible = scope:Computed(function(use, scope)
-                                        return not use(ownsSkin)
+                                        return true --not use(ownsAbility) and not use(isEquipped)
                                     end),
                                     Text = "Buy",
-                                    Position = UDim2.fromScale(0.5, 0.8),
+                                    Position = UDim2.fromScale(0.8, 0.9),
+                                    Rotation = -25,
                                     BackgroundColor3 = Color3.fromRGB(59, 59, 255),
                                     ButtonDown = function()
 
                                     end,
                                     ButtonUp = function()
-                                        self.SkinService:BuySkin(highlightedSkinValue, peek(selectedCatagory))
+                                        self.AbilitiesService:BuyAbility(highlightedAbilityValue)
                                     end,
 
                                     Build = function(scope)
@@ -302,9 +265,7 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
 
 				scope:New "ScrollingFrame" {
                     ZIndex = 3,
-                    Visible = scope:Computed(function(use, scope)
-                        return use(selectedCatagory) == "Baby"
-                    end),
+                    Visible = true,
 					Size = UDim2.new(0.65, 0, 0.8, 0),
                     AnchorPoint = Vector2.new(0.5, 0.5),
                     Position = UDim2.new(0.33, 0, 0.5, 0),
@@ -317,7 +278,7 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                         },
 
                         Section(scope, {
-                            Name = "Owned Skins",
+                            Name = "Owned Abilities",
                             Build = function(scope)
 
                                 return {
@@ -328,26 +289,29 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                                     VerticalAlignment = Enum.VerticalAlignment.Top,
                                 },
 
-                                    forPairs(scope, babySkins, function(use, scope, key, value)
+                                    forPairs(scope, abilities, function(use, scope, key, value)
 
-                                        local equipped = scope:Computed(function(use, scope)
-                                            return use(skinsData).Baby.CurrentSkin == key
-                                        end)
-
-                                        local skinData = SkinsInfo.Skins.Baby[key]
-                                        if not skinData then
-                                            warn("Skin data not found for", key)
+                                        if value == 0 then
                                             return
                                         end
-                                        local rarityColor = SkinsInfo.RarityColors[skinData.Rarity]
 
-                                        return key, skin(scope, {
+                                        local equipped = scope:Computed(function(use, scope)
+                                            return false
+                                        end)
+
+                                        local abilityData = AbilitiesInfo.Abilities[key]
+                                        if not abilityData then
+                                            warn("Ability data not found for", key)
+                                            return
+                                        end
+                                        local rarityColor = AbilitiesInfo.RarityColors[abilityData.Rarity]
+
+                                        return key, abilityItem(scope, {
                                             RarityColor = rarityColor or Color3.fromRGB(255, 255, 255),
-                                            SkinName = key,
+                                            Name = key,
                                             Clicked = function()
-                                                highlightedSkin:set(key)
+                                                highlightedAbility:set(key)
                                             end,
-                                            TypeOfSkin = "Baby",
                                             Equipped = equipped,
                                             Amount = value,
                                         })
@@ -370,22 +334,21 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                                     VerticalAlignment = Enum.VerticalAlignment.Top,
                                 },
 
-                                    forValues(scope, skinsInShop.Baby, function(use, scope, key)
+                                    forValues(scope, abilitiesInShop, function(use, scope, key)
 
                                         local equipped = scope:Computed(function(use, scope)
-                                            return use(skinsData).Baby.CurrentSkin == key
+                                            return false
                                         end)
 
-                                        local skinData = SkinsInfo.Skins.Baby[key]
-                                        local rarityColor = SkinsInfo.RarityColors[skinData.Rarity]
+                                        local abilityData = AbilitiesInfo.Abilities[key]
+                                        local rarityColor = AbilitiesInfo.RarityColors[abilityData.Rarity]
 
-                                        return skin(scope, {
+                                        return abilityItem(scope, {
                                             RarityColor = rarityColor or Color3.fromRGB(255, 255, 255),
-                                            SkinName = key,
+                                            Name = key,
                                             Clicked = function()
-                                                highlightedSkin:set(key)
+                                                highlightedAbility:set(key)
                                             end,
-                                            TypeOfSkin = "Baby",
                                             Equipped = equipped,
                                             Amount = 0,
                                         })
@@ -401,63 +364,7 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
 
                 },
 
-                scope:New "ScrollingFrame" {
-                    ZIndex = 3,
-                    Visible = scope:Computed(function(use, scope)
-                        return use(selectedCatagory) == "Parent"
-                    end),
-					Size = UDim2.new(0.65, 0, 0.8, 0),
-                    AnchorPoint = Vector2.new(0.5, 0.5),
-                    Position = UDim2.new(0.33, 0, 0.5, 0),
-                    BackgroundTransparency = 1,
-                    CanvasSize = UDim2.new(0, 0, 4, 0),
-                    [Children] = {
 
-                        scope : New "UIListLayout" {
-
-                        },
-
-                        Section(scope, {
-                            Name = "Owned Skins",
-                            Build = function(scope)
-
-                                return {
-                                    scope:New "UIGridLayout" {
-                                    CellSize = UDim2.fromOffset(100, 100),
-                                    FillDirection = Enum.FillDirection.Horizontal,
-                                    HorizontalAlignment = Enum.HorizontalAlignment.Center,
-                                    VerticalAlignment = Enum.VerticalAlignment.Top,
-                                },
-
-                                    forPairs(scope, parentSkins, function(use, scope, key, value)
-
-                                        local equipped = scope:Computed(function(use, scope)
-                                            return use(skinsData).Parent.CurrentSkin == key
-                                        end)
-
-                                        local skinData = SkinsInfo.Skins.Parent[key]
-                                        local rarityColor = SkinsInfo.RarityColors[skinData.Rarity]
-
-                                        return key, skin(scope, {
-                                            RarityColor = rarityColor or Color3.fromRGB(255, 255, 255),
-                                            SkinName = key,
-                                            Clicked = function()
-                                                highlightedSkin:set(key)
-                                            end,
-                                            TypeOfSkin = "Parent",
-                                            Equipped = equipped,
-                                            Amount = value,
-                                        })
-
-                                    end)
-                                }
-
-                            end
-                        })
-
-                    }
-
-                },
 
 
 			}
@@ -471,4 +378,4 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
 
 end
 
-return Skins
+return Abilities

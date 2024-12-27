@@ -13,17 +13,22 @@ local function DefaultButton(
 		AnchorPoint: Vector2?,
 		Position: UDim2?,
 		ZIndex: number?,
+        Rotation: number?,
 		Text: string?,
 		BackgroundColor3: Color3?,
 		StrokeColor3: Color3?,
 		ButtonUp: () -> (),
 		ButtonDown: () -> (),
-	}
+        Visible : boolean?,
+        Build : (scope : any) -> () | nil,
+    }
 )
 	return ImageButton(scope, {
 		Size = props.Size or UDim2.fromScale(0.5, 0.5),
 		Image = "",
+        RotationMain = props.Rotation or 0,
 		ZIndex = props.ZIndex or 1,
+        Visible = props.Visible or true,
 		AnchorPoint = props.AnchorPoint or Vector2.new(0.5, 0.5),
 		Position = props.Position or UDim2.fromScale(0.5, 0.5),
         ButtonUp = props.ButtonUp,
@@ -91,7 +96,11 @@ local function DefaultButton(
                         Transparency = 0.42,
                     }),
                 },
-            })}
+            }),
+
+            props.Build and props.Build(scope),
+
+        }
 
         end
     })
