@@ -1,5 +1,6 @@
 local Door = {}
-
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local DoorOpenSound = Instance.new("Sound")
 DoorOpenSound.SoundId = "rbxassetid://6058561902"
@@ -15,11 +16,31 @@ DoorCloseSound.PlayOnRemove = true
 
 function Door:Init()
 
+    self.NotificationService = Knit.GetService("NotificationService")
+
 end
 
 function Door:Triggered(prompt : ProximityPrompt, player : Player)
 
     local hinge = prompt.Parent.Parent :: BasePart
+
+    local keyName = (prompt :: any).Parent:GetAttribute("Key") :: string?
+    if keyName then
+        print(keyName)
+
+        local key = player.Character:FindFirstChild(keyName) :: BasePart
+        if not key then
+
+            self.NotificationService:NotifyPlayer("TextNImage" ,{
+                Text = "You need a key to open this door",
+                Image = "",
+                Color = Color3.fromRGB(255, 86, 86),
+                Time = 2,
+            }, player)
+
+            return
+        end
+    end
 
     local open = hinge:GetAttribute("Open")
 

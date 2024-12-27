@@ -179,7 +179,7 @@ function GamemodeBase.StartBabyBucks(self : NexusInstanceGamemodeBase)
         for _,v in ipairs(self.BabyBucksFolder:GetChildren()) do
 
             local maxBabyBucks = v:GetAttribute("Max") or 1 :: number
-            if #self.BabyBucksFolder:GetChildren() >= maxBabyBucks then
+            if #v:GetChildren() == maxBabyBucks then
                 continue
             end
 
@@ -202,7 +202,7 @@ function GamemodeBase.StartBabyBucks(self : NexusInstanceGamemodeBase)
 
                 local playerTeam = player.Team
                 if playerTeam == self.ParentTeam then
-                    --return
+                    return
                 end
 
                 newBabyBuck:Destroy()

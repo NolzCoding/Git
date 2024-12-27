@@ -13,11 +13,6 @@ local itemSpawns = {
             Chance = 0.1,
         },
 
-        Fork = {
-            Max = 1,
-            Min = 1,
-            Chance = 0.2,
-        },
 
         Soap = {
             Max = 1,
@@ -28,18 +23,18 @@ local itemSpawns = {
         Lighter = {
             Max = 1,
             Min = 1,
-            Chance = 0.5,
+            Chance = 0.1,
         },
 
         Taser = {
             Max = 1,
             Min = 1,
-            Chance = 0.05,
+            Chance = 0.01,
         },
 
     },
 
-    Locker = {
+    TVCabinets = {
         Battery = {
             Max = 1,
             Min = 1,
@@ -50,6 +45,28 @@ local itemSpawns = {
             Max = 1,
             Min = 1,
             Chance = 0.2,
+        },
+
+
+    },
+
+    KitchenCabinet = {
+        --[[Battery = {
+            Max = 1,
+            Min = 1,
+            Chance = 0.1,
+        },
+
+        Fork = {
+            Max = 1,
+            Min = 1,
+            Chance = 0.2,
+        },]]
+
+        Basement_Key = {
+            Max = 1,
+            Min = 1,
+            Chance = 0.8,
         },
 
 
