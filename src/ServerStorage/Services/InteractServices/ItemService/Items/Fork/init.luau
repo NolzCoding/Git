@@ -2,7 +2,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
 local ItemBase = require(ServerStorage.Source.Services.InteractServices.ItemService.ItemBase)
-
+local BabyCharacter = require(ServerStorage.Source.Services.CharacterService.CharacterService.Characters.BabyServer)
+local Knit = require(ReplicatedStorage.Packages.Knit)
+local particles = ReplicatedStorage.Source.Data.Particles
 local ForkServer = {}
 ForkServer.__index = ForkServer
 setmetatable(ForkServer, ItemBase) --TestClass1NexusInstance would be returned instead of TestClass1.
@@ -17,9 +19,38 @@ function ForkServer.__new(self: NexusInstanceForkServer, itemName: string, tool:
     ItemBase.__new(self, itemName, tool) --Remember to call the parent constructor!
     self:DisableCollisons()
 
+
 end
 
 function ForkServer.Client.EatItem(self : NexusInstanceForkServer, player : Player)
+
+end
+
+function ForkServer.PromptInteract(self : NexusInstanceForkServer, promptName: string, ...)
+    print(promptName)
+    if promptName == "Outlets" then
+
+        local babyserver : BabyCharacter.BabyServer = ...
+
+        (babyserver :: any):DamageAttributes({
+            Heart = 50,
+        })
+
+        local root = (babyserver :: any).Player.Character.HumanoidRootPart :: Part
+
+        local props = {
+            Parent = workspace,
+            Particle = particles.Electric1,
+            Position = root,
+            Duration = 1,
+            EmitAmount = 1,
+        }
+
+        self.ParticleService:PlayParticle(props)
+
+        self.Tool:Destroy()
+
+    end
 
 end
 

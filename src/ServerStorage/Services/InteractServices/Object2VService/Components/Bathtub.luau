@@ -1,0 +1,81 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
+local Knit = require(ReplicatedStorage.Packages.Knit)
+local CharacterBaseServer = require(ServerStorage.Source.Services.CharacterService.CharacterService.CharacterBaseServer)
+local Component = require(ReplicatedStorage.Packages.Component)
+type self = typeof(Component.new({Tag = "Bathtub"}))
+local Bathtub = Component.new({Tag = "Bathtub"})
+
+print("reqiored")
+
+function Bathtub:Construct()
+    print("Construct Bathtub")
+
+    self.CharacterService = Knit.GetService("CharacterService")
+
+
+    self.TurnOnPrompt = Instance.new("ProximityPrompt")
+    self.TurnOnPrompt.Parent = self.Instance.Tap
+    self.TurnOnPrompt.ActionText = "Turn On"
+    self.TurnOnPrompt.Style = Enum.ProximityPromptStyle.Custom
+    self.TurnOnPrompt.HoldDuration = 3
+    self.TurnOnPrompt.Exclusivity = Enum.ProximityPromptExclusivity.OneGlobally
+    self.TurnOnPrompt.RequiresLineOfSight = false
+    self.Instance.Tap:SetAttribute("Text", "Hold: Turn On")
+
+    local Collider = self.Instance.Collider :: Part
+
+    self.enabled = false
+
+    local routineFunc = function(...)
+        while true do
+
+            print("Doing the thing")
+
+            local Overlap = Collider:GetTouchingParts()
+            local burnedPlayers = {}
+            for _, part in ipairs(Overlap) do
+                local player = game.Players:GetPlayerFromCharacter(part.Parent)
+                if player then
+                    table.insert(burnedPlayers, player)
+                    local character = self.CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
+                    character:ApplyEffect("Burn", 1)
+                end
+            end
+
+            task.wait(1)
+
+
+        end
+    end
+
+    local rotinue = nil
+
+    self.TurnOnPrompt.Triggered:Connect(function(player: Player)
+
+        self.enabled = not self.enabled
+
+        for _,v : Instance in ipairs(self.Instance.Tap:GetDescendants()) do
+
+            if v:IsA("ParticleEmitter") then
+                v.Enabled = self.enabled
+            end
+
+        end
+
+        self.Instance.Water.Transparency = self.enabled and 0 or 1
+
+        if self.enabled then
+            rotinue = coroutine.create(routineFunc)
+            coroutine.resume(rotinue)
+        else
+            coroutine.close(rotinue)
+        end
+
+
+
+    end)
+
+end
+
+return Bathtub

@@ -61,22 +61,18 @@ local itemSpawns = {
     },
 
     KitchenCabinet = {
-        --[[Battery = {
-            Max = 1,
-            Min = 1,
-            Chance = 0.1,
-        },
+
 
         Fork = {
             Max = 1,
             Min = 1,
-            Chance = 0.2,
-        },]]
+            Chance = 0.3,
+        },
 
         Medicine = {
             Max = 1,
             Min = 1,
-            Chance = 0.75,
+            Chance = 0.2,
         },
 
         Basement_Key = {
@@ -109,8 +105,11 @@ function SpawnItems:HandleObject(object, type)
 
     if not chances then return end
 
+    local rng = Random.new()
+
     for name, info in pairs(chances) do
-        if math.random() < info.Chance then
+
+        if rng:NextNumber() < info.Chance then
             local visual = _retriveVisual(name)
             if not visual then continue end
 
@@ -124,7 +123,6 @@ function SpawnItems:HandleObject(object, type)
                 pivot = insides:GetPivot()
                 size = insides.Size
             end
-            math.randomseed(tick())
             clone:PivotTo(pivot + Vector3.new(math.random(-size.X/2, size.X/2), 0, math.random(-size.Z/2, size.Z/2))) -- Randomize the position
             clone.Parent = workspace
             local newWeldConstraint = Instance.new("WeldConstraint")
