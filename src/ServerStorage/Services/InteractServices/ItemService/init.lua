@@ -11,13 +11,17 @@ local ItemService = Knit.CreateService{Name = "ItemService" , Client = {
 }}
 
 function ItemService:KnitInit()
-
+    self.ItemObjectsIndex = {}
 end
 
 function ItemService:KnitStart()
 
     self.CharacterService = Knit.GetService("CharacterService")
 
+end
+
+function ItemService:GetItemFromTool(tool : Tool)
+    return self.ItemObjectsIndex[tool]
 end
 
 function ItemService:DropItem(player : Player, tool : Tool, itemName : string)
@@ -31,7 +35,6 @@ function ItemService:DropItem(player : Player, tool : Tool, itemName : string)
     clone.Parent = workspace
 
     tool:Destroy()
-
 
 end
 
@@ -88,21 +91,13 @@ function ItemService:GiveItem(player : Player, itemName : string, equipOnSpawn :
     end
 
     local itemClass = require(class).new(itemName,itemClone, player)
-    local trove = Trove.new()
-    --trove:Add(itemClass)
-    --trove:AttachToInstance(itemClone)
 
-    local visual = class:FindFirstChild("Visual")
+    self.ItemObjectsIndex[itemClone] = itemClass
+    itemClone.Destroying:Connect(function()
+        self.ItemObjectsIndex[itemClone] = nil
+    end)
 
-    if visual then
-        visual = visual:Clone()
-        visual.Parent = Workspace
-        visual:PivotTo(CFrame.new(0,100,0)) -- move it far away to avoid physics
-        visual.PrimaryPart:SetNetworkOwner(player)
-        itemClass:SetVisualCache(visual)
-    end
-
-    self.Client.ItemAdded:Fire(player, itemClone, visual)
+    self.Client.ItemAdded:Fire(player, itemClone)
 
     --local clientScript = class:FindFirstChildOfClass("LocalScript"):Clone()
 

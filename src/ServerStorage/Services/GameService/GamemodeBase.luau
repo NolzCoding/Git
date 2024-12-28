@@ -67,6 +67,7 @@ function GamemodeBase.__new(self: NexusInstanceGamemodeBase, players : {Player},
     self.Map = Map
     self.CharacterService = Knit.GetService("CharacterService")
     self.AwardService = Knit.GetService("AwardService")
+    self.LevelService = Knit.GetService("LevelService")
 
     local randomPlayerAsParent = players[math.random(1, #players)]
 
@@ -79,11 +80,13 @@ function GamemodeBase.__new(self: NexusInstanceGamemodeBase, players : {Player},
 
     self.ParentTeam = Instance.new("Team")
     self.ParentTeam.Name = "Parents"
+    self.ParentTeam.TeamColor = BrickColor.new("Bright blue")
     self.ParentTeam.Parent = Teams
     self.ParentTeam.AutoAssignable = false
 
     self.BabyTeam = Instance.new("Team")
     self.BabyTeam.Name = "Babies"
+    self.BabyTeam.TeamColor = BrickColor.new("Bright red")
     self.BabyTeam.Parent = Teams
     self.BabyTeam.AutoAssignable = false
 
@@ -202,12 +205,13 @@ function GamemodeBase.StartBabyBucks(self : NexusInstanceGamemodeBase)
 
                 local playerTeam = player.Team
                 if playerTeam == self.ParentTeam then
-                    return
+                    --return
                 end
 
                 newBabyBuck:Destroy()
 
                 self.AwardService:GiveAward(player, "Cash", 100)
+                self.LevelService:AwardExperience(player, 10)
 
             end)
 

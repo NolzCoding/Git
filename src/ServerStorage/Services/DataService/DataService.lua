@@ -52,7 +52,7 @@ local StarterData =
         },
     },
     Levels = {
-        CurrentLevel = 1,
+        Level = 1,
         Experience = 0,
     },
 }

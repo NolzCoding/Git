@@ -9,6 +9,7 @@ ItemBase.__index = ItemBase
 
 --Exported test class type and Nexus Instance version (optional).
 
+-- to handle prompts define PromptInteract method
 
 export type ItemBase = {
     TestProperty: string?, --No constructor initializes this.

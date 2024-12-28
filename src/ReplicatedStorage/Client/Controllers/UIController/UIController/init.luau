@@ -2,11 +2,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Fusion = require(ReplicatedStorage.Packages.fusion)
+local CalculateLevels = require(ReplicatedStorage.Source.Shared.CalculateLevels)
 local Children = Fusion.Children
 local value = Fusion.Value
 local Toolbar = require(script.Toolbar)
 local ItemUi = require(script.ItemUi)
 local HealthBar = require(script.HealthBar)
+local LevelBar = require(script.LevelBar)
 local PlayerList = require(script.PlayerList)
 local TopTimer = require(script.TopTimer)
 local RightSidebar = require(script.RightSidebar)
@@ -78,9 +80,14 @@ function UIController:KnitStart()
 
 
     local cash = self.scope:Value(data.Cash)
+    local levels = self.scope:Value(data.Levels)
 
 	self.DataController:OnDataChanged("Cash", function(_cash)
         cash:set(_cash)
+    end)
+
+    self.DataController:OnDataChanged("Levels", function(_levels)
+        levels:set(_levels)
     end)
 
     GameService.StateSignal:Connect(function(stateName : string, stateText : string, time : number, ...)
@@ -165,6 +172,23 @@ function UIController:KnitStart()
 
                 }
               },
+
+            LevelBar(self.scope, {
+                Size = UDim2.fromScale(0.52, 0.0485),
+                Position = UDim2.fromScale(0.013, 0.106),
+                Level = self.scope:Computed(function(use)
+                    return use(levels).Level
+                end),
+                Exp = self.scope:Computed(function(use)
+                    return use(levels).Experience
+                end),
+                NextLevelExp = self.scope:Computed(function(use)
+                    return CalculateLevels:GetNextLevelExperience(use(levels).Level)
+                end),
+                Label = self.scope:Computed(function(use)
+                    return CalculateLevels:GetLevelLabel(use(levels).Level)
+                end),
+            }),
 
             RightSidebar(self.scope, {
                 Cash = cash,

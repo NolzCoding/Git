@@ -6,6 +6,7 @@ local Fusion = require(ReplicatedStorage.Packages.fusion)
 
 local Children, OnEvent = Fusion.Children, Fusion.OnEvent
 local Module3D = require(ReplicatedStorage.Source.Shared.Module3D)
+local ViewportUtils = require(ReplicatedStorage.Source.Shared.Uitility.ViewportUtils)
 local Icons = require(ReplicatedStorage.Source.Shared.Icons)
 
 local function ToolBar(
@@ -167,15 +168,33 @@ local function ToolBar(
                             slots[i] = hotbar
 							if value.Tool == nil then continue end
 							local clone = value.Tool:Clone()
+							print("New module 3d")
 
-							local module3d = Module3D:Attach3D(hotbar, clone)
+							local newViewportFrame = scope: New "ViewportFrame" {
+								Parent = hotbar,
+								BackgroundTransparency = 1,
+								Size = UDim2.new(1,0,1,0),
+							}
 
-							module3d.Visible = true
+							clone.Parent = workspace
 
-							table.insert(scope, clone)
+							task.wait()
+
+							clone.Parent = newViewportFrame
+
+							local newCamera = scope: New "Camera" {
+								Parent = newViewportFrame,
+								FieldOfView = 70,
+								CFrame = CFrame.new(0,0,0),
+
+							}
+
+							newViewportFrame.CurrentCamera = newCamera
 
 							table.insert(scope, game:GetService("RunService").RenderStepped:Connect(function()
-								module3d:SetCFrame(CFrame.Angles(0,tick() % (math.pi * 2),0) * CFrame.Angles(math.rad(-10),0,0))
+
+								local newCFrame = CFrame.Angles(0,tick() % (math.pi * 2),0) * CFrame.Angles(math.rad(-10),0,0)
+								ViewportUtils:UpdateCFrame(clone, newCamera, newCFrame)
 							end))
 
 						end

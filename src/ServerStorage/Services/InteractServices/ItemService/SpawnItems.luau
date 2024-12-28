@@ -50,6 +50,16 @@ local itemSpawns = {
 
     },
 
+    KnifeHanger = {
+
+        Knife = {
+            Max = 1,
+            Min = 1,
+            Chance = 1,
+        },
+
+    },
+
     KitchenCabinet = {
         --[[Battery = {
             Max = 1,
@@ -63,10 +73,16 @@ local itemSpawns = {
             Chance = 0.2,
         },]]
 
+        Medicine = {
+            Max = 1,
+            Min = 1,
+            Chance = 0.75,
+        },
+
         Basement_Key = {
             Max = 1,
             Min = 1,
-            Chance = 0.8,
+            Chance = 0.1,
         },
 
 

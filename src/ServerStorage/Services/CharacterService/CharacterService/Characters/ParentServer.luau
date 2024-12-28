@@ -68,7 +68,7 @@ function ParentServer.Client.ThrowBaby(self: NexusInstanceParentServer): ()
     local babyclass = self.PickedUp.babyPlayerClass
     self:StopPickingUp()
     local root = self.Player.Character:FindFirstChild("HumanoidRootPart") :: Part
-    babyclass.ClientSignal.AddForce(root.CFrame.LookVector * 200 + Vector3.new(0, 500, 0))
+    babyclass.ClientSignal.AddForce(root.CFrame.LookVector * 80 + Vector3.new(0, 100, 0))
 
 end
 

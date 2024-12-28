@@ -18,7 +18,7 @@ local function RightSideBar(scope : typeof(Fusion.scoped(Fusion)), props : {
         BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         BackgroundTransparency = 1,
         Size = UDim2.fromScale(0.15, 0.6),
-        Position = UDim2.fromScale(0.02, 0.4),
+        Position = UDim2.fromScale(0.013, 0.5),
         AnchorPoint = Vector2.new(0, 0.5),
 
         [Children] = {
@@ -30,7 +30,7 @@ local function RightSideBar(scope : typeof(Fusion.scoped(Fusion)), props : {
                 BackgroundColor3 = Color3.fromRGB(172, 255, 37),
                 BackgroundTransparency = 0,
                 Size = UDim2.fromScale(1, 0.2),
-                Position = UDim2.fromScale(0.1, 0.8),
+                Position = UDim2.fromScale(0, 0.8),
                 AnchorPoint = Vector2.new(0, 0.5),
                 [Children] = {
                     scope:New "UIAspectRatioConstraint" {

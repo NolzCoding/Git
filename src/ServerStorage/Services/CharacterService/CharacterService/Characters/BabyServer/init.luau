@@ -22,6 +22,7 @@ export type BabyServer = {
     PickedUp: (byPlayerClass : CharacterServerBase.CharacterBaseServer) -> (),
     Released: (byPlayerClass : CharacterServerBase.CharacterBaseServer) -> (),
     BabyDied: () -> (),
+    HealAttributes: (attributes : {[any] : number}) -> (),
     --SetupCharacter: (character : Model) -> (),
 } & typeof(setmetatable({}, BabyServer)) & CharacterServerBase.CharacterBaseServer
 export type NexusInstanceBabyServer = NexusInstance.NexusInstance<BabyServer>
@@ -284,6 +285,17 @@ end
 function BabyServer.BabyDied(self : NexusInstanceBabyServer): ()
     -- do smth when baby dies
     print("Dead")
+end
+
+function BabyServer.HealAttributes(self : NexusInstanceBabyServer, attributes : {string : number}): ()
+
+    local humanoid = (self :: any).Player.Character:WaitForChild("Humanoid") :: Humanoid
+
+    for name, v in pairs(attributes) do
+        local current = humanoid:GetAttribute(name) :: number
+        humanoid:SetAttribute(name, math.clamp(current + v, 0, 100))
+    end
+
 end
 
 function BabyServer.Released(self : NexusInstanceBabyServer, byPlayerClass : CharacterServerBase.CharacterBaseServer): ()
