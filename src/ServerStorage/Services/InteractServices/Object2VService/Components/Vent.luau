@@ -8,6 +8,8 @@ type self = typeof(Component.new({Tag = "Vent"}))
 local Vent = Component.new({Tag = "Vent"})
 print("reqiored")
 
+local NotificationService = Knit.GetService("NotificationService")
+
 function Vent:Construct()
     print("Construct Vent")
 
@@ -23,7 +25,20 @@ function Vent:Construct()
     self.ToObject = self.Instance:FindFirstChild("To").Value :: BasePart
 
     self.Prompt.Triggered:Connect(function(player : Player)
+
         local character = player.Character
+
+        local characterType = character:GetAttribute("Character") :: string
+        if characterType == "Parent" then
+            NotificationService:NotifyPlayer("TextNImage" ,{
+                Text = "Parents can't vent",
+                Image = "",
+                Color = Color3.fromRGB(255, 86, 86),
+                Time = 2,
+            }, player)
+            return
+        end
+
         local root = character.HumanoidRootPart
         root.CFrame = self.ToObject.CFrame
     end)

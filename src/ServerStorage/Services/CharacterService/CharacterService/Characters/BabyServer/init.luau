@@ -1,12 +1,12 @@
 --!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CharacterServerBase = require(script.Parent.Parent.CharacterBaseServer)
+local Fusion = require(ReplicatedStorage.Packages.fusion)
 local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
 local Overhead = require(script.Overhead)
-local Fusion = require(ReplicatedStorage.Packages.fusion)
-local CharacterServerBase = require(script.Parent.Parent.CharacterBaseServer)
 --Define TestClass1 (potentially in a ModuleScript).
-local sounds = require(ReplicatedStorage.Source.Shared.Sounds)
 local ragDollModule = require(game.ServerStorage.Source.Utils.Ragdoll)
+local sounds = require(ReplicatedStorage.Source.Shared.Sounds)
 
 --Define TestClass2 (potentially in a different ModuleScript).
 local BabyServer = {}
@@ -15,6 +15,10 @@ setmetatable(BabyServer, CharacterServerBase) --TestClass1NexusInstance would be
 
 export type BabyServer = {
     scope : any,
+
+    MakePrompt : boolean,
+    HasOverhead : boolean,
+
     Abilities : {
         [string] : () -> (),
     },
@@ -22,8 +26,8 @@ export type BabyServer = {
     PickedUp: (byPlayerClass : CharacterServerBase.CharacterBaseServer) -> (),
     Released: (byPlayerClass : CharacterServerBase.CharacterBaseServer) -> (),
     BabyDied: () -> (),
-    HealAttributes: (attributes : {[any] : number}) -> (),
-    DamageAttributes: (attributes : {[any] : number}) -> (),
+    HealAttributes: (attributes : {Lungs: number?, Stomach: number?, Heart: number? }) -> (),
+    DamageAttributes: (attributes :  {Lungs: number?, Stomach: number?, Heart: number? }) -> (),
     --SetupCharacter: (character : Model) -> (),
 } & typeof(setmetatable({}, BabyServer)) & CharacterServerBase.CharacterBaseServer
 export type NexusInstanceBabyServer = NexusInstance.NexusInstance<BabyServer>
@@ -45,7 +49,6 @@ end
 
 function BabyServer.SetupCharacter(self: NexusInstanceBabyServer, character : Model): ()
     -- do setup for the character
-    character:SetAttribute("Character", "Baby")
 
     local animateScript = character:WaitForChild("Animate") :: LocalScript
     if animateScript then
@@ -130,18 +133,27 @@ function BabyServer.SetupCharacter(self: NexusInstanceBabyServer, character : Mo
 
     local root = character:WaitForChild("HumanoidRootPart") :: Part
 
-    root:AddTag("Baby")
-    root:AddTag("PromptService")
+    if self.MakePrompt then
+        root:SetAttribute("Text", "Pick up")
+        root:SetAttribute("MaxDistance", 5)
+        root:AddTag("Baby")
+        root:AddTag("PromptService")
+
+    end
 
     local holded = self:AddTrackFromId("rbxassetid://104303879907283", "Holded", Enum.AnimationPriority.Action4)
     holded.Looped = true
 
     self.scope = Fusion.scoped(Fusion)
 
-    Overhead(self.scope, {
-        Player = self.Player,
-        Parent = character:WaitForChild("Head") :: BasePart,
-    })
+    if self.HasOverhead then
+
+        Overhead(self.scope, {
+            Player = self.Player,
+            Parent = character:WaitForChild("Head") :: BasePart,
+        })
+
+    end
 
 
     humanoid.Touched:Connect(function(a0: BasePart, a1: BasePart)
@@ -212,6 +224,38 @@ function BabyServer.SetupEffects(self: NexusInstanceBabyServer): ()
 
 
         while tick() < endTime do
+            task.wait(1)
+        end
+
+    end
+
+    self.EffectHandlers["Drowning"] = function(duration : number, multiplier : number)
+        multiplier = multiplier or 1
+        local character = self.Player.Character :: Model
+        local startTime = tick()
+        local endTime = startTime + duration
+
+        type props = {
+            Parent : Instance?,
+            Position : Vector3?,
+            Particle : Instance,
+            Duration : number?,
+            EmitAmount : number?,
+        }
+
+        self.ParticleService:PlayParticle({
+            Parent = (character :: any).HumanoidRootPart,
+            Position = nil, -- empty position = center of the parent
+            Duration = duration,
+            EmitAmount = 0,
+            Particle = ReplicatedStorage.Source.Data.Particles.Bubbles,
+        } :: props)
+
+        while tick() < endTime do
+            self:DamageAttributes({
+                Lungs = multiplier,
+            })
+
             task.wait(1)
         end
 
@@ -299,8 +343,11 @@ function BabyServer.HealAttributes(self : NexusInstanceBabyServer, attributes : 
 
 end
 
-function BabyServer.DamageAttributes(self : NexusInstanceBabyServer, attributes : {string : number}): ()
 
+type HealthAttributes = { Lungs: number, Stomach: number, Heart: number }
+type PartialHealthAttributes = { Lungs: number?, Stomach: number?, Heart: number? }
+
+function BabyServer.DamageAttributes(self : NexusInstanceBabyServer, attributes: PartialHealthAttributes): ()
     local humanoid = (self :: any).Player.Character:WaitForChild("Humanoid") :: Humanoid
 
     for name, v in pairs(attributes) do
@@ -321,8 +368,20 @@ function BabyServer.Released(self : NexusInstanceBabyServer, byPlayerClass : Cha
     animationTrack:Stop()
 end
 
-function BabyServer.__new(self: NexusInstanceBabyServer, player : Player, character : Model): ()
+function BabyServer.__new(self: NexusInstanceBabyServer, player : Player, character : Model, makePrompt : boolean, hasOverhead : boolean): ()
     CharacterServerBase.__new(self, player, character) --Remember to call the parent constructor!
+
+    self.MakePrompt = makePrompt
+    self.HasOverhead = hasOverhead
+
+    if self.MakePrompt == nil then
+        self.MakePrompt = true
+    end
+
+    if self.HasOverhead == nil then
+        self.HasOverhead = true
+    end
+
     self.Abilities = {}
     self:SetupCharacter(character)
     self:SetupEffects()

@@ -12,7 +12,6 @@ function Toilet:Triggered(prompt : ProximityPrompt, player : Player)
     stomach = math.clamp(stomach, 0, 100)
     humanoid:SetAttribute("Stomach", stomach)
 
-
 end
 
 return Toilet

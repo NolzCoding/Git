@@ -19,6 +19,8 @@ function Object2VService:KnitStart()
         Oven = require(script.Components.Oven);
         Gasoline = require(script.Components.Gasoline);
         Bathtub = require(script.Components.Bathtub);
+        GluePuddle = require(script.Components.GluePuddle);
+        BabyBed = require(script.Components.BabyBed);
     }
 
 

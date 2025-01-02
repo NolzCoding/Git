@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
 local ItemBase = require(ServerStorage.Source.Services.InteractServices.ItemService.ItemBase)
-
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local BatteryServer = {}
 BatteryServer.__index = BatteryServer
 setmetatable(BatteryServer, ItemBase) --TestClass1NexusInstance would be returned instead of TestClass1.
@@ -26,6 +26,16 @@ function BatteryServer.Client.EatItem(self : NexusInstanceBatteryServer, player 
     stomach -= 25
     stomach = math.clamp(stomach, 0, 100)
     humanoid:SetAttribute("Stomach", stomach)
+
+    local CharacterService = Knit.GetService("CharacterService")
+
+    local character = CharacterService:GetCharacter(player)
+
+    local gameSession = character.GameSession
+    if gameSession then
+        gameSession:SpawnItem("Battery")
+    end
+
     self.Tool:Destroy()
 end
 

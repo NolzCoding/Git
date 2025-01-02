@@ -8,12 +8,11 @@ local ParentCharacter = require(ServerStorage.Source.Services.CharacterService.C
 
 local MedicineServer = {}
 MedicineServer.__index = MedicineServer
-setmetatable(MedicineServer, ItemBase) --TestClass1NexusInstance would be returned instead of TestClass1.
+setmetatable(MedicineServer, ItemBase)
 
 local HEAL_AMOUNT = 25
 
 export type MedicineServer = {
-    TestProperty2: string,
 } & typeof(setmetatable({}, MedicineServer)) & ItemBase.ItemBase
 export type NexusInstanceMedicineServer = NexusInstance.NexusInstance<MedicineServer>
 

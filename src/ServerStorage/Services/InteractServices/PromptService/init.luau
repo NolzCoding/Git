@@ -36,6 +36,7 @@ function PromptService:KnitInit()
         newProximityPrompt.RequiresLineOfSight = taged:GetAttribute("LineOfSight") or false
         newProximityPrompt.Exclusivity = Enum.ProximityPromptExclusivity.OneGlobally
         newProximityPrompt.HoldDuration = taged:GetAttribute("Hold") or 0
+        newProximityPrompt.MaxActivationDistance = taged:GetAttribute("MaxDistance") or 10
         newProximityPrompt.ClickablePrompt = true
         newProximityPrompt:AddTag(type)
         print("Added Prompt", type)

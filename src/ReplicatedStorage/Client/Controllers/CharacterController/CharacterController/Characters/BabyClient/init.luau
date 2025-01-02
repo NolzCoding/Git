@@ -25,40 +25,43 @@ export type BabyClient = {
 } & typeof(setmetatable({}, BabyClient)) & CharacterClient.CharacterClient
 export type NexusInstanceBabyClient = NexusInstance.NexusInstance<BabyClient>
 
-function BabyClient.__new(self: NexusInstanceBabyClient, character : Model?): ()
+function BabyClient.__new(self: NexusInstanceBabyClient, character : Model?, ignoreUI : boolean?): ()
 
     self.DataService = Knit.GetService("DataService")
     local DataController = Knit.GetController("DataController")
     self.Trove = Trove.new()
     self.AbilityHandlers = {}
     self.AbilityDebounce = {}
-    self.BuildUI = function(scope)
 
-        local _ready, data = self.DataService.DataProperty:OnReady():await()
-        print(data, "Recived")
-        local abilitiesData = scope:Value(data.Abilities)
+    if not ignoreUI then
+        self.BuildUI = function(scope)
 
-        local currentAbilities = scope:Value(data.Abilities.CurrentAbilities)
-        local ownedAbilities = scope:Value(data.Abilities.OwnedAbilities)
+            local _ready, data = self.DataService.DataProperty:OnReady():await()
+            print(data, "Recived")
+            local abilitiesData = scope:Value(data.Abilities)
 
-        DataController:OnDataChanged("Abilities", function(data)
-            abilitiesData:set(data)
-            currentAbilities:set(data.CurrentAbilities)
-            ownedAbilities:set(data.OwnedAbilities)
-        end)
+            local currentAbilities = scope:Value(data.Abilities.CurrentAbilities)
+            local ownedAbilities = scope:Value(data.Abilities.OwnedAbilities)
 
-        return {
-            AbilityUI(scope, {
-                CurrentAbilities = currentAbilities,
-                OwnedAbilities = ownedAbilities,
+            DataController:OnDataChanged("Abilities", function(data)
+                abilitiesData:set(data)
+                currentAbilities:set(data.CurrentAbilities)
+                ownedAbilities:set(data.OwnedAbilities)
+            end)
 
-                AbilityUsed = function(ability)
-                    self:UseAbility(ability)
-                end
+            return {
+                AbilityUI(scope, {
+                    CurrentAbilities = currentAbilities,
+                    OwnedAbilities = ownedAbilities,
 
-            }),
-            HealthBar(scope, {})
-        }
+                    AbilityUsed = function(ability)
+                        self:UseAbility(ability)
+                    end
+
+                }),
+                HealthBar(scope, {})
+            }
+        end
     end
 
     CharacterClient.__new(self, character) --Remember to call the parent constructor!

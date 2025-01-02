@@ -82,6 +82,41 @@ module.Skins = {
             Image = "rbxassetid://126099632237321",
         },
 
+        ["Nerd"] = {
+            Name = "Nerd",
+            Type = "Baby",
+            Description = "Litteraly you lmao",
+            Rarity = "Legendary",
+            Price = 300,
+            Product = 0,
+            PriceType = "Cash",
+            Image = "rbxassetid://94459533670867",
+        },
+
+
+
+        ["Baby Shark"] = {
+            Name = "Baby Shark",
+            Type = "Baby",
+            Description = "Litteraly you lmao",
+            Rarity = "Legendary",
+            Price = 300,
+            Product = 0,
+            PriceType = "Cash",
+            Image = "rbxassetid://135983993891195",
+        },
+
+        ["Baby Chicken"] = {
+            Name = "Baby Chicken",
+            Type = "Baby",
+            Description = "Litteraly you lmao",
+            Rarity = "Legendary",
+            Price = 300,
+            Product = 0,
+            PriceType = "Cash",
+            Image = "rbxassetid://112358190717616",
+        },
+
 
     }
 } :: {

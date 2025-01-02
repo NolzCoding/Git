@@ -6,6 +6,8 @@ local BabyServer = require(script.Characters.BabyServer)
 local CharacterBaseServer = require(script.CharacterBaseServer)
 local ParentServer = require(script.Characters.ParentServer)
 
+local GhostServer = require(script.Characters.GhostServer)
+
 local CharacterService = Knit.CreateService{
     Name = "CharacterService",
     Client = {}
@@ -59,12 +61,20 @@ function CharacterService:NewCharacter(player, characterName) : CharacterBaseSer
 
     local character = player.Character or player.CharacterAdded:Wait()
 
+
     if characterName == "Parent" then
+        character:SetAttribute("Character", "Parent")
         local char = ParentServer.new(player, character)
         self.PlayerCharacters[player] = char
         return char
-    else
+    elseif characterName == "Baby" then
+        character:SetAttribute("Character", "Baby")
         local char = BabyServer.new(player, character)
+        self.PlayerCharacters[player] = char
+        return char
+    else
+        character:SetAttribute("Character", "Ghost")
+        local char = GhostServer.new(player, character)
         self.PlayerCharacters[player] = char
         return char
     end

@@ -4,6 +4,7 @@ local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInst
 local ItemBase = require(ServerStorage.Source.Services.InteractServices.ItemService.ItemBase)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local KnifeServer = {}
+local BabyServer = require(ServerStorage.Source.Services.CharacterService.CharacterService.Characters.BabyServer)
 local Icons = require(ReplicatedStorage.Source.Shared.Icons)
 KnifeServer.__index = KnifeServer
 setmetatable(KnifeServer, ItemBase) --TestClass1NexusInstance would be returned instead of TestClass1.
@@ -53,10 +54,32 @@ function KnifeServer.Client.Attack(self : NexusInstanceKnifeServer, player : Pla
                     attackedPlayer.Humanoid.WalkSpeed = walkspeedbefore
 
                 end)
+
+                local character = self.CharacterService:GetCharacter(attackedPlayer) :: BabyServer.BabyServer
+                local gameSession = character.GameSession
+
+                gameSession:SpawnItem("Knife")
+
                 self.Tool:Destroy()
                 return
             else
-                --self.CharacterService:DamageCharacter(attackedPlayer, 5)
+
+                local babyCharacter = self.CharacterService:GetCharacter(attackedPlayer) :: BabyServer.BabyServer
+                babyCharacter:DamageAttributes(
+                    {
+                        Heart = 30,
+                        Stomach = 30,
+                        Lungs = 30
+                    }
+                )
+
+                local gameSession = babyCharacter.GameSession
+
+                gameSession:SpawnItem("Knife")
+
+                self.Tool:Destroy()
+
+
                 return
             end
 

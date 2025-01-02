@@ -31,7 +31,7 @@ end
 
 function GameService:KnitStart()
 
-    --if true then return end
+    if true then return end
 
 
     self.CharacterService = Knit.GetService("CharacterService")
@@ -50,8 +50,8 @@ function GameService:KnitStart()
                 end
             end
 
-            self:UpdateState("Starting", "Intermission", 0)
-            task.wait(5)
+            self:UpdateState("Starting", "Intermission", workspace:GetServerTimeNow() + 100)
+            task.wait(100)
             self:UpdateState("Starting", "Loading Map & Starting Game", 0)
             local newGame = self:NewGame() :: GamemodeBase.GamemodeBase
             local time = newGame.TIME

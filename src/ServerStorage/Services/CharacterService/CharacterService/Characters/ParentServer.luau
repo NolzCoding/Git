@@ -27,7 +27,6 @@ export type NexusInstanceParentServer = NexusInstance.NexusInstance<ParentServer
 
 function ParentServer.SetupCharacter(self: NexusInstanceParentServer, character : Model): ()
     -- do setup for the character
-    character:SetAttribute("Character", "Parent")
 
     local HumanoidRootPart = character:WaitForChild("HumanoidRootPart") :: Part
 
@@ -138,6 +137,13 @@ function ParentServer.__new(self: NexusInstanceParentServer, player : Player, ch
     self:SetupCharacter(character)
     print("ParentServer")
 
+end
+
+-- destroy
+
+function ParentServer.Destroy(self: NexusInstanceParentServer): ()
+    self:StopPickingUp()
+    CharacterServerBase.Destroy(self)
 end
 
 return NexusInstance.ToInstance(ParentServer) :: NexusInstance.NexusInstanceClass<typeof(ParentServer), (player : Player, character : Model) -> (NexusInstanceParentServer)>

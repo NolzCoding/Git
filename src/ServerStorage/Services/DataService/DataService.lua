@@ -55,6 +55,13 @@ local StarterData =
         Level = 1,
         Experience = 0,
     },
+    Achivements = {
+        Actions = {
+        },
+        Claimed = {
+
+        }
+    }
 }
 
 local DataService = Knit.CreateService{

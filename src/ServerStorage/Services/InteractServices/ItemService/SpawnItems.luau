@@ -63,10 +63,16 @@ local itemSpawns = {
     KitchenCabinet = {
 
 
+        Glue = {
+            Max = 1,
+            Min = 1,
+            Chance = 0.2,
+        },
+
         Fork = {
             Max = 1,
             Min = 1,
-            Chance = 0.3,
+            Chance = 0.5,
         },
 
         Medicine = {
@@ -99,7 +105,43 @@ local function _retriveVisual(name) : Model?
 
 end
 
-function SpawnItems:HandleObject(object, type)
+
+local function _spawnItem(name, object, ancestor)
+    local visual = _retriveVisual(name)
+    if not visual then return end
+
+    local clone = visual:Clone()
+    local pivot = object:GetPivot()
+    local size = object.Size
+
+    local insides = object:FindFirstChild("Insides")
+
+    if insides then
+        pivot = insides:GetPivot()
+        size = insides.Size
+    end
+    clone:PivotTo(pivot + Vector3.new(math.random(-size.X/2, size.X/2), 0, math.random(-size.Z/2, size.Z/2))) -- Randomize the position
+    clone.Parent = ancestor
+    local newWeldConstraint = Instance.new("WeldConstraint")
+    newWeldConstraint.Parent = clone
+    newWeldConstraint.Part0 = insides or object
+    newWeldConstraint.Part1 = clone.PrimaryPart
+
+    local proximityPrompt = clone.PrimaryPart:WaitForChild("ProximityPrompt") :: ProximityPrompt
+    local OpenAttribute = object:GetAttribute("Open")
+    proximityPrompt.Enabled = OpenAttribute
+
+    object:GetAttributeChangedSignal("Open"):Connect(function(...: any)
+        proximityPrompt.Enabled = object:GetAttribute("Open")
+    end)
+
+    table.insert(currnetItemsInWorld, clone)
+    print("Spawned item: " .. name)
+
+    return clone
+end
+
+function SpawnItems:HandleObject(object, type, ancestor)
 
     local chances = itemSpawns[type]
 
@@ -108,49 +150,58 @@ function SpawnItems:HandleObject(object, type)
     local rng = Random.new()
 
     for name, info in pairs(chances) do
-
         if rng:NextNumber() < info.Chance then
-            local visual = _retriveVisual(name)
-            if not visual then continue end
-
-            local clone = visual:Clone()
-            local pivot = object:GetPivot()
-            local size = object.Size
-
-            local insides = object:FindFirstChild("Insides")
-
-            if insides then
-                pivot = insides:GetPivot()
-                size = insides.Size
-            end
-            clone:PivotTo(pivot + Vector3.new(math.random(-size.X/2, size.X/2), 0, math.random(-size.Z/2, size.Z/2))) -- Randomize the position
-            clone.Parent = workspace
-            local newWeldConstraint = Instance.new("WeldConstraint")
-            newWeldConstraint.Parent = clone
-            newWeldConstraint.Part0 = insides or object
-            newWeldConstraint.Part1 = clone.PrimaryPart
-
-            local proximityPrompt = clone.PrimaryPart:WaitForChild("ProximityPrompt") :: ProximityPrompt
-            local OpenAttribute = object:GetAttribute("Open")
-            proximityPrompt.Enabled = OpenAttribute
-
-            object:GetAttributeChangedSignal("Open"):Connect(function(...: any)
-                proximityPrompt.Enabled = object:GetAttribute("Open")
-            end)
-
-            table.insert(currnetItemsInWorld, clone)
-            print("Spawned item: " .. name)
+            _spawnItem(name, object, ancestor)
         end
     end
 
 end
 
-function SpawnItems:Spawn()
+function SpawnItems:SpawnIndividualItem(itemName, ancestor)
+
+    local possibleObjects = {}
+
+    for name, items in pairs(itemSpawns) do
+        for nameOfItem, _ in pairs(items) do
+            if nameOfItem == itemName then
+                table.insert(possibleObjects, name)
+            end
+        end
+    end
+    -- random object
+
+    local object = possibleObjects[math.random(1, #possibleObjects)]
+    local tagged = CollectionService:GetTagged(object)
+    local taggedInsideAncestor = {}
+
+    for _, obj in ipairs(tagged) do
+        if not obj:IsDescendantOf(ancestor) then
+            continue
+        end
+        table.insert(taggedInsideAncestor, obj)
+    end
+    local randomObject = taggedInsideAncestor[math.random(1, #taggedInsideAncestor)]
+
+    _spawnItem(itemName, randomObject, ancestor)
+
+    print("Spawned item: ", itemName, " in ", randomObject)
+
+    return itemName
+
+end
+
+function SpawnItems:Spawn(ancestor)
 
     for name, items in pairs(itemSpawns) do
         local tagged = CollectionService:GetTagged(name)
+
         for _, object in ipairs(tagged) do
-            self:HandleObject(object, name)
+
+            if not object:IsDescendantOf(ancestor) then
+                continue
+            end
+
+            self:HandleObject(object, name, ancestor)
         end
     end
 

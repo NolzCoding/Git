@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
-
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local CharacterClientBase = require(script.Parent.Parent.CharacterClient)
 --Define TestClass1 (potentially in a ModuleScript).
 local ActionButton = require(ReplicatedStorage.Source.Client.Controllers.UIController.Components.Buttons.ActionButton)
@@ -52,6 +52,8 @@ function ParentClient.__new(self: NexusInstanceParentClient, character : Model?)
 
     -- enable baby proximity prompts
 
+    self.NotificationController = Knit.GetController("NotificationController")
+
     local babyPrompts = CollectionService:GetTagged("Baby")
 
     for _, promptParent in ipairs(babyPrompts) do
@@ -70,11 +72,40 @@ function ParentClient.ServerSignal.onPlayerPickup(self : NexusInstanceParentClie
     }
     self.ThrowBabyVisible:set(true)
     self.Weld = weld
+
+    if player:HasTag("NoBabyBed") then
+        self.NotificationController:TextNImage({
+            Text = "You can't but the baby in the bed yet",
+            Image = "rbxassetid://7711634021",
+            Time = 2,
+            Color = Color3.fromRGB(255, 255, 255)
+        })
+        return
+    end
+
+    local babyBed = CollectionService:GetTagged("BabyBed")
+
+    for _, bed in ipairs(babyBed) do
+        local highlight = bed:FindFirstChildOfClass("Highlight") :: Highlight
+
+        highlight.Enabled = true
+
+    end
+
 end
 
 function ParentClient.ServerSignal.onPlayerDrop(self : NexusInstanceParentClient)
     self.ThrowBabyVisible:set(false)
     self.PickedUp = nil
+    local babyBed = CollectionService:GetTagged("BabyBed")
+
+    for _, bed in ipairs(babyBed) do
+        local highlight = bed:FindFirstChildOfClass("Highlight") :: Highlight
+
+        highlight.Enabled = false
+
+    end
+
 end
 
 return NexusInstance.ToInstance(ParentClient) :: NexusInstance.NexusInstanceClass<typeof(ParentClient), (Input1: string, Input2: string) -> (NexusInstanceParentClient)>

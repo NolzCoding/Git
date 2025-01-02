@@ -8,6 +8,8 @@ local value = Fusion.Value
 local Toolbar = require(script.Toolbar)
 local ItemUi = require(script.ItemUi)
 local HealthBar = require(script.HealthBar)
+local Winscreen = require(script.Winscreen)
+local LoadingScreen = require(script.LoadingScreen)
 local LevelBar = require(script.LevelBar)
 local PlayerList = require(script.PlayerList)
 local TopTimer = require(script.TopTimer)
@@ -70,13 +72,13 @@ function UIController:KnitStart()
     local babyPlayers = self.scope:Value({Alive = {}, Dead = {}})
     local parentPlayers = self.scope:Value({Alive = {}, Dead = {}})
 
-    local GameService = Knit.GetService("GameService")
+    local MatchService = Knit.GetService("MatchService")
 
     self.DataService = Knit.GetService("DataService")
     self.DataController = Knit.GetController("DataController")
+    self.MusicController = Knit.GetController("MusicController")
 
     local _ready, data = self.DataService.DataProperty:OnReady():await()
-
 
 
     local cash = self.scope:Value(data.Cash)
@@ -89,18 +91,48 @@ function UIController:KnitStart()
     self.DataController:OnDataChanged("Levels", function(_levels)
         levels:set(_levels)
     end)
+    local loadingScreenVisible = self.scope:Value(false)
+    local winVisible = self.scope:Value(false)
+    local whowon = self.scope:Value("Parents")
+    MatchService.StateSignal:Connect(function(stateName : string, stateText : string, time : number, ...)
 
-    GameService.StateSignal:Connect(function(stateName : string, stateText : string, time : number, ...)
-
-        if stateName == "GameStart" then
+        if stateName == "Starting" then
 
             local parents, babies = ...
-
             parentPlayers:set(parents)
             babyPlayers:set(babies)
         end
 
+        if stateName == "ChoosingMap" then
+            print("Choosing Map")
+            loadingScreenVisible:set(true)
+        elseif stateName == "Loading" then
+
+            loadingScreenVisible:set(true)
+        elseif stateName == "Starting" then
+            self.MusicController:PlayCatagory("InGame")
+
+            loadingScreenVisible:set(true)
+        else
+            loadingScreenVisible:set(false)
+        end
+
+        if stateName == "Ending" then
+            local wonTeam = ...
+            whowon:set(wonTeam)
+            winVisible:set(true)
+            self.MusicController:PlayCatagory("Lobby")
+            babyPlayers:set({Alive = {}, Dead = {}})
+            parentPlayers:set({Alive = {}, Dead = {}})
+        else
+
+            winVisible:set(false)
+
+        end
+
     end)
+
+
 
     self.scope:New "ScreenGui" {
         Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui"),
@@ -111,6 +143,14 @@ function UIController:KnitStart()
             --Toolbar(scope, {}),
             --ItemUi(scope, {}),
            -- HealthBar(scope, {}),
+            Winscreen(self.scope, {
+                WhoWon = whowon,
+                Visible = winVisible,
+            }),
+
+            LoadingScreen(self.scope, {
+                Visible = loadingScreenVisible,
+            }),
 
             self.scope:New "Frame" {
                 Name = "Frame",

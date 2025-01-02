@@ -27,6 +27,9 @@ function ForkServer.Client.EatItem(self : NexusInstanceForkServer, player : Play
 end
 
 function ForkServer.PromptInteract(self : NexusInstanceForkServer, promptName: string, ...)
+
+    local ParticleService = Knit.GetService("ParticleService")
+
     print(promptName)
     if promptName == "Outlets" then
 
@@ -41,12 +44,18 @@ function ForkServer.PromptInteract(self : NexusInstanceForkServer, promptName: s
         local props = {
             Parent = workspace,
             Particle = particles.Electric1,
-            Position = root,
+            Position = root.Position,
             Duration = 1,
             EmitAmount = 1,
         }
 
-        self.ParticleService:PlayParticle(props)
+        ParticleService:PlayParticle(props)
+
+
+        local gameSession = babyserver.GameSession
+        if gameSession then
+            gameSession:SpawnItem("Fork")
+        end
 
         self.Tool:Destroy()
 

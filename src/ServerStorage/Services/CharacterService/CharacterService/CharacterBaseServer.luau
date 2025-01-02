@@ -4,6 +4,9 @@ local TweenService = game:GetService("TweenService")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
 
+local ServerStorage = game:GetService("ServerStorage")
+
+local GameSession = require(ServerStorage.Source.Services.MatchService.GameSession)
 
 local CharacterBaseServer = {}
 CharacterBaseServer.__index = CharacterBaseServer
@@ -35,6 +38,7 @@ export type CharacterBaseServer = {
     ragdollModule : typeof(require(game.ServerStorage.Source.Utils.Ragdoll)),
     ParticleService : typeof(Knit.GetService("ParticleService")),
     DataService : typeof(Knit.GetService("DataService")),
+    GameSession : GameSession.GameSession,
     Server: {
 
     },
@@ -128,6 +132,34 @@ function CharacterBaseServer.__new(self: NexusInstanceCharacterBaseServer, playe
             task.wait(1)
         end
 
+    end
+
+    self.EffectHandlers["Slowness"] = function(duration : number, multiplier : number)
+        multiplier = multiplier or 1
+        local humanoid = character:WaitForChild("Humanoid") :: Humanoid
+        local startTime = tick()
+        local endTime = startTime + duration
+
+        print("Slowness effect started")
+
+
+        type props = {
+            Parent : Instance?,
+            Position : Vector3?,
+            Particle : Instance,
+            Duration : number?,
+            EmitAmount : number?,
+        }
+
+        humanoid.WalkSpeed = 16 * (0.5 / multiplier)
+
+        while tick() < endTime do
+            task.wait(1)
+        end
+
+        print("Slowness effect ended")
+
+        humanoid.WalkSpeed = 16
     end
 end
 

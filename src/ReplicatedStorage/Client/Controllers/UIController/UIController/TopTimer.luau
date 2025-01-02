@@ -3,7 +3,7 @@ local RunService = game:GetService("RunService")
 local TextLabelWithStroke = require(ReplicatedStorage.Source.Client.Controllers.UIController.Components.Text.TextLabelWithStroke)
 
 local Fusion = require(game.ReplicatedStorage.Packages.fusion)
-
+local CollectionService = game:GetService("CollectionService")
 
 local Children, UICorner = Fusion.Children
 local TopTimer = {}
@@ -23,14 +23,30 @@ local function TopTimer(
     }
 )
 
+    local timerVisible = scope:Value(false)
+
+    local player = game.Players.LocalPlayer
+
+    CollectionService:GetInstanceAddedSignal("InGame"):Connect(function(instance)
+        if instance == player then
+            timerVisible:set(true)
+        end
+    end)
+
+    CollectionService:GetInstanceRemovedSignal("InGame"):Connect(function(instance)
+        if instance == player then
+            timerVisible:set(false)
+        end
+    end)
+
     local scale  = scope:Value(1)
     local text  = scope:Value("Hello World")
     local timeTillnext = 0
     local futureTimeText  = scope:Value("")
 
-    local GameService = Knit.GetService("GameService")
+    local MatchService = Knit.GetService("MatchService")
 
-    GameService.StateSignal:Connect(function(state, stateText, time)
+    MatchService.StateSignal:Connect(function(state, stateText, time)
         text:set(stateText)
         timeTillnext = time
     end)
@@ -64,7 +80,7 @@ local function TopTimer(
         AnchorPoint = props.AnchorPoint,
         Size = props.Size,
         LayoutOrder = props.LayoutOrder,
-
+        Visible = timerVisible,
 
         [Children] = {
             scope:New "UIStroke" {

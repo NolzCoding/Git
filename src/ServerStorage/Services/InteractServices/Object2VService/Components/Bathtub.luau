@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local Knit = require(ReplicatedStorage.Packages.Knit)
 local CharacterBaseServer = require(ServerStorage.Source.Services.CharacterService.CharacterService.CharacterBaseServer)
 local Component = require(ReplicatedStorage.Packages.Component)
+local Knit = require(ReplicatedStorage.Packages.Knit)
 type self = typeof(Component.new({Tag = "Bathtub"}))
 local Bathtub = Component.new({Tag = "Bathtub"})
 
@@ -33,18 +33,23 @@ function Bathtub:Construct()
             print("Doing the thing")
 
             local Overlap = Collider:GetTouchingParts()
-            local burnedPlayers = {}
+            local drowningPlayers = {}
             for _, part in ipairs(Overlap) do
+
                 local player = game.Players:GetPlayerFromCharacter(part.Parent)
+
+                if table.find(drowningPlayers, player) then
+                    continue
+                end
+
                 if player then
-                    table.insert(burnedPlayers, player)
+                    table.insert(drowningPlayers, player)
                     local character = self.CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
-                    character:ApplyEffect("Burn", 1)
+                    character:ApplyEffect("Drowning", 1)
                 end
             end
 
             task.wait(1)
-
 
         end
     end

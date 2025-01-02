@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CharacterClientBase = require(script.CharacterClient)
 local BabyClient = require(script.Characters.BabyClient)
 local ParentClient = require(script.Characters.ParentClient)
+local GhostClient = require(script.Characters.GhostClient)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local CharacterController = Knit.CreateController {
@@ -24,8 +25,12 @@ function CharacterController:KnitInit()
         while not character:GetAttribute("Character") do
             wait()
         end
-
         local characterType = character:GetAttribute("Character")
+
+        task.delay(5, function()
+            print(character.Parent)
+
+        end)
 
         if characterType == "Baby" then
             self.Character = BabyClient.new(character)
@@ -33,6 +38,10 @@ function CharacterController:KnitInit()
 
         if characterType == "Parent" then
             self.Character = ParentClient.new(character)
+        end
+
+        if characterType == "Ghost" then
+            self.Character = GhostClient.new(character)
         end
 
 

@@ -27,7 +27,10 @@ local skinsInShop = {
     Baby = {
         "Scary Noob Baby",
         "Batman",
-        "Adventure Baby"
+        "Adventure Baby",
+        "Baby Shark",
+        "Nerd",
+        "Baby Chicken",
     },
     Parent = {
 

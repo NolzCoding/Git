@@ -46,7 +46,7 @@ function Door:Triggered(prompt : ProximityPrompt, player : Player)
 
     local hingeConstraint = hinge:FindFirstChildOfClass("HingeConstraint")
     hingeConstraint.TargetAngle = 0
-    hingeConstraint.ServoMaxTorque = 10000
+    hingeConstraint.ServoMaxTorque = 100000
     hingeConstraint.AngularSpeed = 50
 
     if open then

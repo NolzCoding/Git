@@ -116,6 +116,14 @@ local function RightSideBar(scope : typeof(Fusion.scoped(Fusion)), props : {
                     }),
 
                     ImageButton(scope, {
+                        Image = Icons.BrownBook264,
+                        Size = UDim2.fromScale(0.3, 0.3),
+                        ButtonUp = function()
+                            props.OpenWindow("Achivements")
+                        end
+                    }),
+
+                    ImageButton(scope, {
                         Image = Icons.YellowLightning,
                         Size = UDim2.fromScale(0.3, 0.3),
                         ButtonUp = function()
