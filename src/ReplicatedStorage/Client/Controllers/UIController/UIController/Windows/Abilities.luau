@@ -199,6 +199,46 @@ function Abilities:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                                     },
                                 },
 
+                                scope : New "Frame" {
+                                    Size = UDim2.fromScale(0.4, 0.1),
+                                    Position = UDim2.fromScale(0.75, 0.1),
+                                    BackgroundColor3 = Color3.new(1.000000, 1.000000, 1.000000),
+                                    BackgroundTransparency = 0.5,
+                                    AnchorPoint = Vector2.new(0.5, 0.5),
+                                    [Children] = {
+                                        TextLabelWithStroke(scope, {
+                                            Text = abilityData.Price,
+                                            Size = UDim2.fromScale(0.8, 0.8),
+                                            Position = UDim2.fromScale(0.5, 0.5),
+                                            AnchorPoint = Vector2.new(0.5, 0.5),
+                                            TextColor3 = Color3.fromRGB(255, 255, 255),
+                                            StrokeColor = Color3.fromRGB(15, 15, 15),
+                                            Thickness = 2,
+                                        }),
+
+                                        scope :New "UICorner" {
+                                            CornerRadius = UDim.new(1, 0),
+                                        },
+
+                                        scope : New "ImageLabel" {
+                                            Size = UDim2.fromScale(1.5, 1.5),
+                                            Image = scope:Computed(function(use, scope)
+                                                return (abilityData.Product ~= 0) and Icons.Robux264 or Icons.BabyBucks
+                                            end),
+                                            AnchorPoint = Vector2.new(0.5, 0.5),
+                                            Position = UDim2.fromScale(1.05, 0.5),
+                                            Rotation = 30,
+                                            BackgroundTransparency = 1,
+                                            [Children] = {
+                                                scope : New "UIAspectRatioConstraint" {
+                                                    AspectRatio = 1,
+                                                }
+                                            }
+                                        }
+
+                                    },
+                                },
+
                                 DefaultButton(scope, {
                                     Text = "Unequip",
                                     Position = UDim2.fromScale(0.5, 0.8),

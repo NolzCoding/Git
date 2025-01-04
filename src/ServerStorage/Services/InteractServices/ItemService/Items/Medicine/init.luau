@@ -23,9 +23,7 @@ function MedicineServer.__new(self: NexusInstanceMedicineServer, itemName: strin
 
 end
 
-function MedicineServer.Client.EatItem(self : NexusInstanceMedicineServer, player : Player)
 
-end
 
 function MedicineServer.PromptInteract(self : NexusInstanceMedicineServer, promptName: string, ...)
 
@@ -39,7 +37,7 @@ function MedicineServer.PromptInteract(self : NexusInstanceMedicineServer, promp
 
     babyCharacterClass:HealAttributes(healAttributes)
 
-
+    self.Tool:Destroy()
 
 end
 

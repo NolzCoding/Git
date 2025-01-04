@@ -34,9 +34,13 @@ export type CharacterBaseServer = {
     ActiveEffects : {
         [string] : number,
     },
+    Connections : {
+        [string] : RBXScriptConnection,
+    },
     Died : NexusInstance.TypedEvent<>,
     ragdollModule : typeof(require(game.ServerStorage.Source.Utils.Ragdoll)),
     ParticleService : typeof(Knit.GetService("ParticleService")),
+    AchievementService : typeof(Knit.GetService("AchievementService")),
     DataService : typeof(Knit.GetService("DataService")),
     GameSession : GameSession.GameSession,
     Server: {
@@ -81,6 +85,7 @@ function CharacterBaseServer.__new(self: NexusInstanceCharacterBaseServer, playe
     self.DataService = Knit.GetService("DataService")
     self.ClientSignal = setmetatable({}, clientSignalMetaTable)
     self.AnimationTracks = {}
+    self.Connections = {}
     self.ItemSlots = self.ItemSlots or 2
 
     task.delay(1, function()
@@ -91,48 +96,14 @@ function CharacterBaseServer.__new(self: NexusInstanceCharacterBaseServer, playe
 
     self.IKControls = {}
 
-    local RightHand = character:WaitForChild("RightHand") :: BasePart
-    local RightUpperArm = character:WaitForChild("RightUpperArm") :: BasePart
-
-    self:NewIKControl("RightArm", RightHand, RightUpperArm)
 
     self.EffectHandlers = {}
     self.ActiveEffects = {}
 
     self.ParticleService = Knit.GetService("ParticleService")
-
-    self.EffectHandlers["Burn"] = function(duration : number, multiplier : number)
-        multiplier = multiplier or 1
-        local humanoid = character:WaitForChild("Humanoid") :: Humanoid
-        local damagepersecond = 10
-        local damage = damagepersecond * multiplier
-        local startTime = tick()
-        local endTime = startTime + duration
+    self.AchievementService = Knit.GetService("AchievementService")
 
 
-        type props = {
-            Parent : Instance?,
-            Position : Vector3?,
-            Particle : Instance,
-            Duration : number?,
-            EmitAmount : number?,
-        }
-
-        self.ParticleService:PlayParticle( {
-            Parent = character.HumanoidRootPart,
-            Position = nil, -- empty position = center of the parent
-            Duration = duration,
-            EmitAmount = 0,
-            Particle = ReplicatedStorage.Source.Data.Particles.Flames,
-        } :: props)
-
-
-        while tick() < endTime do
-            humanoid:TakeDamage(damage)
-            task.wait(1)
-        end
-
-    end
 
     self.EffectHandlers["Slowness"] = function(duration : number, multiplier : number)
         multiplier = multiplier or 1
@@ -186,7 +157,7 @@ function CharacterBaseServer.UnBindPartFromIKControl(self: NexusInstanceCharacte
     end
     ikControl.Enabled = false
     ikControl.Weight = 0
-    ikControl.Target = workspace.Baseplate
+    ikControl.Target = nil
 
 end
 
@@ -228,6 +199,8 @@ function CharacterBaseServer.NewIKControl(self: NexusInstanceCharacterBaseServer
     ikControl.Type = Enum.IKControlType.Position
     self.IKControls[name] = ikControl
 
+    print(ikControl)
+
     return ikControl
 
 end
@@ -242,7 +215,9 @@ function CharacterBaseServer.AddTrackFromId(self: NexusInstanceCharacterBaseServ
 end
 
 function CharacterBaseServer.Destroy(self: NexusInstanceCharacterBaseServer): ()
-
+    for _, connection in pairs(self.Connections) do
+        connection:Disconnect()
+    end
 end
 
 function CharacterBaseServer.GetItemCount(self: NexusInstanceCharacterBaseServer): (number)
@@ -280,6 +255,25 @@ function CharacterBaseServer.ApplyEffect(self: NexusInstanceCharacterBaseServer,
     end)
 
     --self.RemoteEvent:FireClient(self.Player, "ApplyEffect", effect, duration)
+end
+
+function CharacterBaseServer.Client.Morph(self: NexusInstanceCharacterBaseServer, player : Player, skinName): ()
+
+    local inGame = player:HasTag("InGame")
+
+    if inGame then
+        return
+    end
+
+    local skinModel = ReplicatedStorage.Data.Skins:FindFirstChild(skinName)
+
+    if not skinModel then
+        warn("Skin ", skinName, " not found")
+        return
+    end
+
+    self:NewMorph(skinModel)
+
 end
 
 function CharacterBaseServer.NewMorph(self: NexusInstanceCharacterBaseServer, model)

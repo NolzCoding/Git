@@ -18,17 +18,21 @@ function SoapServer.__new(self: NexusInstanceSoapServer, itemName: string, tool:
     ItemBase.__new(self, itemName, tool) --Remember to call the parent constructor!
     self:DisableCollisons()
 
+    self.Client.Use = function (self : NexusInstanceSoapServer, player : Player)
+        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+
+        print("Called soap use ", player)
+
+        self.CharacterService = Knit.GetService("CharacterService")
+        local character = self.CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
+
+        character:ApplyEffect("Slippery", 20)
+
+        self.Tool:Destroy()
+    end
+
 end
 
-function SoapServer.Client.EatItem(self : NexusInstanceSoapServer, player : Player)
-    local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
 
-    self.CharacterService = Knit.GetService("CharacterService")
-    local character = self.CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
-
-    character:ApplyEffect("Slippery", 20)
-
-    self.Tool:Destroy()
-end
 
 return NexusInstance.ToInstance(SoapServer) :: NexusInstance.NexusInstanceClass<typeof(SoapServer), (Input1: string, Input2: string) -> (NexusInstanceSoapServer)>

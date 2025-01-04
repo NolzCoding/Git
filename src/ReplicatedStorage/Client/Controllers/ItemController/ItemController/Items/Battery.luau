@@ -22,12 +22,12 @@ export type NexusInstanceBatteryClient = NexusInstance.NexusInstance<BatteryClie
 
 function BatteryClient.__new(self: NexusInstanceBatteryClient, itemName: string, tool: Tool, cashedVisual : Model?)
     print("BatteryClient")
-    ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
+
 
     local character = Players.LocalPlayer.Character
 
     local isBaby = character:GetAttribute("Character") == "Baby"
-
+    print("isBaby BATTERY", isBaby)
     if isBaby then
         self.BuildUI = function(scope)
             return ActionButton(scope, {
@@ -40,17 +40,27 @@ function BatteryClient.__new(self: NexusInstanceBatteryClient, itemName: string,
                 Image = Icons.Drop,
                 ImageSize = UDim2.new(0.5, 0, 0.5, 0),
                 ButtonUp = function()
-                    self.Server:EatItem()
+                    print("clicking gui BATTERY", isBaby)
+
+                    self.Server:Use()
                 end,
             })
         end
+
     end
 
-    UserInputService.InputEnded:Connect(function(input)
-        if input.KeyCode == Enum.KeyCode.F then
-            self.Server:EatItem()
-        end
-    end)
+    self.OnEquipped = function()
+        return {UserInputService.InputEnded:Connect(function(input)
+            if input.KeyCode == Enum.KeyCode.F then
+                print("CLICKING E BATTERY", isBaby)
+
+                self.Server:Use()
+            end
+        end)}
+    end
+
+    ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
+
 
    -- self.Server:DropItem()
 

@@ -5,6 +5,7 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local Fusion = require(ReplicatedStorage.Packages.fusion)
 local Children, peek = Fusion.Children, Fusion.peek
 local computed = Fusion.Computed
+local forPairs = Fusion.ForPairs
 local Card = require(script.Parent.Parent.Parent.Components.UI.Card)
 local Window = require(script.Parent.Parent.Parent.Components.UI.Window)
 local DefaultButton = require(script.Parent.Parent.Parent.Components.Buttons.DefaultButton)
@@ -14,6 +15,7 @@ local Icons = require(ReplicatedStorage.Source.Shared.Icons)
 local Item = require(script.Item)
 local Sounds = require(ReplicatedStorage.Source.Shared.Sounds)
 local SoundService = game:GetService("SoundService")
+local Sticker = require(script.Parent.Parent.Parent.Components.UI.Sticker)
 local RNGData = require(ReplicatedStorage.Source.Shared.RNGData)
 function Shop:Start() -- knit start
 
@@ -68,7 +70,20 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
         crates:set(inventory.Crates)
     end)
 
+	self.NonRestricted = scope:Value(false)
 
+	task.spawn(function()
+
+		local info = game:GetService("PolicyService"):GetPolicyInfoForPlayerAsync(game.Players.LocalPlayer)
+
+
+		if info.ArePaidRandomItemsRestricted then
+			self.NonRestricted:set(false)
+		else
+			self.NonRestricted:set(true)
+		end
+
+	end)
 
 	local rollTable = {
 		{
@@ -193,8 +208,6 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 			fillerItems[#fillerItems + 1] = fillerItem
 		end
 
-
-
 		-- insert winning item in index 2
 
 		self.RNGService:OpenCrate(Fusion.peek(self.ActiveCrate)):andThen(function(item)
@@ -275,7 +288,123 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 		Size = UDim2.fromScale(0.5, 0.5),
 		Open = open,
 		Build = function(scope)
+
+			local contentsOpen = scope:Value(false)
+
+			local contents = scope:Value({})
+
+			local price3 = scope:Value(100)
+			local price10 = scope:Value(500)
+
+			local productid1 = 0
+			local productid3 = 0
+			local productid10 = 0
+
+			local function getNewPrices(crate)
+
+				local price3Info = MarketplaceService:GetProductInfo(RNGData.RNGTableProductsIds[crate][3], Enum.InfoType.Product)
+
+				local price10Info = MarketplaceService:GetProductInfo(RNGData.RNGTableProductsIds[crate][10], Enum.InfoType.Product)
+
+				price3:set(price3Info.PriceInRobux)
+				price10:set(price10Info.PriceInRobux)
+
+				productid1 = RNGData.RNGTableProductsIds[crate][1]
+				productid3 = RNGData.RNGTableProductsIds[crate][3]
+				productid10 = RNGData.RNGTableProductsIds[crate][10]
+
+
+			end
+
+			scope:Observer(self.ActiveCrate):onChange(function()
+				contents:set(RNGData.RNGTable[peek(self.ActiveCrate)])
+				getNewPrices(peek(self.ActiveCrate))
+			end)
+
+			local contentsWindow = Window(scope, {
+				HeaderText = "Contents",
+				ZIndex = 6,
+				Open = contentsOpen,
+				Size = UDim2.fromScale(0.8, 0.8),
+				Build = function(scope)
+
+					return scope:New "Frame" {
+						ZIndex = 3,
+						Size = UDim2.new(0.85, 0, 0.75, 0),
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Position = UDim2.new(0.5, 0, 0.6, 0),
+						BackgroundTransparency = 1,
+						[Children] = {
+
+							scope:New "UIGridLayout" {
+								CellSize = UDim2.new(0.2, 0, 0.25, 0),
+								CellPadding = UDim2.new(0.05, 0, 0.05, 0),
+								FillDirection = Enum.FillDirection.Horizontal,
+								HorizontalAlignment = Enum.HorizontalAlignment.Center,
+								SortOrder = Enum.SortOrder.LayoutOrder,
+								VerticalAlignment = Enum.VerticalAlignment.Top,
+							},
+
+							scope : ForPairs(contents, function(use, scope, key, value)
+
+								return key, scope : New "ImageLabel" {
+
+									BackgroundTransparency = 1,
+									Image = value.Image,
+
+									[Children] = {
+
+										TextLabelWithStroke(scope, {
+											Text = value.Name,
+											AnchorPoint = Vector2.new(0.5, 0.5),
+											Position = UDim2.fromScale(0.5, -0.1),
+											Size = UDim2.fromScale(1, 0.2),
+											TextColor3 = rarityColors[value.Rarity],
+										}),
+
+										TextLabelWithStroke(scope, {
+											Text = value.Chance * 100 .. "%",
+											AnchorPoint = Vector2.new(0.5, 0.5),
+											Position = UDim2.fromScale(0.5, 1),
+											Size = UDim2.fromScale(1, 0.2),
+											TextColor3 = rarityColors[value.Rarity],
+										}),
+
+										scope : New  "UIAspectRatioConstraint" {
+											AspectRatio = 1,
+										}
+
+									}
+
+								}
+
+							end)
+
+						}
+					}
+
+				end
+			})
+
 			return {
+				contentsWindow,
+				DefaultButton(scope, {
+
+					Position = UDim2.fromScale(0.1, 0.1),
+					Size = UDim2.fromScale(0.15, 0.2),
+					ZIndex = 5,
+
+					Text = "See Contents",
+					ButtonDown = function()
+
+
+					end,
+					ButtonUp = function()
+						contentsOpen:set(not peek(contentsOpen))
+					end
+
+
+				}),
 
 				scope:New("Frame")({
 					Name = "2",
@@ -315,7 +444,9 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 
 									[Children] = {
 										DefaultButton(scope,{
-											Name = "Buy1",
+											Name = "Buy3",
+											Visible = self.NonRestricted,
+
 											AnchorPoint = Vector2.new(0.5, 0.5),
 											BackgroundColor3 = Color3.fromRGB(6, 255, 151),
 											BorderColor3 = Color3.fromRGB(0, 0, 0),
@@ -323,13 +454,28 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 											FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json"),
 											Position = UDim2.fromScale(0.184, 0.5),
 											Size = UDim2.fromScale(0.301, 0.564),
-											Text = "Buy 1",
+											Text = "3x",
 
 											ButtonUp = function()
 											end,
 
 											ButtonDown = function()
+												MarketplaceService:PromptProductPurchase(game.Players.LocalPlayer, productid3)
 											end,
+
+											Build = function()
+
+												return Sticker(scope, {
+													Color = Color3.fromRGB(21, 255, 0),
+													Position = UDim2.fromScale(0, 0),
+													Size = UDim2.fromScale(0.5, 0.5),
+													Text = scope:Computed(function(use, scope)
+														return use(price3) .. "R$"
+													end),
+													AnchorPoint = Vector2.new(0, 1),
+												})
+
+											end
 
 										}),
 
@@ -361,6 +507,8 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 														Time = 5,
 													})
 
+													MarketplaceService:PromptProductPurchase(game.Players.LocalPlayer, productid1)
+
 													return
 												end
 
@@ -373,7 +521,8 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 										}),
 
 										DefaultButton(scope,{
-											Name = "Buy3",
+											Name = "Buy10",
+											Visible = self.NonRestricted,
 											AnchorPoint = Vector2.new(0.5, 0.5),
 											BackgroundColor3 = Color3.fromRGB(6, 255, 151),
 											BorderColor3 = Color3.fromRGB(0, 0, 0),
@@ -381,13 +530,30 @@ function Shop:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 											FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json"),
 											Position = UDim2.fromScale(0.823, 0.5),
 											Size = UDim2.fromScale(0.301, 0.564),
-											Text = "Buy 3",
+											Text = "10x",
 
 											ButtonUp = function()
+
 											end,
 
 											ButtonDown = function()
+												MarketplaceService:PromptProductPurchase(game.Players.LocalPlayer, productid10)
 											end,
+
+											Build = function()
+
+												return Sticker(scope, {
+													Color = Color3.fromRGB(255, 0, 0),
+													Position = UDim2.fromScale(0, 0),
+													Size = UDim2.fromScale(0.5, 0.5),
+													Text = scope:Computed(function(use, scope)
+														return use(price10) .. "R$"
+													end),
+													AnchorPoint = Vector2.new(0, 1),
+
+												})
+
+											end
 
 										}),
 

@@ -53,6 +53,11 @@ function ParentServer.SetupCharacter(self: NexusInstanceParentServer, character 
     local track = self:AddTrackFromId("rbxassetid://136850555364141", "Holding")
     track.Looped = true
 
+    local RightHand = character:WaitForChild("RightHand") :: BasePart
+    local RightUpperArm = character:WaitForChild("RightUpperArm") :: BasePart
+
+    self:NewIKControl("RightArm", RightHand, RightUpperArm)
+
 
 end
 
@@ -88,6 +93,11 @@ function ParentServer.StopPickingUp(self: NexusInstanceParentServer): ()
 end
 
 function ParentServer.PickupPlayer(self : NexusInstanceParentServer, playerClassToPickup : BabyServer.BabyServer): ()
+
+
+    if playerClassToPickup.Player:HasTag("NoBabyBed") then
+        return
+    end
 
     if self.PickedUp then
         self:StopPickingUp()
@@ -125,6 +135,13 @@ function ParentServer.PickupPlayer(self : NexusInstanceParentServer, playerClass
         self:StopPickingUp()
     end)
 
+    task.spawn(function()
+
+        self.AchievementService:PerformedAction(self.Player, "BabyPickup", 1)
+
+
+    end)
+
 end
 
 
@@ -136,6 +153,8 @@ function ParentServer.__new(self: NexusInstanceParentServer, player : Player, ch
 
     self:SetupCharacter(character)
     print("ParentServer")
+
+
 
 end
 

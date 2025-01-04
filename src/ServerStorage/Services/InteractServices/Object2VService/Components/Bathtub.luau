@@ -5,6 +5,7 @@ local Component = require(ReplicatedStorage.Packages.Component)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 type self = typeof(Component.new({Tag = "Bathtub"}))
 local Bathtub = Component.new({Tag = "Bathtub"})
+local AchievementService = Knit.GetService("AchievementService")
 
 print("reqiored")
 
@@ -45,7 +46,7 @@ function Bathtub:Construct()
                 if player then
                     table.insert(drowningPlayers, player)
                     local character = self.CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
-                    character:ApplyEffect("Drowning", 1)
+                    character:ApplyEffect("Drowning", 1, 5)
                 end
             end
 
@@ -77,7 +78,7 @@ function Bathtub:Construct()
             coroutine.close(rotinue)
         end
 
-
+        AchievementService:PerformedAction(player, "Bath", 1)
 
     end)
 

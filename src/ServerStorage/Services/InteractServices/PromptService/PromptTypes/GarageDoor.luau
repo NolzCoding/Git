@@ -43,7 +43,7 @@ function GarageDoor:Triggered(prompt : ProximityPrompt, player : Player)
 end
 
 function GarageDoor:HoldStart(prompt : ProximityPrompt, player : Player)
-
+    print("Binding")
     local character = self.CharacterService:GetCharacter(player) :: CharacterBase.CharacterBaseServer
     character:BindPartToIKControl("RightArm", prompt.Parent)
 

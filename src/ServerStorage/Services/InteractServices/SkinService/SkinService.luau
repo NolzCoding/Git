@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local MarketplaceService = game:GetService("MarketplaceService")
+local ServerStorage = game:GetService("ServerStorage")
+local CharacterBaseServer = require(ServerStorage.Source.Services.CharacterService.CharacterService.CharacterBaseServer)
 local SkinInfo = require(ReplicatedStorage.Source.Shared.Skins)
 local SkinService = Knit.CreateService({
     Name = "SkinService";
@@ -20,7 +22,7 @@ function SkinService:KnitStart()
 
     self.DataService = Knit.GetService("DataService")
     self.NotificationService = Knit.GetService("NotificationService")
-
+    self.CharacterService = Knit.GetService("CharacterService")
 
 end
 
@@ -43,6 +45,14 @@ function SkinService:EquipSkin(player : Player, skinName : string, skinType : st
         Color = Color3.fromRGB(115, 255, 21),
         Time = 5,
     }, player)
+
+
+    if player:HasTag("InGame") then
+        return
+    end
+
+    local character = self.CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
+    character:NewMorph(ReplicatedStorage.Data.Skins:FindFirstChild(skinName))
 
 end
 

@@ -20,7 +20,7 @@ setmetatable(DefaultSession, GameSession) --TestClass1NexusInstance would be ret
 export type DefaultSession = {
 
     HandleGame : (self : NexusInstanceDefaultSession, callback : () -> any) -> (),
-
+    Trove : typeof(Trove.new()),
     Parents : {
 
         Alive : {Player},
@@ -39,6 +39,9 @@ export type NexusInstanceDefaultSession = NexusInstance.NexusInstance<DefaultSes
 
 function DefaultSession.__new(self: NexusInstanceDefaultSession, players: {Player})
     GameSession.__new(self, players) --Remember to call the parent constructor!
+
+    self.Trove = Trove.new()
+
     self.Parents = {
         Alive = {},
         Dead = {}
@@ -192,7 +195,7 @@ function DefaultSession.HandleGame(self : NexusInstanceDefaultSession, callback 
 
         for _, healthAttributeName in ipairs(healthAttributeNames) do
 
-            humanoid:GetAttributeChangedSignal(healthAttributeName):Connect(function()
+            self.Trove:Connect(humanoid:GetAttributeChangedSignal(healthAttributeName),function()
 
                 if humanoid:GetAttribute(healthAttributeName) <= 0 then
 
@@ -202,14 +205,14 @@ function DefaultSession.HandleGame(self : NexusInstanceDefaultSession, callback 
             end)
         end
 
-        v.Character.Humanoid.Died:Connect(function()
+        self.Trove:Connect(v.Character.Humanoid.Died, function()
             babyDied(v)
 
         end)
 
         -- if leaves game
 
-        Players.PlayerRemoving:Connect(function(player : Player)
+        self.Trove:Connect(Players.PlayerRemoving, function(player : Player)
 
             if player == v then
 
@@ -285,8 +288,15 @@ function DefaultSession.States.Cleanup(self : NexusInstanceDefaultSession) : ()
 
     self.OnStateUpdate:Fire("Cleanup", "Cleanup", workspace:GetServerTimeNow() + 5)
 
-    self:Destroy()
+end
 
+function DefaultSession.Destroy(self : NexusInstanceDefaultSession) : ()
+    self.Parents = nil
+    self.Babies = nil
+    self.Map = nil
+    self.GameSlot = nil
+    self.Trove:Clean()
+    GameSession.Destroy(self)
 end
 
 return NexusInstance.ToInstance(DefaultSession) :: NexusInstance.NexusInstanceClass<typeof(DefaultSession), (players : {Player}) -> (NexusInstanceDefaultSession)>

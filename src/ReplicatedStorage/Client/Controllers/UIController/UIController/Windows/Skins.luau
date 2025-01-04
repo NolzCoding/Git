@@ -25,14 +25,20 @@ end
 
 local skinsInShop = {
     Baby = {
-        "Scary Noob Baby",
-        "Batman",
-        "Adventure Baby",
-        "Baby Shark",
         "Nerd",
+        "Adventure Baby",
+        "Batman",
+        "Scary Noob Baby",
         "Baby Chicken",
+        "Baby Shark",
+        "Emo Baby",
+        "Emo Girl",
     },
     Parent = {
+        "Bald Santa",
+        "Mom",
+        "Yo Mama",
+        "Crazy Babysitter",
 
     }
 }
@@ -114,6 +120,7 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
     self.DataController = Knit.GetController("DataController")
     self.DataService = Knit.GetService("DataService")
     self.SkinService = Knit.GetService("SkinService")
+    self.CharacterService = Knit.GetService("CharacterService")
 
     local ready, data = self.DataService.DataProperty:OnReady():await()
     print(data, "Recived")
@@ -230,11 +237,51 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                                             Position = UDim2.fromScale(0.5, 0.5),
                                             AnchorPoint = Vector2.new(0.5, 0.5),
                                             TextColor3 = Color3.fromRGB(180, 180, 180),
-                                            Thickness = 0,
+                                            Thickness = 1,
                                         }),
 
                                         scope :New "UICorner" {
                                             CornerRadius = UDim.new(1, 0),
+                                        },
+
+                                    },
+                                },
+
+                                scope : New "Frame" {
+                                    Size = UDim2.fromScale(0.4, 0.1),
+                                    Position = UDim2.fromScale(0.75, 0.1),
+                                    BackgroundColor3 = Color3.new(1.000000, 1.000000, 1.000000),
+                                    BackgroundTransparency = 0.5,
+                                    AnchorPoint = Vector2.new(0.5, 0.5),
+                                    [Children] = {
+                                        TextLabelWithStroke(scope, {
+                                            Text = skinData.Price,
+                                            Size = UDim2.fromScale(0.8, 0.8),
+                                            Position = UDim2.fromScale(0.5, 0.5),
+                                            AnchorPoint = Vector2.new(0.5, 0.5),
+                                            TextColor3 = Color3.fromRGB(255, 255, 255),
+                                            StrokeColor = Color3.fromRGB(15, 15, 15),
+                                            Thickness = 2,
+                                        }),
+
+                                        scope :New "UICorner" {
+                                            CornerRadius = UDim.new(1, 0),
+                                        },
+
+                                        scope : New "ImageLabel" {
+                                            Size = UDim2.fromScale(1.5, 1.5),
+                                            Image = scope:Computed(function(use, scope)
+                                                return (skinData.Product ~= 0) and Icons.Robux264 or Icons.BabyBucks
+                                            end),
+                                            AnchorPoint = Vector2.new(0.5, 0.5),
+                                            Position = UDim2.fromScale(1.05, 0.5),
+                                            Rotation = 30,
+                                            BackgroundTransparency = 1,
+                                            [Children] = {
+                                                scope : New "UIAspectRatioConstraint" {
+                                                    AspectRatio = 1,
+                                                }
+                                            }
                                         }
 
                                     },
@@ -280,6 +327,7 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                                     end,
                                     ButtonUp = function()
                                         self.SkinService:BuySkin(highlightedSkinValue, peek(selectedCatagory))
+
                                     end,
 
                                     Build = function(scope)
@@ -453,6 +501,45 @@ function Skins:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                                         })
 
                                     end)
+                                }
+
+                            end
+                        }),
+
+                        Section(scope, {
+                            Name = "Shop",
+                            Build = function(scope)
+
+                                return {
+                                    scope:New "UIGridLayout" {
+                                    CellSize = UDim2.fromOffset(100, 100),
+                                    FillDirection = Enum.FillDirection.Horizontal,
+                                    HorizontalAlignment = Enum.HorizontalAlignment.Center,
+                                    VerticalAlignment = Enum.VerticalAlignment.Top,
+                                },
+
+                                    forValues(scope, skinsInShop.Parent, function(use, scope, key)
+
+                                        local equipped = scope:Computed(function(use, scope)
+                                            return use(skinsData).Parent.CurrentSkin == key
+                                        end)
+
+                                        local skinData = SkinsInfo.Skins.Parent[key]
+                                        local rarityColor = SkinsInfo.RarityColors[skinData.Rarity]
+
+                                        return skin(scope, {
+                                            RarityColor = rarityColor or Color3.fromRGB(255, 255, 255),
+                                            SkinName = key,
+                                            Clicked = function()
+                                                highlightedSkin:set(key)
+                                            end,
+                                            TypeOfSkin = "Parent",
+                                            Equipped = equipped,
+                                            Amount = 0,
+                                        })
+
+                                    end)
+
                                 }
 
                             end

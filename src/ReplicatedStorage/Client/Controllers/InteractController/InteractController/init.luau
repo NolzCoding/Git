@@ -14,9 +14,7 @@ local InteractController = Knit.CreateController({
 	Name = "InteractController",
 })
 
-function InteractController:KnitStart()
-	print("InteractController KnitStart")
-end
+
 
 function InteractController:GetDeviceSpesificImage()
 
@@ -35,7 +33,17 @@ end
 
 local SIZE = UDim2.fromScale(2.5, 2.5)
 
-function InteractController:KnitInit()
+function InteractController:KnitStart()
+
+
+	self.modules = {}
+
+	for _,v in ipairs(script:GetChildren()) do
+		if v:IsA("ModuleScript") then
+			self.modules[v.Name] = require(v)
+		end
+	end
+
 	local scope = Fusion.scoped(Fusion)
 
     local promptImage = self:GetDeviceSpesificImage()
@@ -83,17 +91,46 @@ function InteractController:KnitInit()
 
             text:set(description or "")
 
+			for _, tag in ipairs(prompt.Parent:GetTags()) do
+				if self.modules[tag] then
+					if not self.modules[tag].Shown then
+						continue
+					end
+					self.modules[tag]:Shown(prompt)
+				end
+			end
+
         end
     end)
 
     ProximityPromptService.PromptHidden:Connect(function(prompt)
         if prompt then
+
+			for _, tag in ipairs(prompt.Parent:GetTags()) do
+				if self.modules[tag] then
+					if not self.modules[tag].Hidden then
+						continue
+					end
+					self.modules[tag]:Hidden(prompt)
+				end
+			end
+
             scale:set(UDim2.fromScale(0, 0))
             task.wait(0.2)
         end
     end)
 
 	ProximityPromptService.PromptTriggered:Connect(function(prompt)
+
+		for _, tag in ipairs(prompt.Parent:GetTags()) do
+			if self.modules[tag] then
+				if not self.modules[tag].Triggered then
+					continue
+				end
+				self.modules[tag]:Triggered(prompt)
+			end
+		end
+
 		uiScale:set(0.9)
 		shadowScale:set(1)
 		task.wait(0.1)

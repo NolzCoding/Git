@@ -36,14 +36,32 @@ function MatchService:NewGameSession(players : {Player})
 
         if stateName == "Cleanup" then
             local players = newGameSession.Players
-            for _, player in ipairs(players) do
-                player.Character:Destroy()
-                player:LoadCharacter()
-                self.CharacterService:NewCharacter(player, "Baby")
+            for _, player : Player in ipairs(players) do
+
+
+                if not player then
+                    continue
+                end
+                if player.Character then
+                    player.Character:Destroy()
+                end
+
+                if player:IsDescendantOf(game.Players) then
+                    player:LoadCharacter()
+                    self.CharacterService:NewCharacter(player, "Baby")
+                end
+
             end
         end
 
-        self.Client.StateSignal:FireAll(stateName, stateText, time, ...)
+        --self.Client.StateSignal:FireAll(stateName, stateText, time, ...)
+
+        for _, player : Player in ipairs(newGameSession.Players) do
+            if player then
+                self.Client.StateSignal:Fire(player, stateName, stateText, time, ...)
+            end
+        end
+
     end)
 
     return newGameSession

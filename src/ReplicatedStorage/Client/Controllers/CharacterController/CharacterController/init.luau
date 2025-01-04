@@ -32,6 +32,14 @@ function CharacterController:KnitInit()
 
         end)
 
+        local currentCharacter = self.Character
+
+        if self.Character then
+            task.spawn(function()
+                self.Character:Destroy()
+            end)
+        end
+
         if characterType == "Baby" then
             self.Character = BabyClient.new(character)
         end

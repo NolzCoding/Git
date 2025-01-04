@@ -20,7 +20,6 @@ export type NexusInstanceLighterClient = NexusInstance.NexusInstance<LighterClie
 
 function LighterClient.__new(self: NexusInstanceLighterClient, itemName: string, tool: Tool, cashedVisual: Model?)
 	print("LighterClient")
-	ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 
 	local lightSound = Instance.new("Sound")
 	lightSound.SoundId = Sounds.Lighter.Light
@@ -35,6 +34,38 @@ function LighterClient.__new(self: NexusInstanceLighterClient, itemName: string,
 	local isBaby = character:GetAttribute("Character") == "Baby"
 
 	if isBaby then
+
+	end
+
+	self.OnEquipped = function()
+
+		if not isBaby then
+			return
+		end
+
+		return {UserInputService.InputEnded:Connect(function(input)
+			if input.KeyCode == Enum.KeyCode.F then
+				local particle = self.Tool.FlamePart.Flame1
+				local light = self.Tool.FlamePart.PointLight
+
+				particle.Enabled = not particle.Enabled
+				light.Enabled = not light.Enabled
+
+				if particle.Enabled then
+					lightSound:Play()
+				else
+					clickSound:Play()
+				end
+
+				self.Server:ToggleLighter()
+			end
+		end)}
+	end
+
+
+
+	if isBaby then
+
 		self.BuildUI = function(scope)
 			return ActionButton(scope, {
 				Position = UDim2.new(0.8, 0, 0.85, 0),
@@ -62,25 +93,13 @@ function LighterClient.__new(self: NexusInstanceLighterClient, itemName: string,
 				end,
 			})
 		end
+
 	end
 
-	UserInputService.InputEnded:Connect(function(input)
-		if input.KeyCode == Enum.KeyCode.F then
-			local particle = self.Tool.FlamePart.Flame1
-			local light = self.Tool.FlamePart.PointLight
 
-			particle.Enabled = not particle.Enabled
-			light.Enabled = not light.Enabled
 
-			if particle.Enabled then
-				lightSound:Play()
-			else
-				clickSound:Play()
-			end
 
-			self.Server:ToggleLighter()
-		end
-	end)
+	ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 
 	-- self.Server:DropItem()
 end

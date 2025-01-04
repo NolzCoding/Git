@@ -20,10 +20,18 @@ export type ItemBaseClient = {
     CashedVisual: Model?,
     Tool : Tool,
     Remote: RemoteFunction,
+    Connections: {RBXScriptConnection},
     BuildUI: (scope : any) -> (),
     Server : {
         DropItem: (self: ItemBaseClient) -> (),
     },
+    EquippedConnections: {RBXScriptConnection}?,
+    OnEquipped : (() -> {RBXScriptConnection}),
+    OnUnequipped : (() -> ()),
+
+    Equipped: (self: ItemBaseClient) -> (),
+    Unequipped: (self: ItemBaseClient) -> (),
+
 } & typeof(setmetatable({}, ItemBaseClient))
 export type NexusInstanceItemBaseClient = NexusInstance.NexusInstance<ItemBaseClient>
 
@@ -31,11 +39,12 @@ export type NexusInstanceItemBaseClient = NexusInstance.NexusInstance<ItemBaseCl
 
 
 function ItemBaseClient.__new(self: NexusInstanceItemBaseClient, itemName: string, tool: Tool, cashedVisual : Model?): () -- cashed visual is optional needs a primary part
+    self.Events = {}
     self.ItemName = itemName
     self.CashedVisual = cashedVisual
     self.Tool = tool
     self.Connections = {}
-    self.BuildUI = function()
+    self.BuildUI = self.BuildUI or function()
 
     end
     -- listen for the tool to be destroyed
@@ -45,12 +54,21 @@ function ItemBaseClient.__new(self: NexusInstanceItemBaseClient, itemName: strin
 
     -- also listen for tool to be parented to backpack or character otherwise destroy
 
+    local dropitem = nil
 
     tool.Equipped:Connect(function()
+        dropitem = UserInputService.InputBegan:Connect(function(input)
+            if input.KeyCode == Enum.KeyCode.Q then
+                self:DropItem()
+            end
+        end)
         self:Equipped()
     end)
 
     tool.Unequipped:Connect(function()
+        if dropitem then
+            dropitem:Disconnect()
+        end
         self:Unequipped()
     end)
 
@@ -95,6 +113,8 @@ end
 
 function ItemBaseClient.Equipped(self: NexusInstanceItemBaseClient)
 
+
+
     self.scope = Fusion.scoped(Fusion)
 
     self.scope : New "ScreenGui" {
@@ -114,6 +134,17 @@ function ItemBaseClient.Equipped(self: NexusInstanceItemBaseClient)
         }
     }
 
+    if self.OnEquipped then
+
+        if self.EquippedConnections then
+            for _, connection in pairs(self.EquippedConnections) do
+                connection:Disconnect()
+            end
+        end
+
+        self.EquippedConnections = self:OnEquipped()
+
+    end
 
 
 end
@@ -122,6 +153,20 @@ function ItemBaseClient.Unequipped(self: NexusInstanceItemBaseClient)
 
     self.scope:doCleanup()
 
+    if self.EquippedConnections then
+        for _, connection in pairs(self.EquippedConnections) do
+            connection:Disconnect()
+        end
+    end
+
+    self.EquippedConnections = nil
+
+    if self.OnUnequipped then
+
+
+        self:OnUnequipped()
+    end
+
 end
 
 
@@ -129,9 +174,19 @@ end
 --Custom function.
 
 function ItemBaseClient.Destroy(self: NexusInstanceItemBaseClient): ()
+    for _, connection in pairs(self.Connections) do
+        connection:Disconnect()
+    end
 
-    table.clear(self)
+    if self.EquippedConnections then
+        for _, connection in pairs(self.EquippedConnections) do
+            connection:Disconnect()
+        end
+    end
+
     print("Destroying item client")
+
+
 
 end
 -- functions called by the client

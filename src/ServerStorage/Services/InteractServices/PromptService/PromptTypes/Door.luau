@@ -1,7 +1,10 @@
 local Door = {}
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local ServerStorage = game:GetService("ServerStorage")
 
+local CharacterBaseServer = require(ServerStorage.Source.Services.CharacterService.CharacterService.CharacterBaseServer)
+local CharacterService = Knit.GetService("CharacterService")
 local DoorOpenSound = Instance.new("Sound")
 DoorOpenSound.SoundId = "rbxassetid://6058561902"
 DoorOpenSound.Parent = script.Parent
@@ -41,6 +44,12 @@ function Door:Triggered(prompt : ProximityPrompt, player : Player)
             return
         end
     end
+
+    task.spawn(function()
+        local character = CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
+
+        character:PlayIKControl("RightArm", (prompt.Parent) :: Part, 0.1, 0.1)
+    end)
 
     local open = hinge:GetAttribute("Open")
 

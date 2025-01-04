@@ -20,7 +20,6 @@ export type NexusInstanceGlueClient = NexusInstance.NexusInstance<GlueClient>
 
 function GlueClient.__new(self: NexusInstanceGlueClient, itemName: string, tool: Tool, cashedVisual : Model?)
     print("GlueClient")
-    ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 
     self.BuildUI = function(scope)
         --[[return ActionButton(scope, {
@@ -37,6 +36,9 @@ function GlueClient.__new(self: NexusInstanceGlueClient, itemName: string, tool:
             end,
         })]]
     end
+
+    ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
+
 
    -- self.Server:DropItem()
 

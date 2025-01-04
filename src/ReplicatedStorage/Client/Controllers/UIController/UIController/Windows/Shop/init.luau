@@ -73,28 +73,32 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                                 local cards = {
 
                                     {
-                                        Title = "Card 1",
+                                        Title = "500 Babybucks",
                                         Description = "This is a description of card 1",
                                         Price = 100,
                                         Image = "rbxassetid://70566867826486",
+                                        Id = 2689679824,
                                     },
                                     {
-                                        Title = "Card 2",
+                                        Title = "5k Babybucks",
                                         Description = "This is a description of card 2",
                                         Price = 200,
                                         Image = "rbxassetid://70566867826486",
+                                        Id = 2689680885
                                     },
                                     {
-                                        Title = "Card 3",
+                                        Title = "20k Babybucks",
                                         Description = "This is a description of card 3",
                                         Price = 300,
                                         Image = "rbxassetid://70566867826486",
+                                        Id = 2689682303
                                     },
                                     {
-                                        Title = "Card 4",
+                                        Title = "100k BABYBUCKS",
                                         Description = "This is a description of card 4",
                                         Price = 400,
                                         Image = "rbxassetid://70566867826486",
+                                        Id = 2689682959
                                     },
 
                                 }
@@ -103,7 +107,7 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
 
                                 for _,v in ipairs(cards) do
 
-                                    local Id = 2666292727
+                                    local Id = v.Id
 
                                     local info =  MarketplaceService:GetProductInfo(Id, Enum.InfoType.Product)
                                     local image = "rbxassetid://" ..  info.IconImageAssetId
@@ -188,8 +192,8 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                                             return use(crates)["Skin Crate"] or 0
                                         end),
                                         ImageSize = UDim2.fromScale(0.8, 0.8),
-                                        Name = "Item 1",
-                                        RarityColor = Color3.fromRGB(255, 103, 103),
+                                        Name = "Skin Crate",
+                                        RarityColor = Color3.fromRGB(207, 87, 255),
                                         Image = Icons.GiftBoxes.Purple.Large,
                                         Clicked = function()
                                             self.UIController:CloseWindow("Shop")
@@ -203,14 +207,14 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                                         Amount = scope:Computed(function(use)
                                             return use(crates)["Epic Skin Crate"] or 0
                                         end),
-                                        Name = "Item 1",
+                                        Name = "Epic Skin Crate",
                                         ImageSize = UDim2.fromScale(0.8, 0.8),
 
                                         RarityColor = Color3.fromRGB(8, 255, 152),
                                         Image = Icons.GiftBoxes.Green.Large,
                                         Clicked = function()
                                             self.UIController:CloseWindow("Shop")
-                                            self.UIController:OpenWindow("RollItem", "Starter Crate")
+                                            self.UIController:OpenWindow("RollItem", "Epic Skin Crate")
                                         end,
 
                                     }),
@@ -222,9 +226,9 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                                         end),
                                         ImageSize = UDim2.fromScale(0.8, 0.8),
 
-                                        Name = "Item 1",
-                                        RarityColor = Color3.fromRGB(207, 87, 255),
-                                        Image = Icons.GiftBoxes.Purple.Large,
+                                        Name = "Ability Crate",
+                                        RarityColor = Color3.fromRGB(255, 230, 87),
+                                        Image = Icons.GiftBoxes.Yellow.Large,
                                         Clicked = function()
                                             self.UIController:CloseWindow("Shop")
                                             self.UIController:OpenWindow("RollItem", "Ability Crate")
@@ -268,6 +272,12 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
 
             }
 
+            self.goTo = function(section)
+                TweenService:Create(scrollingFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    CanvasPosition = Fusion.peek(listSections[section].CanvasPositon),
+                }):Play()
+            end
+
             local ListFrame = scope:New "Frame" {
                 Size = UDim2.new(0.1, 0, 1, 0),
                 AnchorPoint = Vector2.new(1, 0.5),
@@ -296,6 +306,21 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
 
                             end,
 
+                            Build = function(scope)
+
+                                return {TextLabelWithStroke(scope, {
+                                    Text = "Shop",
+                                    Size = UDim2.fromScale(1, 0.3),
+                                    Position = UDim2.fromScale(0.5, 0.8),
+                                    ZIndex = 2,
+                                    AnchorPoint = Vector2.new(0.5, 0.5),
+                                    Thickness = 2,
+                                    StrokeColor = Color3.fromRGB(20, 18, 8),
+                                    TextColor = Color3.fromRGB(231, 216, 148),
+                                })}
+
+                            end
+
                         })
 
                     end),
@@ -309,6 +334,22 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
 			}
 		end,
 	})
+end
+
+function Shop:OnOpen(...)
+
+    print(...)
+
+    local goto = ...
+
+
+
+    if goto then
+        task.delay(0.5,function()
+            self.goTo(goto)
+        end)
+    end
+
 end
 
 return Shop

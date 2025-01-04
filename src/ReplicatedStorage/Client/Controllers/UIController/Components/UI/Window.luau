@@ -12,7 +12,7 @@ local function Window(scope: typeof(Fusion.scoped(Fusion)), props: {
     HeaderText : string?,
     Build : (scope : any) -> (),
     Open : boolean?,
-
+	ZIndex : number?,
     Position : UDim2?,
     AnchorPoint : Vector2?,
     Size : UDim2?,
@@ -57,6 +57,7 @@ local function Window(scope: typeof(Fusion.scoped(Fusion)), props: {
     local tweenSize = scope:Tween(desiredSize, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.InOut))
 
 	return scope:New("Frame")({
+		ZIndex = props.ZIndex or 1,
 		Name = "Basic Frame",
 		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 		BackgroundTransparency = 1,

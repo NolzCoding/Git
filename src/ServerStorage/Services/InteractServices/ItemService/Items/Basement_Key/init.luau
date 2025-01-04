@@ -19,8 +19,4 @@ function Basement_KeyServer.__new(self: NexusInstanceBasement_KeyServer, itemNam
 
 end
 
-function Basement_KeyServer.Client.EatItem(self : NexusInstanceBasement_KeyServer, player : Player)
-
-end
-
 return NexusInstance.ToInstance(Basement_KeyServer) :: NexusInstance.NexusInstanceClass<typeof(Basement_KeyServer), (Input1: string, Input2: string) -> (NexusInstanceBasement_KeyServer)>

@@ -68,7 +68,7 @@ function BabyClient.__new(self: NexusInstanceBabyClient, character : Model?, ign
 
     -- disable all proximity prompts with the tag "Baby"
 
-    local function callback(instance)
+    --[[local function callback(instance)
         local prompt = instance:FindFirstChild("ProximityPrompt") :: ProximityPrompt
         if prompt then
             prompt.Enabled = false
@@ -79,11 +79,12 @@ function BabyClient.__new(self: NexusInstanceBabyClient, character : Model?, ign
 
     for _, instance in ipairs(CollectionService:GetTagged("Baby")) do
         callback(instance)
-    end
+    end]]
 
     self:SetupAbilities()
 
 end
+
 
 function BabyClient.UseAbility(self : NexusInstanceBabyClient, ability : string)
 

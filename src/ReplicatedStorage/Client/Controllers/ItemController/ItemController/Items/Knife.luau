@@ -21,7 +21,6 @@ export type NexusInstanceKnifeClient = NexusInstance.NexusInstance<KnifeClient>
 
 function KnifeClient.__new(self: NexusInstanceKnifeClient, itemName: string, tool: Tool, cashedVisual : Model?)
     print("KnifeClient")
-    ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 
     self.Animation = Instance.new("Animation")
     self.Parent = self.Tool
@@ -66,6 +65,9 @@ function KnifeClient.__new(self: NexusInstanceKnifeClient, itemName: string, too
     end))
 
    -- self.Server:DropItem()
+
+   ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
+
 
 end
 

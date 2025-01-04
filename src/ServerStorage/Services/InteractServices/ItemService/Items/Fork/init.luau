@@ -22,9 +22,6 @@ function ForkServer.__new(self: NexusInstanceForkServer, itemName: string, tool:
 
 end
 
-function ForkServer.Client.EatItem(self : NexusInstanceForkServer, player : Player)
-
-end
 
 function ForkServer.PromptInteract(self : NexusInstanceForkServer, promptName: string, ...)
 

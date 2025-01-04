@@ -80,10 +80,9 @@ function BabyServer.SetupCharacter(self: NexusInstanceBabyServer, character : Mo
 
     local humanoidDescription = humanoid:WaitForChild("HumanoidDescription") :: HumanoidDescription
     humanoidDescription.HeadScale = 1
-    humanoidDescription.DepthScale = 1
-    humanoidDescription.HeightScale = 0.75
-    humanoidDescription.WidthScale = 1
-    humanoidDescription.BodyTypeScale = 1
+    humanoidDescription.DepthScale = 0.6
+    humanoidDescription.HeightScale = 0.6
+    humanoidDescription.WidthScale = 0.6
     task.wait()
 
     humanoid:ApplyDescription(humanoidDescription)
@@ -147,7 +146,6 @@ function BabyServer.SetupCharacter(self: NexusInstanceBabyServer, character : Mo
     self.scope = Fusion.scoped(Fusion)
 
     if self.HasOverhead then
-
         Overhead(self.scope, {
             Player = self.Player,
             Parent = character:WaitForChild("Head") :: BasePart,
@@ -167,6 +165,12 @@ function BabyServer.SetupCharacter(self: NexusInstanceBabyServer, character : Mo
             end)
         end
     end)
+
+    local RightHand = character:WaitForChild("RightHand") :: BasePart
+    local RightUpperArm = character:WaitForChild("RightUpperArm") :: BasePart
+
+    self:NewIKControl("RightArm", RightHand, RightUpperArm)
+
 
 end
 
@@ -224,6 +228,46 @@ function BabyServer.SetupEffects(self: NexusInstanceBabyServer): ()
 
 
         while tick() < endTime do
+            task.wait(1)
+        end
+
+    end
+
+    self.EffectHandlers["Burn"] = function(duration : number, multiplier : number)
+        multiplier = multiplier or 1
+
+        print(multiplier)
+
+        local startTime = tick()
+        local endTime = startTime + duration
+
+        local character = self.Player.Character :: Model
+
+        type props = {
+            Parent : Instance?,
+            Position : Vector3?,
+            Particle : Instance,
+            Duration : number?,
+            EmitAmount : number?,
+        }
+
+        self.ParticleService:PlayParticle( {
+            Parent = (character :: any).HumanoidRootPart,
+            Position = nil, -- empty position = center of the parent
+            Duration = duration,
+            EmitAmount = 0,
+            Particle = ReplicatedStorage.Source.Data.Particles.Flames,
+        } :: props)
+
+
+        while tick() < endTime do
+            print("Damaging baby")
+            self:DamageAttributes({
+                Lungs = multiplier,
+                Stomach = multiplier,
+                Heart = multiplier,
+            })
+
             task.wait(1)
         end
 
@@ -320,6 +364,8 @@ end
 
 function BabyServer.PickedUp(self : NexusInstanceBabyServer, byPlayerClass : CharacterServerBase.CharacterBaseServer): ()
 
+
+
     local humanoid = self.Player.Character:WaitForChild("Humanoid") :: Humanoid
     humanoid:ChangeState(Enum.HumanoidStateType.Physics)
 
@@ -350,10 +396,15 @@ type PartialHealthAttributes = { Lungs: number?, Stomach: number?, Heart: number
 function BabyServer.DamageAttributes(self : NexusInstanceBabyServer, attributes: PartialHealthAttributes): ()
     local humanoid = (self :: any).Player.Character:WaitForChild("Humanoid") :: Humanoid
 
+    local totalDamage = 0
+
     for name, v in pairs(attributes) do
         local current = humanoid:GetAttribute(name) :: number
+        totalDamage += v
         humanoid:SetAttribute(name, math.clamp(current - v, 0, 100))
     end
+
+    self.AchievementService:PerformedAction(self.Player, "Damage", totalDamage)
 
 end
 

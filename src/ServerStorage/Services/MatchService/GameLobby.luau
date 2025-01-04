@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local ServerStorage = game:GetService('ServerStorage')
 local CharacterBaseServer = require(ServerStorage.Source.Services.CharacterService.CharacterService.CharacterBaseServer)
 local module = {}
+local SocialService = game:GetService('SocialService')
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Fusion = require(ReplicatedStorage.Packages.fusion)
 local Children, peek = Fusion.Children, Fusion.peek
@@ -18,7 +19,7 @@ function GameLobby:Construct()
 
     local scope = Fusion:scoped()
     local countDown = scope:Value(0)
-    local requiredPlayers = 1 -- Change this value to set the required number of players
+    local requiredPlayers = 2-- Change this value to set the required number of players
     local maxPlayers = 6 -- Change this value to set the maximum number of players
 
     local isCounting = false
@@ -43,6 +44,8 @@ function GameLobby:Construct()
 
     end
 
+    local promptinviteDebounce = false
+
     local startCountDown = function()
         countDown:set(10)
 
@@ -55,6 +58,9 @@ function GameLobby:Construct()
                 countDown:set(0)
                 print("Waiting for " .. requiredPlayers .. " players")
                 countDown:set("Waiting for " .. requiredPlayers .. " players")
+
+                -- prompt invite to friends
+
                 return
             end
         end
@@ -107,13 +113,33 @@ function GameLobby:Construct()
         end
     end
 
+
+
     Folder.ChildAdded:Connect(function(child)
         if child:IsA("ObjectValue") then
             local playerCount = #Folder:GetChildren()
             if playerCount <= maxPlayers then
                 local player = child.Value :: Player
                 player:AddTag("InLobby")
+
                 updateCountDown()
+
+                if playerCount == 1 then
+
+                    -- get player
+
+
+
+                        task.spawn(function()
+                            print("Prompting game invite")
+                            SocialService:PromptGameInvite(player)
+
+                        end)
+
+
+
+                end
+
             else
 
                 -- push back the player

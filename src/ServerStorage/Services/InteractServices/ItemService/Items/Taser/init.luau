@@ -20,73 +20,76 @@ function TaserServer.__new(self: NexusInstanceTaserServer, itemName: string, too
 
     self:DisableCollisons()
 
-end
 
-function TaserServer.Client.Shoot(self : NexusInstanceTaserServer, player : Player, target : BasePart, hit : Vector3)
+    self.Client.Shoot = function (self : NexusInstanceTaserServer, player : Player, target : BasePart, hit : Vector3)
 
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://7554632797"
-    sound.Parent = self.Tool
-    sound.PlayOnRemove = true
-    sound:Destroy()
+        local sound = Instance.new("Sound")
+        sound.SoundId = "rbxassetid://7554632797"
+        sound.Parent = self.Tool
+        sound.PlayOnRemove = true
+        sound:Destroy()
 
-    if not target then
+        if not target then
+            local props = {
+                Parent = workspace,
+                Particle = particles.Electric1,
+                Position = hit,
+                Duration = 1,
+                EmitAmount = 1,
+            }
+            self.ParticleService:PlayParticle(props)
+
+            return
+        end
+
+
+        local RaycastParams = RaycastParams.new()
+        RaycastParams.FilterDescendantsInstances = {player.Character, self.Tool}
+        RaycastParams.FilterType = Enum.RaycastFilterType.Exclude
+
+        local ray = Ray.new(self.Tool.Handle.Position, hit - self.Tool.Handle.Position)
+
+        local result = workspace:Raycast(ray.Origin, ray.Direction * 40, RaycastParams)
+
+        local hitPart = result and result.Instance
+        if not hitPart then
+            return
+        end
+
+        if not hitPart == target then -- doesnt have visiblity
+            return
+        end
+
+        local shootPlayer = game.Players:GetPlayerFromCharacter(hitPart.Parent)
+
+        if shootPlayer then
+
+            Ragdoll:RagDollCharacter(shootPlayer.Character, shootPlayer)
+            task.defer(function()
+                local root : Part = shootPlayer.Character.HumanoidRootPart.CFrame
+                root.AssemblyLinearVelocity = Vector3.new(0, 100, 0)
+            end)
+            task.delay(5, function()
+                Ragdoll:UnRagDollCharacter(shootPlayer.Character, shootPlayer)
+            end)
+
+        end
+
         local props = {
-            Parent = workspace,
+            Parent = target,
             Particle = particles.Electric1,
             Position = hit,
             Duration = 1,
             EmitAmount = 1,
         }
+
         self.ParticleService:PlayParticle(props)
 
-        return
-    end
-
-
-    local RaycastParams = RaycastParams.new()
-    RaycastParams.FilterDescendantsInstances = {player.Character, self.Tool}
-    RaycastParams.FilterType = Enum.RaycastFilterType.Exclude
-
-    local ray = Ray.new(self.Tool.Handle.Position, hit - self.Tool.Handle.Position)
-
-    local result = workspace:Raycast(ray.Origin, ray.Direction * 40, RaycastParams)
-
-    local hitPart = result and result.Instance
-    if not hitPart then
-        return
-    end
-
-    if not hitPart == target then -- doesnt have visiblity
-        return
-    end
-
-    local shootPlayer = game.Players:GetPlayerFromCharacter(hitPart.Parent)
-
-    if shootPlayer then
-
-        Ragdoll:RagDollCharacter(shootPlayer.Character, shootPlayer)
-        task.defer(function()
-            local root : Part = shootPlayer.Character.HumanoidRootPart.CFrame
-            root.AssemblyLinearVelocity = Vector3.new(0, 100, 0)
-        end)
-        task.delay(5, function()
-            Ragdoll:UnRagDollCharacter(shootPlayer.Character, shootPlayer)
-        end)
 
     end
-
-    local props = {
-        Parent = target,
-        Particle = particles.Electric1,
-        Position = hit,
-        Duration = 1,
-        EmitAmount = 1,
-    }
-
-    self.ParticleService:PlayParticle(props)
-
 
 end
+
+
 
 return NexusInstance.ToInstance(TaserServer) :: NexusInstance.NexusInstanceClass<typeof(TaserServer), (Input1: string, Input2: string) -> (NexusInstanceTaserServer)>

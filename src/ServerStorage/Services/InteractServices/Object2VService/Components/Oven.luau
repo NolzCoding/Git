@@ -6,6 +6,8 @@ local Component = require(ReplicatedStorage.Packages.Component)
 type self = typeof(Component.new({Tag = "Oven"}))
 local Oven = Component.new({Tag = "Oven"})
 
+local AchievementService = Knit.GetService("AchievementService")
+
 print("reqiored")
 
 function Oven:Construct()
@@ -39,7 +41,16 @@ function Oven:Construct()
     local playersHolding = {}
 
     local canOpen = function()
-        return #playersHolding == 1 -- later needs to check if its a baby, or parent
+
+        -- check if one of the players is a parent
+
+        for _, player in ipairs(playersHolding) do
+            if player.Character:GetAttribute("Character") == "Parent" then
+                return true
+            end
+        end
+
+        return #playersHolding >= 2 -- later needs to check if its a baby, or parent
     end
 
     local debounceOpen = false
@@ -79,19 +90,19 @@ function Oven:Construct()
     local routineFunc = function(...)
         while true do
 
-            print("Doing the thing")
-
             local Overlap = Collider:GetTouchingParts()
             local burnedPlayers = {}
             for _, part in ipairs(Overlap) do
                 local player = game.Players:GetPlayerFromCharacter(part.Parent)
+                if table.find(burnedPlayers, player) then
+                    continue
+                end
                 if player then
                     table.insert(burnedPlayers, player)
                     local character = self.CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
-                    character:ApplyEffect("Burn", 1)
+                    character:ApplyEffect("Burn", 1, 5)
                 end
             end
-
             task.wait(1)
 
 
@@ -112,6 +123,7 @@ function Oven:Construct()
             coroutine.close(rotinue)
         end
 
+        AchievementService:PerformedAction(player, "TurnOnOven", 1)
 
 
     end)

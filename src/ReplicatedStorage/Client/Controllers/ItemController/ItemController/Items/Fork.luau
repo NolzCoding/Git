@@ -20,7 +20,6 @@ export type NexusInstanceForkClient = NexusInstance.NexusInstance<ForkClient>
 
 function ForkClient.__new(self: NexusInstanceForkClient, itemName: string, tool: Tool, cashedVisual : Model?)
     print("ForkClient")
-    ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 
     self.BuildUI = function(scope)
         --[[return ActionButton(scope, {
@@ -37,6 +36,7 @@ function ForkClient.__new(self: NexusInstanceForkClient, itemName: string, tool:
             end,
         })]]
     end
+    ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 
    -- self.Server:DropItem()
 

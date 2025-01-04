@@ -11,9 +11,19 @@ end
 
 module.RNGTable = {
     ["Skin Crate"] = {
-        _addSkinWithChance(Skins.Skins.Baby["Scary Noob Baby"], 0.5),
-        _addSkinWithChance(Skins.Skins.Baby["Batman"], 0.3),
-        _addSkinWithChance(Skins.Skins.Baby["Adventure Baby"], 0.2),
+        _addSkinWithChance(Skins.Skins.Baby["Baby Chicken"], 0.3),
+        _addSkinWithChance(Skins.Skins.Baby["Baby Shark"], 0.3),
+        _addSkinWithChance(Skins.Skins.Baby["Scary Noob Baby"], 0.2),
+        _addSkinWithChance(Skins.Skins.Parent["Mom"], 0.2),
+    },
+
+    ["Epic Skin Crate"] = {
+        _addSkinWithChance(Skins.Skins.Baby["Batman"], 0.27),
+        _addSkinWithChance(Skins.Skins.Baby["Adventure Baby"], 0.25),
+        _addSkinWithChance(Skins.Skins.Baby["Emo Baby"], 0.15),
+        _addSkinWithChance(Skins.Skins.Baby["Emo Girl"], 0.15),
+        _addSkinWithChance(Skins.Skins.Parent["Bald Santa"], 0.1),
+        _addSkinWithChance(Skins.Skins.Parent["Crazy Babysitter"], 0.08),
     },
 
     ["Ability Crate"] = {
@@ -27,8 +37,26 @@ module.RNGTable = {
 module.RNGTableTypes = {
     ["Skin Crate"] = "Skin",
     ["Ability Crate"] = "Ability",
+    ["Epic Skin Crate"] = "Skin",
 }
 
+module.RNGTableProductsIds = {
+    ["Skin Crate"] = {
+        [1] = 2689666148,
+        [3] = 2689667076,
+        [10] = 2689667404,
+    },
+    ["Epic Skin Crate"] = {
+        [1] = 2689668257,
+        [3] = 2689668970,
+        [10] = 2689669692,
+    },
+    ["Ability Crate"] = {
+        [1] = 2689671243,
+        [3] = 2689672250,
+        [10] = 2689672655,
+    }
+}
 
 --[[local rollTable = {
     {

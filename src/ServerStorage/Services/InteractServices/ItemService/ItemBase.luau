@@ -15,6 +15,7 @@ export type ItemBase = {
     TestProperty: string?, --No constructor initializes this.
     VisualCache : Model?,
     Tool : Tool,
+    Client : {},
 } & typeof(setmetatable({}, ItemBase))
 export type NexusInstanceItemBase = NexusInstance.NexusInstance<ItemBase>
 
@@ -23,21 +24,22 @@ export type ItemBaseClient = {
     DropItem: (self: ItemBaseClient) -> (),
 }
 
-ItemBase.Client = {} :: ItemBaseClient
+
 
 function ItemBase.__new(self: NexusInstanceItemBase, itemName: string, tool: Tool, madeFor : Player): ()
     self.ItemName = itemName
     self.Tool = tool
-
+    self.Client = {}
     -- listen for the tool to be destroyed
     tool.Destroying:Connect(function()
+        print("Destroying " .. itemName, " , module name" .. script.Parent.Name)
         self:Destroy() -- destroy the itemclass
     end)
     -- newRemoteFunction
     self.Remote = Instance.new("RemoteFunction")
     self.Remote.Parent = tool
 
-    print(print(self.Remote))
+    print(self.Remote, " remote created for", itemName, tool)
 
     self.Remote.OnServerInvoke = function(player, methodName, ...)
         local method = self.Client[methodName]
@@ -46,6 +48,22 @@ function ItemBase.__new(self: NexusInstanceItemBase, itemName: string, tool: Too
         end
     end
 
+    self.Client.ThrowItem = function (self: NexusInstanceItemBase, player : Player, serverTime : number)
+        self.VisualCache.PrimaryPart:SetNetworkOwner(player)
+        self.Tool:Destroy()
+        -- get difference between server time now and the time the item was thrown
+        --local timeDifference = workspace:GetServerTimeNow() - serverTime
+
+
+    end
+
+    self.Client.DropItem = function (self: NexusInstanceItemBase, player : Player)
+
+        local ItemService = Knit.GetService("ItemService")
+
+        ItemService:DropItem(player,self.Tool, self.ItemName)
+        print("Ragdolling")
+    end
 
 end
 
@@ -88,23 +106,7 @@ function ItemBase.SetVisualCache(self: NexusInstanceItemBase, visual: Model)
 end
 -- functions called by the client
 
-function ItemBase.Client.ThrowItem(self: NexusInstanceItemBase, player : Player, serverTime : number)
-    self.VisualCache.PrimaryPart:SetNetworkOwner(player)
 
-    self.Tool:Destroy()
-    -- get difference between server time now and the time the item was thrown
-    --local timeDifference = workspace:GetServerTimeNow() - serverTime
-
-
-end
-
-function ItemBase.Client.DropItem(self: NexusInstanceItemBase, player : Player)
-
-    local ItemService = Knit.GetService("ItemService")
-
-    ItemService:DropItem(player,self.Tool, self.ItemName)
-    print("Ragdolling")
-end
 
 --Create the class to return in the ModuleScript, or use within the script.
 return NexusInstance.ToInstance(ItemBase) :: NexusInstance.NexusInstanceClass<typeof(ItemBase), () -> (NexusInstanceItemBase)>

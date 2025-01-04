@@ -3,6 +3,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Fusion = require(ReplicatedStorage.Packages.fusion)
 local Children = Fusion.Children
 
+local Sticker = require(ReplicatedStorage.Source.Client.Controllers.UIController.Components.UI.Sticker)
+
 local TextLabelWithStroke =
 	require(ReplicatedStorage.Source.Client.Controllers.UIController.Components.Text.TextLabelWithStroke)
 local ImageButton = require(ReplicatedStorage.Source.Client.Controllers.UIController.Components.Buttons.ImageButton)
@@ -37,6 +39,14 @@ local function LevelBar(
 
 
 		[Children] = {
+
+			Sticker(scope, {
+				Position = UDim2.fromScale(1, -0.5),
+				Size = UDim2.fromScale(1, 1),
+				ZIndex = 12,
+				Text = "Levels comming soon",
+			}),
+
 			scope:New("UIAspectRatioConstraint")({
 				Name = "UIAspectRatioConstraint",
 				AspectRatio = 7.27,

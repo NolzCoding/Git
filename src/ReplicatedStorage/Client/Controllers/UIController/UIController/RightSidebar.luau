@@ -92,46 +92,6 @@ local function RightSideBar(scope : typeof(Fusion.scoped(Fusion)), props : {
 
 
                     ImageButton(scope, {
-                        Image = Icons.ShoppingBasket,
-                        Size = UDim2.fromScale(0.3, 0.3),
-                        ButtonUp = function()
-                            props.OpenWindow("Shop")
-                        end
-                    }),
-
-                    ImageButton(scope, {
-                        Image = Icons.EmptyHeart,
-                        Size = UDim2.fromScale(0.3, 0.3),
-                        ButtonUp = function()
-                            props.OpenWindow("RollItem")
-                        end
-                    }),
-
-                    ImageButton(scope, {
-                        Image = Icons.ShoppingBasket,
-                        Size = UDim2.fromScale(0.3, 0.3),
-                        ButtonUp = function()
-                            props.OpenWindow("Skins")
-                        end
-                    }),
-
-                    ImageButton(scope, {
-                        Image = Icons.BrownBook264,
-                        Size = UDim2.fromScale(0.3, 0.3),
-                        ButtonUp = function()
-                            props.OpenWindow("Achivements")
-                        end
-                    }),
-
-                    ImageButton(scope, {
-                        Image = Icons.YellowLightning,
-                        Size = UDim2.fromScale(0.3, 0.3),
-                        ButtonUp = function()
-                            props.OpenWindow("Abilities")
-                        end
-                    }),
-
-                    ImageButton(scope, {
                         Image = "",
                         Size = UDim2.fromScale(0.3, 0.3),
                         ButtonUp = function()
@@ -154,21 +114,136 @@ local function RightSideBar(scope : typeof(Fusion.scoped(Fusion)), props : {
                                 end
                             end)
 
-                            return scope:New "ImageLabel" {
+                            return {scope:New "ImageLabel" {
                                 BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                                 BackgroundTransparency = 1,
                                 BorderColor3 = Color3.fromRGB(0, 0, 0),
                                 BorderSizePixel = 0,
                                 AnchorPoint = Vector2.new(0.5, 0.5),
-                                Image = Icons.Emojis.Skull,
+                                Image = Icons.ShoppingBasket,
                                 Position = UDim2.fromScale(0.5, 0.5),
                                 Rotation = scope:Tween(rotation, TweenInfo.new(2, Enum.EasingStyle.Elastic, Enum.EasingDirection.InOut)),
                                 ScaleType = Enum.ScaleType.Fit,
                                 Size = UDim2.fromScale(1, 1),
-                            }
+                            },
+
+
+                            TextLabelWithStroke(scope, {
+                                Text = "Shop",
+                                Size = UDim2.fromScale(1, 0.3),
+                                Position = UDim2.fromScale(0.5, 0.8),
+                                ZIndex = 2,
+                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                Thickness = 2,
+                                StrokeColor = Color3.fromRGB(20, 18, 8),
+                                TextColor = Color3.fromRGB(231, 216, 148),
+                            })
+
+
+                        }
+
+
 
                         end
                     }),
+
+                    ImageButton(scope, {
+                        Image = Icons.GiftBoxes.Green.Group,
+                        Size = UDim2.fromScale(0.3, 0.3),
+                        ButtonUp = function()
+                            props.OpenWindow("Shop", 2)
+                        end,
+
+                        Build = function(scope)
+
+                            return {TextLabelWithStroke(scope, {
+                                Text = "Crates",
+                                Size = UDim2.fromScale(1, 0.3),
+                                Position = UDim2.fromScale(0.5, 0.8),
+                                ZIndex = 2,
+                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                Thickness = 2,
+                                StrokeColor = Color3.fromRGB(20, 18, 8),
+                                TextColor = Color3.fromRGB(231, 216, 148),
+                            })}
+
+                        end
+
+                    }),
+
+                    ImageButton(scope, {
+                        Image = Icons.BabyBucks,
+                        Size = UDim2.fromScale(0.3, 0.3),
+                        ButtonUp = function()
+                            props.OpenWindow("Skins")
+                        end,
+
+                        Build = function(scope)
+
+                            return {TextLabelWithStroke(scope, {
+                                Text = "Skins",
+                                Size = UDim2.fromScale(1, 0.3),
+                                Position = UDim2.fromScale(0.5, 0.8),
+                                ZIndex = 2,
+                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                Thickness = 2,
+                                StrokeColor = Color3.fromRGB(20, 18, 8),
+                                TextColor = Color3.fromRGB(231, 216, 148),
+                            })}
+
+                        end
+
+                    }),
+
+                    ImageButton(scope, {
+                        Image = Icons.BrownBook264,
+                        Size = UDim2.fromScale(0.3, 0.3),
+                        ButtonUp = function()
+                            props.OpenWindow("Achievements")
+                        end,
+
+                        Build = function(scope)
+
+                            return {TextLabelWithStroke(scope, {
+                                Text = "Achievements",
+                                Size = UDim2.fromScale(1, 0.3),
+                                Position = UDim2.fromScale(0.5, 0.8),
+                                ZIndex = 2,
+                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                Thickness = 2,
+                                StrokeColor = Color3.fromRGB(20, 18, 8),
+                                TextColor = Color3.fromRGB(231, 216, 148),
+                            })}
+
+                        end
+
+                    }),
+
+                    ImageButton(scope, {
+                        Image = Icons.YellowLightning,
+                        Size = UDim2.fromScale(0.3, 0.3),
+                        ButtonUp = function()
+                            props.OpenWindow("Abilities")
+                        end,
+
+                        Build = function(scope)
+
+                            return {TextLabelWithStroke(scope, {
+                                Text = "Abilities",
+                                Size = UDim2.fromScale(1, 0.3),
+                                Position = UDim2.fromScale(0.5, 0.8),
+                                ZIndex = 2,
+                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                Thickness = 2,
+                                StrokeColor = Color3.fromRGB(20, 18, 8),
+                                TextColor = Color3.fromRGB(231, 216, 148),
+                            })}
+
+                        end
+
+                    }),
+
+
 
                 }
             }

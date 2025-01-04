@@ -19,25 +19,34 @@ function LighterServer.__new(self: NexusInstanceLighterServer, itemName: string,
     ItemBase.__new(self, itemName, tool) --Remember to call the parent constructor!
     self:DisableCollisons()
 
-end
+    self.Client.ToggleLighter = function (self : NexusInstanceLighterServer, player : Player)
 
-function LighterServer.Client.ToggleLighter(self : NexusInstanceLighterServer, player : Player)
+        self.CharacterService = Knit.GetService("CharacterService")
+        local character = self.CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
 
-    self.CharacterService = Knit.GetService("CharacterService")
-    local character = self.CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
+        local particle = self.Tool.FlamePart.Flame1
+        local light = self.Tool.FlamePart.PointLight
 
-    local particle = self.Tool.FlamePart.Flame1
-    local light = self.Tool.FlamePart.PointLight
+        particle.Enabled = not particle.Enabled
+        light.Enabled = not light.Enabled
 
-    particle.Enabled = not particle.Enabled
-    light.Enabled = not light.Enabled
+        if light.Enabled then
 
-    if light.Enabled then
-        if character.ActiveEffects["Gasoline"] then
-            character:ApplyEffect("Burn", 10)
+            if character.ActiveEffects["Burn"] then
+
+                return
+
+            end
+
+            if character.ActiveEffects["Gasoline"] then
+                character:ApplyEffect("Burn", 10, 5)
+            end
         end
+
     end
 
+
 end
+
 
 return NexusInstance.ToInstance(LighterServer) :: NexusInstance.NexusInstanceClass<typeof(LighterServer), (Input1: string, Input2: string) -> (NexusInstanceLighterServer)>

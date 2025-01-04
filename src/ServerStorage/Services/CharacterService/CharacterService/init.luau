@@ -61,6 +61,9 @@ function CharacterService:NewCharacter(player, characterName) : CharacterBaseSer
 
     local character = player.Character or player.CharacterAdded:Wait()
 
+    task.spawn(function()
+        self.PlayerCharacters:Destroy()
+    end)
 
     if characterName == "Parent" then
         character:SetAttribute("Character", "Parent")

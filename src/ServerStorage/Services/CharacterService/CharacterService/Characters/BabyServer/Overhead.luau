@@ -17,6 +17,9 @@ local function OverHead(scope, props: {
     Player : Player,
 
 }) -- should be lifetime of the game
+
+
+
 	local healths = {
 		{ AttributeName = "Heart", Icon = Icons.OrganHeart, Value = scope:Value(100) },
 		{ AttributeName = "Stomach", Icon = Icons.OrganStomach, Value = scope:Value(100) },
@@ -24,10 +27,12 @@ local function OverHead(scope, props: {
 	}
 
     local humanoid = (props :: any).Player.Character:WaitForChild("Humanoid") :: Humanoid
+    for i, tbl in ipairs(healths) do
 
-    for i, table in ipairs(healths) do
-		local attributeName = table.AttributeName
-        humanoid:GetAttributeChangedSignal("attributeName"):Connect(function()
+		local attributeName = tbl.AttributeName
+        humanoid:GetAttributeChangedSignal(attributeName):Connect(function()
+			print(props.Parent)
+			print("attributeName ", attributeName)
             healths[i].Value:set(humanoid:GetAttribute(attributeName))
         end)
     end

@@ -21,11 +21,28 @@ export type NexusInstanceSoapClient = NexusInstance.NexusInstance<SoapClient>
 
 function SoapClient.__new(self: NexusInstanceSoapClient, itemName: string, tool: Tool, cashedVisual : Model?)
     print("SoapClient")
-    ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
+
 
     local character = Players.LocalPlayer.Character
 
     local isBaby = character:GetAttribute("Character") == "Baby"
+
+
+    self.OnEquipped = function()
+
+        if not isBaby then
+
+            return
+
+        end
+
+        return {UserInputService.InputEnded:Connect(function(input)
+            if input.KeyCode == Enum.KeyCode.F then
+                self.Server:Use()
+            end
+        end)}
+    end
+
 
     if isBaby then
         self.BuildUI = function(scope)
@@ -39,17 +56,17 @@ function SoapClient.__new(self: NexusInstanceSoapClient, itemName: string, tool:
                 Image = Icons.Drop,
                 ImageSize = UDim2.new(0.5, 0, 0.5, 0),
                 ButtonUp = function()
-                    self.Server:EatItem()
+                    self.Server:Use()
                 end,
             })
         end
+
+
+
     end
 
-    UserInputService.InputEnded:Connect(function(input)
-        if input.KeyCode == Enum.KeyCode.F then
-            self.Server:EatItem()
-        end
-    end)
+    ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
+
 
    -- self.Server:DropItem()
 

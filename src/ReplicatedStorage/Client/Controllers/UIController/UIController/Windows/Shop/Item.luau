@@ -77,6 +77,17 @@ function Item (scope, props : {
             },
 
             TextLabelWithStroke(scope, {
+                Text = props.Name,
+                Size = UDim2.fromScale(1, 0.2),
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Position = UDim2.fromScale(0.5, 0),
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                StrokeColor3 = props.RarityColor,
+                Thickness = 2,
+                ZIndex = 1,
+            }),
+
+            TextLabelWithStroke(scope, {
                 Text = scope:Computed(function(use)
                     return use(props.Amount) .. "x"
                 end),

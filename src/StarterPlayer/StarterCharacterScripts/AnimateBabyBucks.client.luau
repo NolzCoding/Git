@@ -1,6 +1,22 @@
-local rootPart = script.Parent.Parent:FindFirstChild("HumanoidRootPart") :: Part
+local rootPart = script.Parent.Parent:WaitForChild("HumanoidRootPart") :: Part
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+
+local characterType =script.Parent.Parent:GetAttribute("Character")
+if not characterType then
+
+    -- attribute added
+    while not script.Parent.Parent:GetAttribute("Character") do
+        task.wait()
+    end
+
+    characterType = script.Parent.Parent:GetAttribute("Character")
+
+end
+
+if characterType ~= "Baby" then
+    return
+end
 
 local Sounds = require(ReplicatedStorage.Source.Shared.Sounds)
 
@@ -15,7 +31,6 @@ end
 
 print(rootPart)
 rootPart.Touched:Connect(function(part : BasePart)
-    print("part")
     if part:HasTag("BabyBuck") then
 
         print(part)

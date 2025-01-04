@@ -83,6 +83,11 @@ function ParentClient.ServerSignal.onPlayerPickup(self : NexusInstanceParentClie
         return
     end
 
+    --find proximiy prompt
+
+    local babyPrompt = player.Character.HumanoidRootPart:FindFirstChildOfClass("ProximityPrompt") :: ProximityPrompt
+    babyPrompt.Enabled = false
+
     local babyBed = CollectionService:GetTagged("BabyBed")
 
     for _, bed in ipairs(babyBed) do
@@ -96,7 +101,15 @@ end
 
 function ParentClient.ServerSignal.onPlayerDrop(self : NexusInstanceParentClient)
     self.ThrowBabyVisible:set(false)
+
+    if not self.PickedUp then return end
+
+    local player = self.PickedUp.Player :: Player
     self.PickedUp = nil
+
+    local babyPrompt = player.Character.HumanoidRootPart:FindFirstChildOfClass("ProximityPrompt") :: ProximityPrompt
+    babyPrompt.Enabled = true
+
     local babyBed = CollectionService:GetTagged("BabyBed")
 
     for _, bed in ipairs(babyBed) do

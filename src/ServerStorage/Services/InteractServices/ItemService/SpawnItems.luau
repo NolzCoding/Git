@@ -63,11 +63,7 @@ local itemSpawns = {
     KitchenCabinet = {
 
 
-        Glue = {
-            Max = 1,
-            Min = 1,
-            Chance = 0.2,
-        },
+
 
         Fork = {
             Max = 1,
@@ -78,13 +74,13 @@ local itemSpawns = {
         Medicine = {
             Max = 1,
             Min = 1,
-            Chance = 0.2,
+            Chance = 0.3,
         },
 
         Basement_Key = {
             Max = 1,
             Min = 1,
-            Chance = 0.1,
+            Chance = 0.05,
         },
 
 

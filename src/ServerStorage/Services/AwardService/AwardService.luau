@@ -36,6 +36,39 @@ function AwardService:KnitStart()
         self.DataService:SetData(player, "Cash", data.Cash)
     end
 
+    self.AwardHandlers["Crate"] = function(player : Player, crateName : string, amount : number)
+        local data = self.DataService:GetData(player)
+
+        data.Inventory.Crates[crateName] = (data.Inventory.Crates[crateName] or 0) + (amount or 1)
+
+        self.NotificationService:NotifyPlayer("TextNImage", {
+            Text = "+".. (amount or 1) .. " " .. crateName,
+            --Image = Icons.Crate,
+            Color = Color3.fromRGB(115, 255, 21),
+            Time = 5,
+        }, player)
+
+        self.DataService:SetData(player, "Inventory", data.Inventory)
+    end
+
+    self.AwardHandlers["Skin"] = function(player : Player, skinType : string, skinName : string)
+        local data = self.DataService:GetData(player)
+        local Skins = data.Skins
+        local SkinCatagory = Skins[skinType]
+        local OwnedSkins = SkinCatagory.OwnedSkins
+
+        OwnedSkins[skinName] = OwnedSkins[skinName] or 1
+
+        self.NotificationService:NotifyPlayer("TextNImage", {
+            Text = "+" .. skinName .. "!",
+            Color = Color3.fromRGB(115, 255, 21),
+            Time = 5,
+        }, player)
+
+        self.DataService:SetData(player, "Skins", Skins)
+
+    end
+
 end
 
 

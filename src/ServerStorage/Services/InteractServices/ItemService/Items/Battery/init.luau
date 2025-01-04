@@ -1,7 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
 local ItemBase = require(ServerStorage.Source.Services.InteractServices.ItemService.ItemBase)
+local CharacterBaseServer = require(ServerStorage.Source.Services.CharacterService.CharacterService.CharacterBaseServer)
+local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local BatteryServer = {}
 BatteryServer.__index = BatteryServer
@@ -17,26 +18,26 @@ function BatteryServer.__new(self: NexusInstanceBatteryServer, itemName: string,
     ItemBase.__new(self, itemName, tool) --Remember to call the parent constructor!
     self:DisableCollisons()
 
-end
+    self.Client.Use = function (self : NexusInstanceBatteryServer, player : Player)
+        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
 
-function BatteryServer.Client.EatItem(self : NexusInstanceBatteryServer, player : Player)
-    local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+        self.CharacterService = Knit.GetService("CharacterService")
+        local character = self.CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
 
-    local stomach = humanoid:GetAttribute("Stomach")
-    stomach -= 25
-    stomach = math.clamp(stomach, 0, 100)
-    humanoid:SetAttribute("Stomach", stomach)
+        character:DamageAttributes({
+            Stomach = 25,
+        })
 
-    local CharacterService = Knit.GetService("CharacterService")
+        task.spawn(function()
+            local AchievementService = Knit.GetService("AchievementService")
+            AchievementService:PerformedAction(player, "Battery", 1)
+        end)
 
-    local character = CharacterService:GetCharacter(player)
-
-    local gameSession = character.GameSession
-    if gameSession then
-        gameSession:SpawnItem("Battery")
+        self.Tool:Destroy()
     end
 
-    self.Tool:Destroy()
 end
+
+
 
 return NexusInstance.ToInstance(BatteryServer) :: NexusInstance.NexusInstanceClass<typeof(BatteryServer), (Input1: string, Input2: string) -> (NexusInstanceBatteryServer)>

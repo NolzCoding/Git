@@ -125,8 +125,6 @@ function CharacterClient.HandleToolKeycodes(self : NexusInstanceCharacterClient)
 
     end))
 
-
-
 end
 
 function CharacterClient.ToolAdded(self : NexusInstanceCharacterClient, Tool : Tool, equip : boolean?)
@@ -230,6 +228,12 @@ function CharacterClient.CreateUI(self : NexusInstanceCharacterClient): ()
             self.BuildUI(self.scope),
         }
     }
+
+end
+
+function CharacterClient.MorphInLobby(self: NexusInstanceCharacterClient, skinName): ()
+
+    self.Server.Morph(skinName)
 
 end
 

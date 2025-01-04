@@ -22,70 +22,72 @@ function KnifeServer.__new(self: NexusInstanceKnifeServer, itemName: string, too
     self.CharacterService = Knit.GetService("CharacterService")
     self.NotificationService = Knit.GetService("NotificationService")
 
-end
-
-function KnifeServer.Client.Attack(self : NexusInstanceKnifeServer, player : Player)
+    self.Client.Attack = function (self : NexusInstanceKnifeServer, player : Player)
 
 
-    local overlappingParams = OverlapParams.new()
-    overlappingParams.FilterType = Enum.RaycastFilterType.Exclude
-    overlappingParams.FilterDescendantsInstances = {player.Character}
+        local overlappingParams = OverlapParams.new()
+        overlappingParams.FilterType = Enum.RaycastFilterType.Exclude
+        overlappingParams.FilterDescendantsInstances = {player.Character}
 
-    local root = (player :: any).Character.HumanoidRootPart :: Part
+        local root = (player :: any).Character.HumanoidRootPart :: Part
 
-    local parts = workspace:GetPartBoundsInBox(root.CFrame + root.CFrame.LookVector *1, Vector3.new(4,4,4), overlappingParams)
-    for _, part in ipairs(parts) do
-        if part.Parent:FindFirstChild("Humanoid") then
-            local attackedPlayer = game.Players:GetPlayerFromCharacter(part.Parent)
-            if not attackedPlayer then return end
-            if player.Team == attackedPlayer.Team then return end
-            local typeOfCharacter = attackedPlayer.Character:GetAttribute("Character")
-            if not typeOfCharacter then return end
-            if typeOfCharacter == "Parent" then
-                local walkspeedbefore = attackedPlayer.Character.Humanoid.WalkSpeed
-                attackedPlayer.Character.Humanoid.WalkSpeed = 1
-                self.NotificationService:NotifyPlayer("TextNImage", {
-                    Text = "You stabbed your parent in the foot, you couldnt get it out",
-                    Image = Icons.Emojis.Skull,
-                    Color = Color3.fromRGB(140, 0, 255),
-                    Time = 5,
-                }, player)
-                task.delay(10, function()
-                    attackedPlayer.Humanoid.WalkSpeed = walkspeedbefore
+        local parts = workspace:GetPartBoundsInBox(root.CFrame + root.CFrame.LookVector *1, Vector3.new(4,4,4), overlappingParams)
+        for _, part in ipairs(parts) do
+            if part.Parent:FindFirstChild("Humanoid") then
+                local attackedPlayer = game.Players:GetPlayerFromCharacter(part.Parent)
+                if not attackedPlayer then return end
+                if player.Team == attackedPlayer.Team then return end
+                local typeOfCharacter = attackedPlayer.Character:GetAttribute("Character")
+                if not typeOfCharacter then return end
+                if typeOfCharacter == "Parent" then
+                    local walkspeedbefore = attackedPlayer.Character.Humanoid.WalkSpeed
+                    attackedPlayer.Character.Humanoid.WalkSpeed = 1
+                    self.NotificationService:NotifyPlayer("TextNImage", {
+                        Text = "You stabbed your parent in the foot, you couldnt get it out",
+                        Image = Icons.Emojis.Skull,
+                        Color = Color3.fromRGB(140, 0, 255),
+                        Time = 5,
+                    }, player)
+                    task.delay(10, function()
+                        attackedPlayer.Humanoid.WalkSpeed = walkspeedbefore
 
-                end)
+                    end)
 
-                local character = self.CharacterService:GetCharacter(attackedPlayer) :: BabyServer.BabyServer
-                local gameSession = character.GameSession
+                    local character = self.CharacterService:GetCharacter(attackedPlayer) :: BabyServer.BabyServer
+                    local gameSession = character.GameSession
 
-                gameSession:SpawnItem("Knife")
+                    gameSession:SpawnItem("Knife")
 
-                self.Tool:Destroy()
-                return
-            else
+                    self.Tool:Destroy()
+                    return
+                else
 
-                local babyCharacter = self.CharacterService:GetCharacter(attackedPlayer) :: BabyServer.BabyServer
-                babyCharacter:DamageAttributes(
-                    {
-                        Heart = 30,
-                        Stomach = 30,
-                        Lungs = 30
-                    }
-                )
+                    local babyCharacter = self.CharacterService:GetCharacter(attackedPlayer) :: BabyServer.BabyServer
+                    babyCharacter:DamageAttributes(
+                        {
+                            Heart = 30,
+                            Stomach = 30,
+                            Lungs = 30
+                        }
+                    )
 
-                local gameSession = babyCharacter.GameSession
+                    local gameSession = babyCharacter.GameSession
 
-                gameSession:SpawnItem("Knife")
+                    gameSession:SpawnItem("Knife")
 
-                self.Tool:Destroy()
+                    self.Tool:Destroy()
 
 
-                return
+                    return
+                end
+
             end
-
         end
+
     end
 
 end
+
+
 
 return NexusInstance.ToInstance(KnifeServer) :: NexusInstance.NexusInstanceClass<typeof(KnifeServer), (Input1: string, Input2: string) -> (NexusInstanceKnifeServer)>

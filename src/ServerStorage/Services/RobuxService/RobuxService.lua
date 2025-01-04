@@ -1,22 +1,24 @@
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
-
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 --local PricingModule = require(ReplicatedStorage.Source.Shared.Pricing)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
-
+local RNGData = require(ReplicatedStorage.Source.Shared.RNGData)
 local RobuxService = Knit.CreateService{Name = "RobuxService",DataService = nil , Client = { }, GamepassListeners = {}}
 
 
 
 function RobuxService:KnitStart()
 	self.DataService = Knit.GetService("DataService")
-
+	self.AwardService = Knit.GetService("AwardService")
 end
 
-
+function RobuxService:GiveCrate(player, crateName, amount)
+	self.AwardService:GiveAward(player, "Crate", crateName, amount)
+end
 
 
 
@@ -35,7 +37,19 @@ function RobuxService:KnitInit()
     local DevpassID = {
 		--! eggs
 
+		["SkinCrate1"] = {2689666148, function(plr) return self:GiveCrate(plr, "Skin Crate", 1) end},
+		["SkinCrate3"] = {2689667076, function(plr) return self:GiveCrate(plr, "Skin Crate", 3) end},
+		["SkinCrate10"] = {2689667404, function(plr) return self:GiveCrate(plr, "Skin Crate", 10) end},
 
+		["AbilityCrate1"] = {2689671243, function(plr) return self:GiveCrate(plr, "Ability Crate", 1) end},
+		["AbilityCrate3"] = {2689672250, function(plr) return self:GiveCrate(plr, "Ability Crate", 3) end},
+		["AbilityCrate10"] = {2689672655, function(plr) return self:GiveCrate(plr, "Ability Crate", 10) end},
+
+		["EpicSkinCrate1"] = {2689668257, function(plr) return self:GiveCrate(plr, "Epic Skin Crate", 1) end},
+		["EpicSkinCrate3"] = {2689668970, function(plr) return self:GiveCrate(plr, "Epic Skin Crate", 3) end},
+		["EpicSkinCrate10"] = {2689669692, function(plr) return self:GiveCrate(plr, "Epic Skin Crate", 10) end},
+
+		["Nerd"] = {2688415605, function(plr) return self.AwardService:GiveAward(plr, "Skin", "Baby", "Nerd") end}
 
 		-- Robux Egg
 
@@ -47,8 +61,6 @@ function RobuxService:KnitInit()
 
 --1741113328
     }
-
-
 
     local function robux(receiptInfo)
 		print("init robyx2")

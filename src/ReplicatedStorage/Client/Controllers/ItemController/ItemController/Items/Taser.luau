@@ -23,7 +23,6 @@ export type NexusInstanceTaserClient = NexusInstance.NexusInstance<TaserClient>
 
 function TaserClient.__new(self: NexusInstanceTaserClient, itemName: string, tool: Tool, cashedVisual : Model?)
     print("TaserClient")
-    ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 
     self.BuildUI = function(scope)
         --[[return ActionButton(scope, {
@@ -42,7 +41,10 @@ function TaserClient.__new(self: NexusInstanceTaserClient, itemName: string, too
     end
 
 
+    local debounce = false
+
     local inputBegan = function(input : InputObject)
+        if debounce then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             local Params = RaycastParams.new()
             Params.FilterDescendantsInstances = {game.Players.LocalPlayer.Character, self.Tool}
@@ -60,8 +62,6 @@ function TaserClient.__new(self: NexusInstanceTaserClient, itemName: string, too
                 hitPos = ray.Direction * 40 + ray.Origin
             end
 
-
-
             -- spawn part between tool and hitPos
 
             local barrel = self.Tool:FindFirstChild("Barrel", true) :: Attachment
@@ -77,6 +77,12 @@ function TaserClient.__new(self: NexusInstanceTaserClient, itemName: string, too
             part.Material = Enum.Material.Neon
 
             Debris:AddItem(part, 0.25)
+
+            debounce = true
+
+            task.wait(0.5)
+
+            debounce = false
 
         end
     end
@@ -94,6 +100,7 @@ function TaserClient.__new(self: NexusInstanceTaserClient, itemName: string, too
     end)
 
    -- self.Server:DropItem()
+   ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 
 end
 

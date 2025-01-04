@@ -36,6 +36,20 @@ function Gasoline:Construct()
         }, player)
     end)
 
+    self.Prompt.PromptButtonHoldBegan:Connect(function(player : Player)
+        local character = CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
+
+        character:BindPartToIKControl("RightArm", self.Instance)
+
+    end)
+
+    self.Prompt.PromptButtonHoldEnded:Connect(function(player : Player)
+        local character = CharacterService:GetCharacter(player) :: CharacterBaseServer.CharacterBaseServer
+
+        character:UnBindPartFromIKControl("RightArm", self.Instance)
+
+    end)
+
 end
 
 return Gasoline

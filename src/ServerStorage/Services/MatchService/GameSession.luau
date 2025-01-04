@@ -83,6 +83,9 @@ function GameSession.Start(self: NexusInstanceGameSession): ()
         self.States.Ending(self, winningTeam)
         self.States.Cleanup(self)
         resolve()
+    end):finally(function()
+        print("Destorying game session")
+        self:Destroy()
     end)
 
 end
