@@ -71,6 +71,10 @@ function Bathtub:Construct()
 
         self.Instance.Water.Transparency = self.enabled and 0 or 1
 
+        if self.Instance.Water:FindFirstChildOfClass("Texture") then
+            self.Instance.Water:FindFirstChildOfClass("Texture").Transparency = self.enabled and 0 or 1
+        end
+
         if self.enabled then
             rotinue = coroutine.create(routineFunc)
             coroutine.resume(rotinue)

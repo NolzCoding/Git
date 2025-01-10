@@ -5,6 +5,7 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 
+local Maps = require(ReplicatedStorage.Source.Shared.Maps)
 
 local GameSession = {}
 GameSession.__index = GameSession
@@ -35,7 +36,15 @@ export type GameSession = {
     },
 
     OnStateUpdate: NexusInstance.TypedEvent<string, string, number>,
-
+    OnScoreUpdate: NexusInstance.TypedEvent<any>,
+    OnVoteUpdate: NexusInstance.TypedEvent<{
+        {
+            Players : {Player},
+            Name : string,
+            Image : string,
+        }
+    }>,
+    OnPlayerVote: NexusInstance.TypedEvent<Player, number>,
     SpawnItem : (self: NexusInstanceGameSession, itemName : string) -> (),
 
 } & typeof(setmetatable({}, GameSession))
@@ -45,9 +54,19 @@ export type NexusInstanceGameSession = NexusInstance.NexusInstance<GameSession>
 function GameSession.__new(self: NexusInstanceGameSession, players: {Player}): ()
     self.Players = players
     self.CharacterService = Knit.GetService("CharacterService")
-
     -- stateName : string, stateText : string, time : number
     self.OnStateUpdate = self:CreateEvent() :: NexusInstance.TypedEvent<string, string, number>
+    self.OnScoreUpdate = self:CreateEvent() :: NexusInstance.TypedEvent<any>
+    self.OnVoteUpdate = self:CreateEvent() :: NexusInstance.TypedEvent<{
+        {
+            Players : {Player},
+            Name : string,
+            Image : string,
+        }
+    }>
+
+    self.OnPlayerVote = self:CreateEvent() :: NexusInstance.TypedEvent<Player, number>
+
 end
 
 local function findEmptySlot() : Part?
@@ -64,8 +83,40 @@ local function findEmptySlot() : Part?
     return nil
 end
 
+local function _newVoteTable()
+
+    local maptbl = {
+    }
+
+    for _,v in ipairs(Maps.Maps) do
+
+        table.insert(maptbl, {
+            Players = {},
+            Name = v.Name,
+            Image = v.Image,
+        })
+
+    end
+
+    return maptbl
+
+end
+
 function GameSession.SpawnItem(self: NexusInstanceGameSession, itemName : string): ()
     --! meant to be overriden
+end
+
+function GameSession.ReviveBaby(self: NexusInstanceGameSession, graveStone : BasePart): ()
+    local cframe = graveStone.CFrame
+
+    local plrid = graveStone:GetAttribute("PlayerID") :: number
+    local player = game.Players:GetPlayerByUserId(plrid)
+    player.Character:Destroy()
+    player:LoadCharacter()
+    self.CharacterService:NewCharacter(player, "Baby")
+
+    local humanoidRootPart = player.Character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = cframe
 
 end
 
@@ -74,8 +125,8 @@ function GameSession.Start(self: NexusInstanceGameSession): ()
     return Promise.new(function(resolve, reject)
         local slot = findEmptySlot()
         self.GameSlot = slot -- can be nil but who cares, i dont lol, i dont care about nils, i dont care about anything, i dont care about you, i dont care about me
-
-        local map = self.States.ChoosingMap(self,slot)
+        local matTable = _newVoteTable()
+        local map = self.States.ChoosingMap(self,slot, matTable)
         self.Map = map
         self.States.Loading(self,map)
         self.States.Starting(self)

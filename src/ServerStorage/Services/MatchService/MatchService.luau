@@ -7,7 +7,8 @@ local MatchService = Knit.CreateService {
     Client = {
 
         StateSignal = Knit.CreateSignal(),
-
+        ScoreSignal = Knit.CreateSignal(),
+        VoteSignal = Knit.CreateSignal(),
     },
 }
 
@@ -21,11 +22,36 @@ function MatchService:KnitStart()
     local GameLobby = require(script.Parent.GameLobby)
 
     self.CharacterService = Knit.GetService("CharacterService")
+    self.DataService = Knit.GetService("DataService")
 
 end
 
 function MatchService:KnitInit()
 
+    self.Players = {}
+
+    game.Players.PlayerRemoving:Connect(function(player : Player)
+        self.Players[player] = nil
+    end)
+
+end
+
+function MatchService:Vote(player : Player, map : number)
+
+
+
+    local gameSession = self.Players[player] :: GameSession.GameSession
+
+    if not gameSession then
+        return
+    end
+
+    gameSession.OnPlayerVote:Fire(player, map)
+
+end
+
+function MatchService.Client:Vote(player : Player, map : number)
+    self.Server:Vote(player, map)
 end
 
 function MatchService:NewGameSession(players : {Player})
@@ -33,7 +59,7 @@ function MatchService:NewGameSession(players : {Player})
     local newGameSession = DefaultSession.new(players)
 
     newGameSession.OnStateUpdate:Connect(function(stateName : string, stateText : string, time : number, ...)
-
+        print(stateName)
         if stateName == "Cleanup" then
             local players = newGameSession.Players
             for _, player : Player in ipairs(players) do
@@ -54,7 +80,6 @@ function MatchService:NewGameSession(players : {Player})
             end
         end
 
-        --self.Client.StateSignal:FireAll(stateName, stateText, time, ...)
 
         for _, player : Player in ipairs(newGameSession.Players) do
             if player then
@@ -62,6 +87,35 @@ function MatchService:NewGameSession(players : {Player})
             end
         end
 
+    end)
+
+    newGameSession.OnScoreUpdate:Connect(function(...)
+        for _, player : Player in ipairs(newGameSession.Players) do
+            if player then
+                self.Client.ScoreSignal:Fire(player, ...)
+            end
+        end
+    end)
+
+    newGameSession.OnVoteUpdate:Connect(function(...)
+        for _, player : Player in ipairs(newGameSession.Players) do
+            if player then
+                self.Client.VoteSignal:Fire(player, ...)
+            end
+        end
+    end)
+
+    for _,v in ipairs(players) do
+        self.Players[v] = newGameSession
+        if v.Character then
+            v.Character:Destroy()
+        end
+    end
+
+    newGameSession:Start():andThen(function()
+        print("Game session ended")
+    end):catch(function(err)
+        warn(err)
     end)
 
     return newGameSession

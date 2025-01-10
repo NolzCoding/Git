@@ -2,7 +2,7 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenServicePlus = require(ReplicatedStorage.Source.Shared.Uitility.TweenServicePlus)
 
-
+local AnalyticsService = game:GetService("AnalyticsService")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Drawer = {}
 
@@ -29,9 +29,15 @@ function Drawer:Click(Selection : BasePart, player)
         return
     end
 
+    AnalyticsService:LogOnboardingFunnelStepEvent(
+        player,
+        3, -- Step number
+        "Opened Drawer" -- Step name
+    )
+
     local Open = Selection:GetAttribute("Open")
     local distance = Selection:GetAttribute("Distance") or 1.5 -- studs
-    local offset = Selection.CFrame.LookVector * (Open and -distance or distance)
+    local offset = Selection.CFrame.LookVector * (Open and -distance or distance) * (Selection:GetAttribute("Multiplier") or 1)
 
     Selection:SetAttribute("Open", not Open)
 

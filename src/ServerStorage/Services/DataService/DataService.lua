@@ -14,6 +14,18 @@ local StarterData =
 {
     Cash = 0,
     Gamepasses = {},
+    Quests = {
+        LastDailyQuest = 0, -- the last time the player got new daily quests
+        LastWeeklyQuest = 0, -- the last time the player got new weekly quests
+        DailyQuests = {
+
+        },
+
+        WeeklyQuests = {
+
+        },
+
+    },
     Skins = {
         Baby = {
             CurrentSkin = "Baby",
@@ -55,6 +67,7 @@ local StarterData =
         Level = 1,
         Experience = 0,
     },
+    Wins = 0,
     Achievements = {
         Actions = {
         },

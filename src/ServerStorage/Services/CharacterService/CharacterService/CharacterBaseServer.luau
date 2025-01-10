@@ -144,8 +144,8 @@ function CharacterBaseServer.BindPartToIKControl(self: NexusInstanceCharacterBas
         warn("IKControl ", name, " not found")
         return
     end
-    ikControl.Enabled = true
     ikControl.Weight = 1
+    ikControl.Enabled = true
     ikControl.Target = part
 end
 
@@ -173,12 +173,12 @@ function CharacterBaseServer.PlayIKControl(self: NexusInstanceCharacterBaseServe
         return
     end
 
-    ikControl.Weight = 0 -- Start at 0
+    ikControl.Weight = 1 -- Start at 0
     ikControl.Enabled = true
     ikControl.Target = target
 
-    local newTween = TweenService:Create(ikControl, TweenInfo.new(time, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 0, true, delay), {Weight = 1})
-    newTween:Play()
+    --local newTween = TweenService:Create(ikControl, TweenInfo.new(time, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 0, true, delay), {Weight = 1})
+    --newTween:Play()
 
     task.delay(time*2 + delay, function()
         ikControl.Enabled = false

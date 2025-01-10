@@ -8,6 +8,7 @@ GhostServer.__index = GhostServer
 setmetatable(GhostServer, BabyServer) --TestClass1NexusInstance would be returned instead of TestClass1.
 
 export type GhostServer = {
+    Gravestone : MeshPart,
 } & typeof(setmetatable({}, GhostServer)) & BabyServer.BabyServer
 export type NexusInstanceGhostServer = NexusInstance.NexusInstance<GhostServer>
 
@@ -24,7 +25,37 @@ function GhostServer.__new(self: NexusInstanceGhostServer, player : Player, char
     end
 
 
+end
 
+function GhostServer.SpawnGravestone(self : NexusInstanceGhostServer, character : Model)
+    local player = self.Player
+    local gravestone = ReplicatedStorage.Data.Gravestone:Clone()
+    gravestone.Parent = game.Workspace
+    gravestone:SetAttribute("PlayerID", player.UserId)
+
+    local Highlight = Instance.new("Highlight")
+    Highlight.Parent = gravestone
+    Highlight.FillTransparency = 0.75
+    Highlight.FillColor = Color3.fromRGB(255, 255, 255)
+
+    gravestone.CFrame = (character:: any):WaitForChild("HumanoidRootPart").CFrame
+
+    local SurfaceGui = gravestone.SurfaceGui :: SurfaceGui
+    local TextLabel = SurfaceGui.TextLabel :: TextLabel
+    TextLabel.Text = "RIP " .. player.Name
+
+    self.Gravestone = gravestone
+
+    return gravestone
+
+end
+
+
+function GhostServer.Destroy(self: NexusInstanceGhostServer)
+    if self.Gravestone then
+        self.Gravestone:Destroy()
+    end
+    BabyServer.Destroy(self)
 end
 
 

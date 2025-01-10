@@ -3,6 +3,8 @@ local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local ServerStorage = game:GetService('ServerStorage')
 local CharacterBaseServer = require(ServerStorage.Source.Services.CharacterService.CharacterService.CharacterBaseServer)
 local module = {}
+local RunService = game:GetService('RunService')
+local AnalyticsService = game:GetService('AnalyticsService')
 local SocialService = game:GetService('SocialService')
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Fusion = require(ReplicatedStorage.Packages.fusion)
@@ -19,7 +21,13 @@ function GameLobby:Construct()
 
     local scope = Fusion:scoped()
     local countDown = scope:Value(0)
-    local requiredPlayers = 2-- Change this value to set the required number of players
+
+    local requiredPlayers = 2 -- Change this value to set the required number of players
+
+    if RunService:IsStudio() then
+        requiredPlayers = 1 -- for testing in studio
+    end
+
     local maxPlayers = 6 -- Change this value to set the maximum number of players
 
     local isCounting = false
@@ -32,6 +40,12 @@ function GameLobby:Construct()
 
         for _, player in ipairs(players) do
             table.insert(list, player.Value)
+            AnalyticsService:LogOnboardingFunnelStepEvent(
+                    player,
+                    2, -- Step number
+                    "Game Start" -- Step name
+            )
+
         end
 
         MatchService:NewGameSession(list)
@@ -118,8 +132,18 @@ function GameLobby:Construct()
     Folder.ChildAdded:Connect(function(child)
         if child:IsA("ObjectValue") then
             local playerCount = #Folder:GetChildren()
+            local player = child.Value :: Player
+
+
+
             if playerCount <= maxPlayers then
-                local player = child.Value :: Player
+
+                AnalyticsService:LogOnboardingFunnelStepEvent(
+                    player,
+                    1, -- Step number
+                    "Joined Lobby" -- Step name
+                )
+
                 player:AddTag("InLobby")
 
                 updateCountDown()

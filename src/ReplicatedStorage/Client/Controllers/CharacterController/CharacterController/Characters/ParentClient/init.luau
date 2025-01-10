@@ -2,10 +2,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local CharacterClientBase = require(script.Parent.Parent.CharacterClient)
+local Fusion = require(ReplicatedStorage.Packages.fusion)
+local Children = Fusion.Children
+local Icons = require(ReplicatedStorage.Source.Shared.Icons)
 --Define TestClass1 (potentially in a ModuleScript).
 local ActionButton = require(ReplicatedStorage.Source.Client.Controllers.UIController.Components.Buttons.ActionButton)
 local CollectionService = game:GetService("CollectionService")
-
+local UserInputService = game:GetService("UserInputService")
 --Define TestClass2 (potentially in a different ModuleScript).
 local ParentClient = {}
 ParentClient.__index = ParentClient
@@ -17,35 +20,53 @@ export type ParentClient = {
 export type NexusInstanceParentClient = NexusInstance.NexusInstance<ParentClient>
 
 function ParentClient.__new(self: NexusInstanceParentClient, character : Model?): ()
+
+
+    local function throwBaby ()
+
+        self.Server:ThrowBaby()
+
+        if self.PickedUp then
+            self.PickedUp.WeldConstraint:Destroy()
+
+            local playerToThrow = self.PickedUp.Player :: Player
+            local toThrowRoot = playerToThrow.Character:WaitForChild("HumanoidRootPart") :: Part
+            local toThrowHumanoid = playerToThrow.Character:WaitForChild("Humanoid") :: Humanoid
+
+            local root = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") :: Part
+            toThrowHumanoid:ChangeState(Enum.HumanoidStateType.FallingDown)
+            toThrowHumanoid.PlatformStand = true
+            toThrowRoot.AssemblyLinearVelocity = root.CFrame.LookVector * 500
+        end
+
+    end
+
+
+
     self.BuildUI = function(scope)
         self.ThrowBabyVisible = scope:Value(false)
 
-        return ActionButton(scope, {
-            Visible = self.ThrowBabyVisible :: any,
-            BackgroundColor3 = Color3.fromRGB(255, 14, 14),
-            ButtonText = "Throw baby",
-            Size = UDim2.new(0.1, 0, 0.1, 0),
-            Position = UDim2.new(0.8, 0, 0.85, 0),
-            ButtonUp = function()
-                self.Server:ThrowBaby()
-
-                if self.PickedUp then
-                    self.PickedUp.WeldConstraint:Destroy()
-
-                    local playerToThrow = self.PickedUp.Player :: Player
-                    local toThrowRoot = playerToThrow.Character:WaitForChild("HumanoidRootPart") :: Part
-                    local toThrowHumanoid = playerToThrow.Character:WaitForChild("Humanoid") :: Humanoid
-
-                    local root = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") :: Part
-                    toThrowHumanoid:ChangeState(Enum.HumanoidStateType.FallingDown)
-                    toThrowHumanoid.PlatformStand = true
-                    toThrowRoot.AssemblyLinearVelocity = root.CFrame.LookVector * 500
-                end
-
-            end,
-            ButtonDown = function()
-            end,
-        })
+        return scope: New "ScreenGui" {
+            Name = "ParentUI",
+            ZIndexBehavior = Enum.ZIndexBehavior.Global,
+            [Children] = {
+                ActionButton(scope, {
+                    Visible = self.ThrowBabyVisible :: any,
+                    BackgroundColor3 = Color3.fromRGB(255, 14, 14),
+                    ButtonText = "Throw baby (R)",
+                    Image = Icons.StrongArm,
+                    ImageSize = UDim2.new(0.8, 0, 0.8, 0),
+                    Size = UDim2.new(0.1, 0, 0.1, 0),
+                    Position = UDim2.new(0.5, 0, 0.8, 0),
+                    AnchorPoint = Vector2.new(0.5, 0.5),
+                    ButtonUp = function()
+                        throwBaby()
+                    end,
+                    ButtonDown = function()
+                    end,
+                })
+            },
+        }
     end
 
     CharacterClientBase.__new(self, character :: Model,5) --Remember to call the parent constructor!
@@ -62,6 +83,14 @@ function ParentClient.__new(self: NexusInstanceParentClient, character : Model?)
         prompt.Enabled = true
 
     end
+
+    table.insert(self.Connections, UserInputService.InputBegan:Connect(function(a0: InputObject, a1: boolean)
+
+        if a0.KeyCode == Enum.KeyCode.R then
+            throwBaby()
+        end
+
+    end))
 
 end
 

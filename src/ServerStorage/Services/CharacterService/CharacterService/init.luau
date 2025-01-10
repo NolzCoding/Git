@@ -20,6 +20,7 @@ function CharacterService:KnitInit()
     local count = 0
     Players.PlayerAdded:Connect(function(player)
 
+        player:LoadCharacter()
         self:NewCharacter(player, "Baby")
 
         if true then return end
@@ -41,6 +42,8 @@ function CharacterService:KnitInit()
             count += 1
 
         end)
+
+
 
     end)
 

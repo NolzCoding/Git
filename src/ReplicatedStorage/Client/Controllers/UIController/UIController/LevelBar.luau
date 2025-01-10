@@ -40,12 +40,12 @@ local function LevelBar(
 
 		[Children] = {
 
-			Sticker(scope, {
+			--[[Sticker(scope, {
 				Position = UDim2.fromScale(1, -0.5),
 				Size = UDim2.fromScale(1, 1),
 				ZIndex = 12,
 				Text = "Levels comming soon",
-			}),
+			}),]]
 
 			scope:New("UIAspectRatioConstraint")({
 				Name = "UIAspectRatioConstraint",

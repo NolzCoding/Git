@@ -39,17 +39,7 @@ function NotificationController:KnitStart()
         },
     }
 
-    task.delay(10, function()
-        --text
 
-        self:TextNImage({
-            Text = "Hello World",
-            Image = Icons.Heart,
-            Color = Color3.fromRGB(255, 0, 0),
-            Time = 5,
-        })
-
-    end)
 
     local NotificationService = Knit.GetService("NotificationService")
 

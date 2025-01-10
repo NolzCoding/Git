@@ -14,8 +14,6 @@ local InteractController = Knit.CreateController({
 	Name = "InteractController",
 })
 
-
-
 function InteractController:GetDeviceSpesificImage()
 
     local image = ""
@@ -34,7 +32,6 @@ end
 local SIZE = UDim2.fromScale(2.5, 2.5)
 
 function InteractController:KnitStart()
-
 
 	self.modules = {}
 
@@ -80,6 +77,8 @@ function InteractController:KnitStart()
 		globalTransparency:set(transparency)
 
 	end)
+
+
 
     ProximityPromptService.PromptShown:Connect(function(prompt)
         if prompt then
@@ -179,6 +178,28 @@ function InteractController:KnitStart()
 
 	end)
 
+	scope:New "ScreenGui" {
+		Name = "Highlight",
+		Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui"),
+		ResetOnSpawn = false,
+		[Children] = {
+			scope:New "Highlight" {
+
+				Adornee = currentAdornee,
+				FillTransparency = 1,
+
+				OutlineTransparency = scope:Computed(function(use)
+					if use(scale).X.Scale == 0 then
+						return 1
+					end
+
+					return 0
+
+				end)
+
+			}
+		},
+	}
 
 	scope:New("BillboardGui")({
 		Name = "Interact",

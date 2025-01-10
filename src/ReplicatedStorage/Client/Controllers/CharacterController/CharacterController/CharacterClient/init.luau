@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local NexusInstance = require(ReplicatedStorage.Source.Shared.Uitility.NexusInstance)
 
-local ToolBar = require(script.ToolBar)
+local ToolBar = require(script.ToolBar2)
 
 local Fusion = require(ReplicatedStorage.Packages.fusion)
 local Children, peek = Fusion.Children, Fusion.peek

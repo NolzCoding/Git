@@ -40,14 +40,11 @@ local itemSpawns = {
             Min = 1,
             Chance = 0.5,
         },
-
         Lighter = {
             Max = 1,
             Min = 1,
             Chance = 0.2,
         },
-
-
     },
 
     KnifeHanger = {
@@ -61,9 +58,6 @@ local itemSpawns = {
     },
 
     KitchenCabinet = {
-
-
-
 
         Fork = {
             Max = 1,
@@ -137,9 +131,9 @@ local function _spawnItem(name, object, ancestor)
     return clone
 end
 
-function SpawnItems:HandleObject(object, type, ancestor)
+function SpawnItems:HandleObject(object, type, ancestor, customItemSpawns)
 
-    local chances = itemSpawns[type]
+    local chances = (customItemSpawns or itemSpawns)[type]
 
     if not chances then return end
 
@@ -153,11 +147,11 @@ function SpawnItems:HandleObject(object, type, ancestor)
 
 end
 
-function SpawnItems:SpawnIndividualItem(itemName, ancestor)
+function SpawnItems:SpawnIndividualItem(itemName, ancestor, customItemSpawns)
 
     local possibleObjects = {}
 
-    for name, items in pairs(itemSpawns) do
+    for name, items in pairs(customItemSpawns or itemSpawns) do
         for nameOfItem, _ in pairs(items) do
             if nameOfItem == itemName then
                 table.insert(possibleObjects, name)
@@ -186,9 +180,9 @@ function SpawnItems:SpawnIndividualItem(itemName, ancestor)
 
 end
 
-function SpawnItems:Spawn(ancestor)
+function SpawnItems:Spawn(ancestor, customItemSpawns)
 
-    for name, items in pairs(itemSpawns) do
+    for name, items in pairs(customItemSpawns or itemSpawns) do
         local tagged = CollectionService:GetTagged(name)
 
         for _, object in ipairs(tagged) do
@@ -197,7 +191,7 @@ function SpawnItems:Spawn(ancestor)
                 continue
             end
 
-            self:HandleObject(object, name, ancestor)
+            self:HandleObject(object, name, ancestor, customItemSpawns)
         end
     end
 

@@ -13,6 +13,7 @@ local LoadingScreen = require(script.LoadingScreen)
 local LevelBar = require(script.LevelBar)
 local PlayerList = require(script.PlayerList)
 local TopTimer = require(script.TopTimer)
+local QuestUI = require(script.QuestUI)
 local RightSidebar = require(script.RightSidebar)
 local DefaultButton = require(script.Parent.Components.Buttons.DefaultButton)
 local UIController = Knit.CreateController {
@@ -96,25 +97,30 @@ function UIController:KnitStart()
     local whowon = self.scope:Value("Parents")
     MatchService.StateSignal:Connect(function(stateName : string, stateText : string, time : number, ...)
 
-        if stateName == "Starting" then
+
+
+        if stateName == "ChoosingMap" then
+            print("Opening VoteMap")
+            self:OpenWindow("VoteMap")
+        elseif stateName == "Loading" then
+            self:CloseWindow("VoteMap")
+        elseif stateName == "Starting" then
+            self.MusicController:PlayCatagory("InGame")
+            loadingScreenVisible:set(true)
+
+            task.delay(5, function()
+                loadingScreenVisible:set(false)
+            end)
 
             local parents, babies = ...
             parentPlayers:set(parents)
             babyPlayers:set(babies)
-        end
 
-        if stateName == "ChoosingMap" then
-            print("Choosing Map")
-            loadingScreenVisible:set(true)
-        elseif stateName == "Loading" then
 
-            loadingScreenVisible:set(true)
-        elseif stateName == "Starting" then
-            self.MusicController:PlayCatagory("InGame")
-
-            loadingScreenVisible:set(true)
         else
             loadingScreenVisible:set(false)
+
+
         end
 
         if stateName == "Ending" then
@@ -132,6 +138,14 @@ function UIController:KnitStart()
 
     end)
 
+
+    MatchService.ScoreSignal:Connect(function(...)
+        local parents, babies = ...
+
+        parentPlayers:set(parents)
+        babyPlayers:set(babies)
+
+    end)
 
 
     self.scope:New "ScreenGui" {
@@ -151,6 +165,8 @@ function UIController:KnitStart()
             LoadingScreen(self.scope, {
                 Visible = loadingScreenVisible,
             }),
+
+            QuestUI(self.scope),
 
             self.scope:New "Frame" {
                 Name = "Frame",
@@ -174,11 +190,12 @@ function UIController:KnitStart()
                         AspectRatio = 2.5,
                     }),
 
-                    DefaultButton(self.scope, {
+                    --[[DefaultButton(self.scope, {
                         Size = UDim2.fromScale(0.2, 0.5),
                         AnchorPoint = Vector2.new(0.5, 0.5),
                         Position = UDim2.fromScale(0.5, 1),
                         ZIndex = 1,
+                        Visible = false,
                         Text = "Revive All Players",
                         BackgroundColor3 = Color3.fromRGB(136, 255, 0),
                         StrokeColor3 = Color3.fromRGB(22, 22, 22),
@@ -188,7 +205,7 @@ function UIController:KnitStart()
                         ButtonDown = function()
                             print("Button Down")
                         end
-                    }),
+                    }),]]
 
                     PlayerList(self.scope, {
                         Position = UDim2.new(0.3, 0, 0.5, 0),

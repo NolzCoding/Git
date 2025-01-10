@@ -8,16 +8,31 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local RNGData = require(ReplicatedStorage.Source.Shared.RNGData)
 local RobuxService = Knit.CreateService{Name = "RobuxService",DataService = nil , Client = { }, GamepassListeners = {}}
-
-
+local ServerStorage = game:GetService("ServerStorage")
+local GameSession = require(ServerStorage.Source.Services.MatchService.GameSession)
 
 function RobuxService:KnitStart()
 	self.DataService = Knit.GetService("DataService")
 	self.AwardService = Knit.GetService("AwardService")
+	self.CharacterService = Knit.GetService("CharacterService")
 end
 
 function RobuxService:GiveCrate(player, crateName, amount)
 	self.AwardService:GiveAward(player, "Crate", crateName, amount)
+end
+
+function RobuxService:ReviveBaby(player)
+
+	local gravestonePlayerID = player:GetAttribute("Gravestone")
+	local reviveplayer = Players:GetPlayerByUserId(gravestonePlayerID)
+
+	local buyerCharacter = self.CharacterService:GetCharacter(player)
+	local GameSession = buyerCharacter.GameSession :: GameSession.GameSession
+
+	local reviveCharacter = self.CharacterService:GetCharacter(reviveplayer)
+
+	GameSession:ReviveBaby(reviveCharacter.Gravestone)
+
 end
 
 
@@ -49,7 +64,14 @@ function RobuxService:KnitInit()
 		["EpicSkinCrate3"] = {2689668970, function(plr) return self:GiveCrate(plr, "Epic Skin Crate", 3) end},
 		["EpicSkinCrate10"] = {2689669692, function(plr) return self:GiveCrate(plr, "Epic Skin Crate", 10) end},
 
-		["Nerd"] = {2688415605, function(plr) return self.AwardService:GiveAward(plr, "Skin", "Baby", "Nerd") end}
+		["Nerd"] = {2688415605, function(plr) return self.AwardService:GiveAward(plr, "Skin", "Baby", "Nerd") end},
+
+		["Cash500"] = {2689679824, function(plr) return self.AwardService:GiveAward(plr, "Cash", 500) end},
+		["Cash5000"] = {2689680885, function(plr) return self.AwardService:GiveAward(plr, "Cash", 5000) end},
+		["Cash20000"] = {2689682303, function(plr) return self.AwardService:GiveAward(plr, "Cash", 20000) end},
+		["Cash100000"] = {2689682959, function(plr) return self.AwardService:GiveAward(plr, "Cash", 100000) end},
+
+		["ReviveBaby"] = {2695617898, function(plr) return self:ReviveBaby(plr) end}
 
 		-- Robux Egg
 

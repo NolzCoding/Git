@@ -232,6 +232,12 @@ function Achievements:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 	self.DataService = Knit.GetService("DataService")
 	self.DataController = Knit.GetController("DataController")
     self.AchievementService = Knit.GetService("AchievementService")
+    self.NotificationController = Knit.GetController("NotificationController")
+
+    local AchievementNotified = {
+
+    } :: {[string] : boolean}
+
 	local ready, data = self.DataService.DataProperty:OnReady():await()
 
     print(data)
@@ -278,6 +284,27 @@ function Achievements:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 
                         local isClaimed = scope:Computed(function(use)
                             return use(claimedAchievements)[key]
+                        end)
+
+                        local canClaim = scope:Computed(function(use)
+                            return use(points) >= value.Amount
+                        end)
+
+                        scope:Observer(canClaim):onChange(function()
+
+                            local claimable = Fusion.peek(canClaim)
+
+                            if not AchievementNotified[key] and claimable and not Fusion.peek(isClaimed) then
+                                self.NotificationController:TextNImage({
+                                    Text = "Achievement " .. value.Title .. " Unlocked",
+                                    Color = Color3.fromRGB(255, 205, 148),
+                                    Icon = Icons.BrownBook264,
+                                    Time = 5,
+                                })
+
+                                AchievementNotified[key] = true
+                            end
+
                         end)
 
                         print(Fusion.peek(points))

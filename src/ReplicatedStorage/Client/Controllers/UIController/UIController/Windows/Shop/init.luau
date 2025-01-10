@@ -123,6 +123,9 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                                                 ZIndex = 1,
                                                 ButtonUp = function()
                                                     print("Button Up")
+
+                                                    MarketplaceService:PromptProductPurchase(game.Players.LocalPlayer, Id)
+
                                                 end,
                                                 ButtonDown = function()
                                                     print("Button Down")

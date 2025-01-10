@@ -22,6 +22,8 @@ return {
         Skull = "rbxassetid://117743847819035"
     },
 
+    Skull256 = "rbxassetid://71970635502956",
+    StrongArm = "rbxassetid://83504810428762",
     Frames = {
         VerticalFrame = "rbxassetid://4965331168",
         SquareFrame = "rbxassetid://4965331294",
@@ -55,6 +57,17 @@ return {
             Group = "rbxassetid://113164810288809",
             Open = "rbxassetid://75568398191437",
         },
+    },
+
+    ItemImages = {
+        Taser = "rbxassetid://99749741488576",
+        Soap = "rbxassetid://111644088849646",
+        Lighter = "rbxassetid://103185644105933",
+        Fork = "rbxassetid://124864666406744",
+        Battery = "rbxassetid://111741916026309",
+        ["Basement Key"] = "rbxassetid://135558653765966",
+        Medicine = "rbxassetid://105856109672009",
+        Knife = "rbxassetid://93676867159937"
     },
 
     CheckMark64 = "rbxassetid://138968808496027"

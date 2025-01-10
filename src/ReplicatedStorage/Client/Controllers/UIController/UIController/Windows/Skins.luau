@@ -33,15 +33,73 @@ local skinsInShop = {
         "Baby Shark",
         "Emo Baby",
         "Emo Girl",
+        "Player196",
     },
     Parent = {
         "Bald Santa",
         "Mom",
         "Yo Mama",
         "Crazy Babysitter",
-
+        "Squid Game",
+        "Squid Game Doll"
     }
 }
+
+local function orderSkins()
+
+    local orderedSkins = {}
+
+    for skinType, skins in pairs(skinsInShop) do
+        orderedSkins[skinType] = {}
+        for _, skinName in ipairs(skins) do
+            local skinData = SkinsInfo.Skins[skinType][skinName]
+            table.insert(orderedSkins[skinType], {
+                Name = skinName,
+                Price = skinData.Price,
+                Product = skinData.Product
+            })
+        end
+
+        table.sort(orderedSkins[skinType], function(a, b)
+
+            if a.Product ~= 0 and b.Product == 0 then
+                return true
+            elseif a.Product == 0 and b.Product ~= 0 then
+                return false
+            end
+
+            if a.Product ~= 0 and b.Product ~= 0 then
+                return a.Product > b.Product
+            end
+
+            return a.Price > b.Price
+        end)
+
+
+
+    end
+
+    local orderedList = {
+        Baby = {},
+        Parent = {},
+    }
+
+    for skinType, skins in pairs(orderedSkins) do
+        for _, skin in ipairs(skins) do
+            table.insert(orderedList[skinType], skin.Name)
+        end
+    end
+
+    return orderedList
+
+end
+
+local order = orderSkins()
+
+print(order)
+
+skinsInShop.Baby = order.Baby
+skinsInShop.Parent = order.Parent
 
 function skin (scope, props : {
     RarityColor : Color3,

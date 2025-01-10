@@ -43,18 +43,24 @@ local function Window(scope: typeof(Fusion.scoped(Fusion)), props: {
 
 	end)
 
+	local tweenInfo = scope:Value(TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out))
+
+
     local desiredSize = scope:Computed(function(use)
         local openSize = props.Size or UDim2.fromScale(0.321, 0.431)
 
         if use(props.Open) then
-            return openSize
+			tweenInfo:set(TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out))
+			return openSize
         else
+			tweenInfo:set(TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In))
             return UDim2.fromScale(0, 0)
         end
 
     end)
 
-    local tweenSize = scope:Tween(desiredSize, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.InOut))
+
+    local tweenSize = scope:Tween(desiredSize, tweenInfo)
 
 	return scope:New("Frame")({
 		ZIndex = props.ZIndex or 1,

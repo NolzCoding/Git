@@ -44,16 +44,15 @@ local function AbilityUI(scope, props: {
             scope:New "Frame" {
                 BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                 BackgroundTransparency = 1,
-                Size = UDim2.fromScale(0.06, 0.3),
-                Position = UDim2.fromScale(0.95, 0.4),
-                AnchorPoint = Vector2.new(1, 0.5),
+                Size = UDim2.fromScale(0.15, 0.085),
+                Position = UDim2.fromScale(0.65, 0.97),
+                AnchorPoint = Vector2.new(0.5, 1),
                 [Children] = {
                     scope:New "UIListLayout" {
                         Padding = UDim.new(0.05, 0),
-                        FillDirection = Enum.FillDirection.Vertical,
+                        FillDirection = Enum.FillDirection.Horizontal,
                         HorizontalAlignment = Enum.HorizontalAlignment.Right,
                         VerticalAlignment = Enum.VerticalAlignment.Top,
-
                     },
                     scope:ForPairs(props.CurrentAbilities, function(use,scope,key, value)
 
@@ -67,7 +66,7 @@ local function AbilityUI(scope, props: {
                             Cooldown = 8,
                             KeyCode = key,
                             BackgroundColor3 = Color3.new(0.035294, 0.486275, 1.000000),
-                            Size = UDim2.fromScale(1, 0.5),
+                            Size = UDim2.fromScale(1, 1),
 
                             ButtonText = scope:Computed(function(use, scope)
                                 return value .. " x" .. (use(props.OwnedAbilities)[value] or 0) .. " (" .. key.Name .. ")"

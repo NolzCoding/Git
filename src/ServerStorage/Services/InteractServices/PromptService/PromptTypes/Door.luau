@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local ServerStorage = game:GetService("ServerStorage")
 
+local AnalyticsService = game:GetService("AnalyticsService")
 local CharacterBaseServer = require(ServerStorage.Source.Services.CharacterService.CharacterService.CharacterBaseServer)
 local CharacterService = Knit.GetService("CharacterService")
 local DoorOpenSound = Instance.new("Sound")
@@ -57,6 +58,12 @@ function Door:Triggered(prompt : ProximityPrompt, player : Player)
     hingeConstraint.TargetAngle = 0
     hingeConstraint.ServoMaxTorque = 100000
     hingeConstraint.AngularSpeed = 50
+
+    AnalyticsService:LogOnboardingFunnelStepEvent(
+        player,
+        4, -- Step number
+        "Opened Door" -- Step name
+    )
 
     if open then
         hingeConstraint.TargetAngle = 0

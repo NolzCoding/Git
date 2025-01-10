@@ -5,7 +5,7 @@ local NexusInstance = require(game:GetService("ReplicatedStorage").Source.Shared
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Promise = require(ReplicatedStorage.Packages.Promise)
-
+local Maps = require(ReplicatedStorage.Source.Shared.Maps)
 local SpawnItems = require(ServerStorage.Source.Services.InteractServices.ItemService.SpawnItems)
 
 local DefaultSession = {}
@@ -20,6 +20,10 @@ setmetatable(DefaultSession, GameSession) --TestClass1NexusInstance would be ret
 export type DefaultSession = {
 
     HandleGame : (self : NexusInstanceDefaultSession, callback : () -> any) -> (),
+    StartBabyBucks : () -> (),
+    BabyBucksFolder : Folder,
+    SpawnItem : (self : NexusInstanceDefaultSession, itemName : string) -> (),
+    BabyBuckPromise : Promise,
     Trove : typeof(Trove.new()),
     Parents : {
 
@@ -39,7 +43,9 @@ export type NexusInstanceDefaultSession = NexusInstance.NexusInstance<DefaultSes
 
 function DefaultSession.__new(self: NexusInstanceDefaultSession, players: {Player})
     GameSession.__new(self, players) --Remember to call the parent constructor!
-
+    self.DataService = Knit.GetService("DataService")
+    self.AwardService = Knit.GetService("AwardService")
+    self.LevelService = Knit.GetService("LevelService")
     self.Trove = Trove.new()
 
     self.Parents = {
@@ -50,11 +56,7 @@ function DefaultSession.__new(self: NexusInstanceDefaultSession, players: {Playe
         Alive = {},
         Dead = {}
     }
-    self:Start():andThen(function()
-        print("started")
-    end):catch(function(err)
-        warn(err)
-    end)
+
 
 end
 
@@ -80,16 +82,126 @@ function DefaultSession:SpawnPlayer(player : Player, spawnPoint : Part, characte
 
 end
 
+function DefaultSession.ReviveBaby(self: NexusInstanceDefaultSession, graveStone : BasePart)
+
+    -- remove from dead and add to alive
+
+    local player = Players:GetPlayerByUserId(graveStone:GetAttribute("PlayerID"))
+
+    table.remove(self.Babies.Dead, table.find(self.Babies.Dead, player))
+    table.insert(self.Babies.Alive, player)
+
+    -- revive the player
+
+    GameSession.ReviveBaby(self, graveStone)
+
+end
+
+function DefaultSession.StartBabyBucks(self : NexusInstanceDefaultSession)
+
+    local babybuck = script.Parent.BabyBuck
+
+    local function _spawnBabyBucks()
+        for _,v in ipairs(self.BabyBucksFolder:GetChildren()) do
+
+            local maxBabyBucks = v:GetAttribute("Max") or 1 :: number
+            if #v:GetChildren() == maxBabyBucks then
+                continue
+            end
+
+            local newBabyBuck = babybuck:Clone()
+            newBabyBuck.Parent = v
+
+            local randomPosBySize = Vector3.new(math.random(-v.Size.X/2, v.Size.X/2), math.random(-v.Size.Y/2, v.Size.Y/2), math.random(-v.Size.Z/2, v.Size.Z/2))
+            newBabyBuck.Position = v.Position + randomPosBySize
+
+            local debounce = false
+
+            newBabyBuck.Touched:Connect(function(part: BasePart)
+                if part.Name ~= "HumanoidRootPart" then return end
+                if debounce then return end
+
+                local player = Players:GetPlayerFromCharacter(part.Parent)
+                if not player then return end
+
+                debounce = true
+
+                local playerTeam = player.Team
+                if playerTeam == self.ParentTeam then
+                    --return
+                end
+
+                newBabyBuck:Destroy()
+
+                self.AwardService:GiveAward(player, "Cash", 15)
+                --self.LevelService:AwardExperience(player, 10)
+
+            end)
+
+        end
+    end
+
+    self.BabyBuckPromise = Promise.new(function(resolve, reject)
+
+        local TIME = 20
+
+        while true do
+            print("Spawning")
+            _spawnBabyBucks()
+
+            task.wait(TIME)
+
+        end
+
+    end)
+
+end
+
 function DefaultSession.SpawnItem(self : NexusInstanceDefaultSession, itemName : string ) : ()
     return SpawnItems:SpawnIndividualItem(itemName, self.Map)
 end
 
-function DefaultSession.States.ChoosingMap(self :  NexusInstanceDefaultSession, slot : Part) : Model
+function DefaultSession.States.ChoosingMap(self :  NexusInstanceDefaultSession, slot : Part, votingTable : {[number] : {Name : string, Image : string, Players : {Player}}} ) : Model
 
-    self.OnStateUpdate:Fire("ChoosingMap", "Choosing map", workspace:GetServerTimeNow() + 5)
+    self.OnStateUpdate:Fire("ChoosingMap", "Choosing map", workspace:GetServerTimeNow() + 10)
 
-    local map = ServerStorage.House
-    wait(1)
+    self.OnVoteUpdate:Fire(votingTable, workspace:GetServerTimeNow() + 10)
+
+    local playerVote = self.OnPlayerVote:Connect(function(player : Player, id : number)
+
+        -- remove old vote
+
+        for _,v in ipairs(votingTable) do
+            local isvoted = table.find(v.Players, player)
+            if not isvoted then continue end
+            table.remove(v.Players, isvoted)
+        end
+
+        local map = votingTable[id]
+        table.insert(map.Players, player)
+        print("Inserted player")
+        self.OnVoteUpdate:Fire(votingTable)
+
+    end)
+
+    task.wait(10)
+    playerVote:Disconnect()
+
+    local highestVotes = 0
+    local highestVotedMap = nil
+
+    for _,v in ipairs(votingTable) do
+        if #v.Players > highestVotes then
+            highestVotes = #v.Players
+            highestVotedMap = v
+        end
+    end
+
+    if highestVotedMap == nil then
+        highestVotedMap = votingTable[math.random(1, #votingTable)]
+    end
+
+    local map = ServerStorage:FindFirstChild(highestVotedMap.Name) :: Model
     return map
 end
 
@@ -100,6 +212,9 @@ function DefaultSession.States.Loading(self : NexusInstanceDefaultSession, map :
     cloneMap.Parent = self.GameSlot
     cloneMap:PivotTo(self.GameSlot.CFrame)
     self.Map = cloneMap
+
+    self.BabyBucksFolder = self.Map:WaitForChild("BabyBucks") :: Folder
+
 
 end
 
@@ -140,10 +255,15 @@ function DefaultSession.States.Starting(self : NexusInstanceDefaultSession) : ()
 
     task.wait(5)
 
-    SpawnItems:Spawn(self.Map)
+    local mapName = self.Map.Name
+
+
+    SpawnItems:Spawn(self.Map, Maps.ItemSpawns[mapName] )
 
 
 end
+
+
 
 function DefaultSession.HandleGame(self : NexusInstanceDefaultSession, callback : () -> any) : ()
 
@@ -160,11 +280,15 @@ function DefaultSession.HandleGame(self : NexusInstanceDefaultSession, callback 
 
         table.remove(self.Babies.Alive, table.find(self.Babies.Alive, player))
 
+        table.insert(self.Babies.Dead, player)
+
         task.delay(0.1, function()
             if #self.Babies.Alive == 0 then
                 callback()
             end
         end)
+
+        self.OnScoreUpdate:Fire(self.Parents, self.Babies)
 
         -- spawn as a ghost
 
@@ -175,11 +299,13 @@ function DefaultSession.HandleGame(self : NexusInstanceDefaultSession, callback 
         player.Character:Destroy()
         task.wait()
         player:LoadCharacter()
-        self.CharacterService:NewCharacter(player, "Ghost")
+        local ghostchar = self.CharacterService:NewCharacter(player, "Ghost")
 
         local newCharacter = player.Character
         local root = newCharacter:WaitForChild("HumanoidRootPart")
         root.CFrame = rootCFrame
+
+        ghostchar:SpawnGravestone(newCharacter)
 
     end
 
@@ -224,15 +350,55 @@ function DefaultSession.HandleGame(self : NexusInstanceDefaultSession, callback 
 
         -- dead = when humanoid dies or when any of the 3 healthAttributes reach 0
 
+        self:StartBabyBucks()
+
+    end
+
+    local parentDiedOrLeft = function(player)
+
+        local isDead = table.find(self.Parents.Dead, player)
+
+        if isDead then
+            return
+        end
+
+        table.remove(self.Parents.Alive, table.find(self.Parents.Alive, player))
+
+        table.insert(self.Parents.Dead, player)
+
+        task.delay(0.1, function()
+            if #self.Parents.Alive == 0 then
+                callback()
+            end
+        end)
+
+        self.OnScoreUpdate:Fire(self.Parents, self.Babies)
+
+        -- spawn as a ghost
+
+        -- destory old character
+
+    end
+
+    for _,player in ipairs(self.Parents.Alive) do
+
+        self.Trove:Connect(player.Character.Humanoid.Died, function()
+            parentDiedOrLeft(player)
+        end)
+
+        self.Trove:Connect(Players.PlayerRemoving, function(player : Player)
+            parentDiedOrLeft(player)
+        end)
+
     end
 
 end
 
 function DefaultSession.States.Playing(self : NexusInstanceDefaultSession) : ()
 
-    self.OnStateUpdate:Fire("Playing", "Playing", workspace:GetServerTimeNow() + 100)
+    self.OnStateUpdate:Fire("Playing", "Playing", workspace:GetServerTimeNow() + 160)
 
-    local GAME_TIME = 100
+    local GAME_TIME = 160
     local winner = nil
 
     local function allBabiesDeadCallback()
@@ -253,6 +419,8 @@ function DefaultSession.States.Playing(self : NexusInstanceDefaultSession) : ()
 
     return winner
 
+
+
     -- returns the winner team
 
 
@@ -267,16 +435,55 @@ function DefaultSession.States.Ending(self : NexusInstanceDefaultSession, winnin
     end
 
 
+
     for _, player in ipairs(self.Players) do
         player:RemoveTag("InGame")
     end
     self.OnStateUpdate:Fire("Ending", "Ending", workspace:GetServerTimeNow() + 5, winningteamname)
+
+    -- add + win
+
+    task.spawn(function()
+        for _, player in ipairs(winningTeam.Alive) do
+            local data = self.DataService:GetData(player)
+            data.Wins += 1
+            self.LevelService:AwardExperience(player, 50, true, " For winning")
+            self.AwardService:GiveAward(player, "Cash", 100)
+            self.DataService:SetData(player, data)
+        end
+
+        for _, player in ipairs(winningTeam.Dead) do
+            local data = self.DataService:GetData(player)
+            data.Wins += 1
+            self.LevelService:AwardExperience(player, 50, true, " For winning")
+            self.AwardService:GiveAward(player, "Cash", 100)
+            self.DataService:SetData(player, data)
+        end
+
+        local losingTeam = winningTeam == self.Babies and self.Parents or self.Babies
+
+        for _, player in ipairs(losingTeam.Alive) do
+            self.LevelService:AwardExperience(player, 25, true, " For losing")
+            self.AwardService:GiveAward(player, "Cash", 50)
+        end
+
+        for _, player in ipairs(losingTeam.Dead) do
+            self.LevelService:AwardExperience(player, 25, true, " For losing")
+            self.AwardService:GiveAward(player, "Cash", 50)
+        end
+
+    end)
+
+
     task.wait(5)
 
 end
 
 function DefaultSession.States.Cleanup(self : NexusInstanceDefaultSession) : ()
 
+    if self.BabyBuckPromise then
+        self.BabyBuckPromise:cancel()
+    end
     self.Map:Destroy()
 
     for _, player in ipairs(self.Players) do

@@ -58,7 +58,7 @@ function LevelService:AwardExperience(player : Player, amount : number, notify :
 
     if notify then
         self.NotificationService:NotifyPlayer("TextNImage", {
-            Text = "+" .. amount .. " exp! " .. (notifyText or ""),
+            Text = "+" .. amount .. " exp " .. (notifyText or ""),
             Image = "",
             Color = Color3.fromRGB(21, 76, 255),
             Time = 5,

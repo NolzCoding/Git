@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
+local Icons = require(ReplicatedStorage.Source.Shared.Icons)
 local Fusion = require(ReplicatedStorage.Packages.fusion)
 local Children = Fusion.Children
 local TextLabelWithStroke = require(script.Parent.Parent.Components.Text.TextLabelWithStroke)
@@ -24,6 +24,10 @@ local function PlayerList(scope : typeof(Fusion:scoped()),
         return use(props.Players).Dead
     end)
 
+    local allPlayers = scope:Computed(function(use)
+        return {unpack(use(Alive)), unpack(use(Dead))}
+    end)
+
     return scope:New "Frame" {
         Size = props.Size or UDim2.fromScale(0.2, 0.2),
         Position = props.Position or UDim2.fromScale(0.5, 0.5),
@@ -37,13 +41,17 @@ local function PlayerList(scope : typeof(Fusion:scoped()),
                 HorizontalAlignment = props.HorizontalAlignment or Enum.HorizontalAlignment.Center,
                 VerticalAlignment = Enum.VerticalAlignment.Top,
             },
-            scope:ForValues(Alive, function(use, scope, value: Player)
+            scope:ForValues(allPlayers, function(use, scope, value: Player)
 
 
                 local userId = value.UserId
                 local thumbType = Enum.ThumbnailType.HeadShot
                 local thumbSize = Enum.ThumbnailSize.Size420x420
                 local content, isReady = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize)
+
+                local isDead = scope:Computed(function(use)
+                    return table.find(use(Dead), value)
+                end)
 
                 return scope:New "ImageLabel" {
                     Size = UDim2.fromScale(0.1, 0.1),
@@ -57,6 +65,17 @@ local function PlayerList(scope : typeof(Fusion:scoped()),
                             TextColor = Color3.fromRGB(194, 255, 252),
                             AnchorPoint = Vector2.new(0.5, 0.5),
                         }),
+
+                        scope : New "ImageLabel"{
+
+                            Size = UDim2.fromScale(1, 1),
+                            Image = Icons.Skull256,
+                            Visible = isDead,
+                            BackgroundTransparency = 1,
+                            ImageTransparency = 0.5,
+
+                        },
+
                         scope : New "UIAspectRatioConstraint" {
                             AspectRatio = 1,
                         },

@@ -54,7 +54,7 @@ function ParentServer.SetupCharacter(self: NexusInstanceParentServer, character 
     track.Looped = true
 
     local RightHand = character:WaitForChild("RightHand") :: BasePart
-    local RightUpperArm = character:WaitForChild("RightUpperArm") :: BasePart
+    local RightUpperArm = character:WaitForChild("UpperTorso") :: BasePart
 
     self:NewIKControl("RightArm", RightHand, RightUpperArm)
 

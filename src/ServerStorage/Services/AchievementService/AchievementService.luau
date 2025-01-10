@@ -11,6 +11,8 @@ function AchievementService:KnitInit()
 
     self.Handlers = {}
     self.AwardService = Knit.GetService("AwardService")
+    self.LevelService = Knit.GetService("LevelService")
+    self.QuestService = Knit.GetService("QuestService")
 
 end
 
@@ -51,6 +53,8 @@ function AchievementService:PerformedAction(player : Player, actionName : string
         data.Achievements.Actions[actionName] = amount
     end
 
+    self.QuestService:PerformedAction(player, actionName, amount) -- Update quests
+
     self.DataService:SetData(player, "Achievements", data.Achievements)
 
 end
@@ -77,8 +81,11 @@ function AchievementService:Claim(player : Player, achievementName : string)
 
     data.Achievements.Claimed[achievementName] = true
     self.DataService:SetData(player, "Achievements", data.Achievements)
-
     self.Handlers[achievement.RewardType](player, achievement.Props)
+
+    if achievement.Exp then
+        self.LevelService:AwardExperience(player, achievement.Exp, true)
+    end
 
 end
 
