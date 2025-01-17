@@ -7,10 +7,8 @@ type self = typeof(Component.new({Tag = "Bathtub"}))
 local Bathtub = Component.new({Tag = "Bathtub"})
 local AchievementService = Knit.GetService("AchievementService")
 
-print("reqiored")
 
 function Bathtub:Construct()
-    print("Construct Bathtub")
 
     self.CharacterService = Knit.GetService("CharacterService")
 
@@ -30,8 +28,6 @@ function Bathtub:Construct()
 
     local routineFunc = function(...)
         while true do
-
-            print("Doing the thing")
 
             local Overlap = Collider:GetTouchingParts()
             local drowningPlayers = {}

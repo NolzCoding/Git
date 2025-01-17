@@ -15,6 +15,7 @@ function RobuxService:KnitStart()
 	self.DataService = Knit.GetService("DataService")
 	self.AwardService = Knit.GetService("AwardService")
 	self.CharacterService = Knit.GetService("CharacterService")
+	self.BattlepassService = Knit.GetService("BattlepassService")
 end
 
 function RobuxService:GiveCrate(player, crateName, amount)
@@ -35,6 +36,17 @@ function RobuxService:ReviveBaby(player)
 
 end
 
+function RobuxService:Starterpack(player)
+	self.AwardService:GiveAward(player, "Cash", 800)
+	self.AwardService:GiveAward(player, "Skin", "Baby", "Scary Noob Baby")
+end
+
+function RobuxService:Seasonpass(player)
+
+	local data = self.DataService:GetData(player)
+
+
+end
 
 
 --     1908201326,1909998210,1909998515
@@ -66,12 +78,39 @@ function RobuxService:KnitInit()
 
 		["Nerd"] = {2688415605, function(plr) return self.AwardService:GiveAward(plr, "Skin", "Baby", "Nerd") end},
 
+		["Skin Pack"] = {2699462245, function(plr)
+
+			self.AwardService:GiveAward(plr, "Skin", "Baby", "Iron Baby")
+
+			self.AwardService:GiveAward(plr, "Skin", "Baby", "Cry Baby")
+
+			self.AwardService:GiveAward(plr, "Skin", "Baby", "Player196")
+
+			self.AwardService:GiveAward(plr, "Skin", "Parent", "Squid Game")
+
+
+		end},
+
+		["Ability Pack"] = {2699445518, function(plr)
+
+			self.AwardService:GiveAward(plr, "Ability", "Jump", 8)
+			self.AwardService:GiveAward(plr, "Ability", "Speed", 5)
+			self.AwardService:GiveAward(plr, "Ability", "Invisibility", 2)
+
+
+		end},
+
 		["Cash500"] = {2689679824, function(plr) return self.AwardService:GiveAward(plr, "Cash", 500) end},
 		["Cash5000"] = {2689680885, function(plr) return self.AwardService:GiveAward(plr, "Cash", 5000) end},
 		["Cash20000"] = {2689682303, function(plr) return self.AwardService:GiveAward(plr, "Cash", 20000) end},
 		["Cash100000"] = {2689682959, function(plr) return self.AwardService:GiveAward(plr, "Cash", 100000) end},
 
-		["ReviveBaby"] = {2695617898, function(plr) return self:ReviveBaby(plr) end}
+		["ReviveBaby"] = {2695617898, function(plr) return self:ReviveBaby(plr) end},
+		--2695770303
+
+		["Starterpack"] = {2695770303, function(plr) return self:Starterpack(plr) end},
+
+		["Season1Pass"] = {2700938303, function(plr) return self.BattlepassService:AddPass(plr, "PremiumPassS1") end}
 
 		-- Robux Egg
 

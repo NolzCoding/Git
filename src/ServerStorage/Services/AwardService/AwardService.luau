@@ -51,6 +51,24 @@ function AwardService:KnitStart()
         self.DataService:SetData(player, "Inventory", data.Inventory)
     end
 
+    self.AwardHandlers["Ability"] = function(player : Player, abilityName, amount : number)
+
+        local data = self.DataService:GetData(player)
+        local Abilities = data.Abilities.OwnedAbilities
+
+        Abilities[abilityName] = Abilities[abilityName] or 0
+        Abilities[abilityName] = Abilities[abilityName] + amount
+
+        self.NotificationService:NotifyPlayer("TextNImage", {
+            Text = "+" .. amount .. " " .. abilityName .. " Ability!",
+            Color = Color3.fromRGB(115, 255, 21),
+            Time = 5,
+        }, player)
+
+        self.DataService:SetData(player, "Abilities", data.Abilities)
+
+    end
+
     self.AwardHandlers["Skin"] = function(player : Player, skinType : string, skinName : string)
         local data = self.DataService:GetData(player)
         local Skins = data.Skins

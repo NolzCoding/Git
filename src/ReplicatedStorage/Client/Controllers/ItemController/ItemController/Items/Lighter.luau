@@ -74,8 +74,10 @@ function LighterClient.__new(self: NexusInstanceLighterClient, itemName: string,
 				BackgroundColor3 = Color3.fromRGB(255, 14, 14),
 				ButtonText = "Toggle F",
 				KeyCode = Enum.KeyCode.F,
-				Image = Icons.Drop,
-				ImageSize = UDim2.new(0.5, 0, 0.5, 0),
+				Image = Icons.ItemActions.Flame,
+				ImageSize = UDim2.new(0.8, 0, 0.8, 0),
+				ScaleType = Enum.ScaleType.Fit,
+
 				ButtonUp = function()
 					local particle = self.Tool.FlamePart.Flame1
 					local light = self.Tool.FlamePart.PointLight
@@ -97,7 +99,15 @@ function LighterClient.__new(self: NexusInstanceLighterClient, itemName: string,
 	end
 
 
-
+	self.ItemDescription = {
+		Name = "Lighter",
+		Description = "Burns baby if they're soaked in gasoline",
+		Effects = {
+			Lungs = 50,
+			Heart = 50,
+			Stomach = 50,
+		}
+	}
 
 	ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 

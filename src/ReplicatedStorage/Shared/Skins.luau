@@ -8,12 +8,13 @@ module.RarityColors = {
     Rare = Color3.fromRGB(53, 124, 255),
     Epic = Color3.fromRGB(220, 45, 255),
     Legendary = Color3.fromRGB(255, 164, 45),
+    Exotic = Color3.fromRGB(255, 45, 45),
 }
 
 export type Skin = {
     Name : string,
     Description : string,
-    Rarity : "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary",
+    Rarity : "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary" | "Exotic",
     Price : number,
     PriceType : "Cash" | "Robux",
     Product : number,
@@ -98,6 +99,28 @@ module.Skins = {
             Image = "rbxassetid://106628402209458",
         },
 
+        ["Caseoh"] = {
+            Name = "Caseoh",
+            Description = "Caseoh",
+            Rarity = "Legendary",
+            Price = 5000,
+            Type = "Parent",
+            PriceType = "Cash",
+            Product = 0,
+            Image = "rbxassetid://105532765051447",
+        },
+
+        ["Karen"] = {
+            Name = "Karen",
+            Description = "Karen",
+            Rarity = "Exotic",
+            Price = 10000,
+            Type = "Parent",
+            PriceType = "Cash",
+            Product = 0,
+            Image = "rbxassetid://72661369678065",
+        },
+
     },
     Baby = {
 
@@ -145,6 +168,28 @@ module.Skins = {
             Image = "rbxassetid://83273303239269",
         },
 
+        ["Baby Ninja"] = {
+            Name = "Baby Ninja",
+            Type = "Baby",
+            Description = "Baby Ninja",
+            Rarity = "Uncommon",
+            Price = 750,
+            Product = 0,
+            PriceType = "Cash",
+            Image = "rbxassetid://117061821681900",
+        },
+
+        ["Cry Baby"] = {
+            Name = "Cry Baby",
+            Type = "Baby",
+            Description = "Cry Baby",
+            Rarity = "Uncommon",
+            Price = 750,
+            Product = 0,
+            PriceType = "Cash",
+            Image = "rbxassetid://84616139118709",
+        },
+
         ["Batman"] = {
             Name = "Batman",
             Type = "Baby",
@@ -167,6 +212,17 @@ module.Skins = {
             Image = "rbxassetid://130833846819290",
         },
 
+        ["Iron Baby"] = {
+            Name = "Iron Baby",
+            Type = "Baby",
+            Description = "Iron Baby",
+            Rarity = "Rare",
+            Price = 1500,
+            Product = 0,
+            PriceType = "Cash",
+            Image = "rbxassetid://113291087067072",
+        },
+
         ["Adventure Baby"] = {
             Name = "Adventure Baby",
             Type = "Baby",
@@ -177,6 +233,8 @@ module.Skins = {
             PriceType = "Cash",
             Image = "rbxassetid://126099632237321",
         },
+
+
 
         ["Nerd"] = {
             Name = "Nerd",
@@ -205,10 +263,21 @@ module.Skins = {
             Type = "Baby",
             Description = "Litteraly you lmao",
             Rarity = "Legendary",
-            Price = 8000,
+            Price = 6000,
             Product = 0,
             PriceType = "Cash",
             Image = "rbxassetid://86324623174272",
+        },
+
+        ["Sigma"] = {
+            Name = "Sigma",
+            Type = "Baby",
+            Description = "Litteraly you lmao",
+            Rarity = "Exotic",
+            Price = 8000,
+            Product = 0,
+            PriceType = "Cash",
+            Image = "rbxassetid://110129535404722",
         },
 
     }

@@ -22,6 +22,16 @@ function Basement_KeyClient.__new(self: NexusInstanceBasement_KeyClient, itemNam
     print("Basement_KeyClient")
     ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 
+    self.ItemDescription = {
+        Name = "Basement Key",
+        Description = "Opens the basement",
+        Effects = {
+            Lungs = 0,
+            Heart = 0,
+            Stomach = 0,
+        }
+    }
+
     self.BuildUI = function(scope)
         --[[return ActionButton(scope, {
             Position = UDim2.new(0.8, 0, 0.85, 0),

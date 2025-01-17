@@ -32,7 +32,6 @@ function CharacterController:KnitInit()
 
         end)
 
-        local currentCharacter = self.Character
 
         if self.Character then
             task.spawn(function()

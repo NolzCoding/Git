@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HealthBar = {}
 
 local Fusion = require(ReplicatedStorage.Packages.fusion)
+local tween = Fusion.Tween
 
 local Children, OnEvent = Fusion.Children, Fusion.OnEvent
 local Module3D = require(ReplicatedStorage.Source.Shared.Module3D)
@@ -11,7 +12,12 @@ local Icons = require(ReplicatedStorage.Source.Shared.Icons)
 local TextLabelWithStroke =
 	require(ReplicatedStorage.Source.Client.Controllers.UIController.Components.Text.TextLabelWithStroke)
 
-local function HealthBar(scope, props: {}) -- should be lifetime of the game
+local function HealthBar(scope, props: {
+	Highlighted : boolean,
+}) -- should be lifetime of the game
+
+
+
 	local healths = {
 		{ AttributeName = "Heart", Icon = Icons.OrganHeart, Value = scope:Value(100) },
 		{ AttributeName = "Stomach", Icon = Icons.OrganStomach, Value = scope:Value(100) },
@@ -40,6 +46,20 @@ local function HealthBar(scope, props: {}) -- should be lifetime of the game
 
 	Players.LocalPlayer.CharacterAdded:Connect(characterAdded)
 
+	local defaultPos = UDim2.fromScale(0.021, 0.989)
+	local defaultSize = UDim2.fromScale(0.2, 0.11)
+
+	local highlightedPos = UDim2.fromScale(0.25, 0.75)
+	local highlightedSize = UDim2.fromScale(0.5, 0.5)
+
+	local position = scope:Computed(function(use)
+		return use(props.Highlighted) and highlightedPos or defaultPos
+	end)
+
+	local size = scope:Computed(function(use)
+		return use(props.Highlighted) and highlightedSize or defaultSize
+	end)
+
 	return scope:New("ScreenGui")({
 		Name = "HealthBarUI",
 		IgnoreGuiInset = true,
@@ -54,8 +74,8 @@ local function HealthBar(scope, props: {}) -- should be lifetime of the game
 				BackgroundTransparency = 1,
 				BorderColor3 = Color3.fromRGB(0, 0, 0),
 				BorderSizePixel = 0,
-				Position = UDim2.fromScale(0.021, 0.989),
-				Size = UDim2.fromScale(0.17, 0.1),
+				Position = scope:Tween(position, TweenInfo.new(2, Enum.EasingStyle.Quint, Enum.EasingDirection.In)),
+				Size = scope:Tween(size, TweenInfo.new(2, Enum.EasingStyle.Quint, Enum.EasingDirection.In)),
 
 				[Children] = {
 					scope:New("UIListLayout")({

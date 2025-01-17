@@ -25,7 +25,7 @@ local function TextNImage(
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		BackgroundTransparency = 1,
 		Position = props.Position or UDim2.new(0.5, 0, 0.5, 0),
-		Size = props.Size or UDim2.new(1, 0, 0.1, 0),
+		Size = props.Size or UDim2.new(1, 0, 0.07, 0),
 		Text = props.Text,
 		Font = Enum.Font.FredokaOne,
 		TextScaled = true,

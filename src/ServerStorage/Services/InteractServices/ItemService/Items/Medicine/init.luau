@@ -10,7 +10,7 @@ local MedicineServer = {}
 MedicineServer.__index = MedicineServer
 setmetatable(MedicineServer, ItemBase)
 
-local HEAL_AMOUNT = 25
+local HEAL_AMOUNT = 30
 
 export type MedicineServer = {
 } & typeof(setmetatable({}, MedicineServer)) & ItemBase.ItemBase

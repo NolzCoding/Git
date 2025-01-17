@@ -29,8 +29,14 @@ function BatteryServer.__new(self: NexusInstanceBatteryServer, itemName: string,
         })
 
         task.spawn(function()
+
             local AchievementService = Knit.GetService("AchievementService")
             AchievementService:PerformedAction(player, "Battery", 1)
+
+            local gameSession = character.GameSession
+
+            gameSession:SpawnItem("Battery", 1)
+
         end)
 
         self.Tool:Destroy()

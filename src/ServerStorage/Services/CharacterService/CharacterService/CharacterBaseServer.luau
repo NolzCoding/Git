@@ -10,7 +10,6 @@ local GameSession = require(ServerStorage.Source.Services.MatchService.GameSessi
 
 local CharacterBaseServer = {}
 CharacterBaseServer.__index = CharacterBaseServer
-CharacterBaseServer.Client = {}
 
 
 export type CharacterBaseServer = {
@@ -59,6 +58,8 @@ function CharacterBaseServer.__new(self: NexusInstanceCharacterBaseServer, playe
     self.Remote = Instance.new("RemoteFunction")
     self.Remote.Parent = character
 
+    self.Client = {}
+
     self.Died = self:CreateEvent()
 
     self.RemoteEvent = Instance.new("RemoteEvent")
@@ -103,7 +104,7 @@ function CharacterBaseServer.__new(self: NexusInstanceCharacterBaseServer, playe
     self.ParticleService = Knit.GetService("ParticleService")
     self.AchievementService = Knit.GetService("AchievementService")
 
-
+    self:SetupClient()
 
     self.EffectHandlers["Slowness"] = function(duration : number, multiplier : number)
         multiplier = multiplier or 1
@@ -193,7 +194,7 @@ function CharacterBaseServer.NewIKControl(self: NexusInstanceCharacterBaseServer
     ikControl.Parent = endEffector
     ikControl.ChainRoot = chainRoot
     ikControl.EndEffector = endEffector
-    ikControl.SmoothTime = 0.2
+    ikControl.SmoothTime = 0 --0.2
     ikControl.Weight = 0
     ikControl.Enabled = false
     ikControl.Type = Enum.IKControlType.Position
@@ -257,7 +258,29 @@ function CharacterBaseServer.ApplyEffect(self: NexusInstanceCharacterBaseServer,
     --self.RemoteEvent:FireClient(self.Player, "ApplyEffect", effect, duration)
 end
 
-function CharacterBaseServer.Client.Morph(self: NexusInstanceCharacterBaseServer, player : Player, skinName): ()
+function CharacterBaseServer.SetupClient(self: NexusInstanceCharacterBaseServer): ()
+
+    self.Client.Morph = function(self : NexusInstanceCharacterBaseServer,player : Player, skinName : string)
+        local inGame = player:HasTag("InGame")
+
+        if inGame then
+            return
+        end
+
+        local skinModel = ReplicatedStorage.Data.Skins:FindFirstChild(skinName)
+
+        if not skinModel then
+            warn("Skin ", skinName, " not found")
+            return
+        end
+
+        self:NewMorph(skinModel)
+
+    end
+
+end
+
+--[[function CharacterBaseServer.Client.Morph(self: NexusInstanceCharacterBaseServer, player : Player, skinName): ()
 
     local inGame = player:HasTag("InGame")
 
@@ -274,7 +297,7 @@ function CharacterBaseServer.Client.Morph(self: NexusInstanceCharacterBaseServer
 
     self:NewMorph(skinModel)
 
-end
+end]]
 
 function CharacterBaseServer.NewMorph(self: NexusInstanceCharacterBaseServer, model)
     local player = self.Player

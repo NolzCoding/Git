@@ -19,8 +19,10 @@ local function TextLabelWithStroke(
         TextXAlignment : UsedAs<Enum.TextXAlignment>?,
         Rotation : UsedAs<number>?,
         StrokeColor : UsedAs<Color3>?,
+        RichText : UsedAs<boolean>?,
         Thickness : UsedAs<number>?,
         Text: UsedAs<string>,
+        ZIndex : UsedAs<number>?,
         Build : UsedAs<{}>?,
     }
 )
@@ -30,7 +32,9 @@ local function TextLabelWithStroke(
     end
 
     return scope:New "TextLabel" {
+        ZIndex = props.ZIndex or 1,
         BackgroundTransparency = 1,
+        RichText = props.RichText or false,
         Position = props.Position,
         AnchorPoint = props.AnchorPoint,
         TextXAlignment = props.TextXAlignment or Enum.TextXAlignment.Center,

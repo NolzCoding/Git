@@ -4,17 +4,21 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Fusion = require(ReplicatedStorage.Packages.fusion)
 local Children = Fusion.Children
+local computed = Fusion.Computed
 local forValues = Fusion.ForValues
 local Card = require(script.Parent.Parent.Parent.Components.UI.Card)
 local Window = require(script.Parent.Parent.Parent.Components.UI.Window)
 local DefaultButton = require(script.Parent.Parent.Parent.Components.Buttons.DefaultButton)
 local TextLabelWithStroke = require(script.Parent.Parent.Parent.Components.Text.TextLabelWithStroke)
 local Section = require(script.Parent.Parent.Parent.Components.UI.Section)
+local BigOffer = require(script.BigOffer)
 local AbsoluteScaleComputed = require(ReplicatedStorage.Source.Shared.Uitility.AbsoluteScaleComputed)
 local ImageButton = require(script.Parent.Parent.Parent.Components.Buttons.ImageButton)
 local Icons = require(ReplicatedStorage.Source.Shared.Icons)
 local Item = require(script.Item)
 local TweenService = game:GetService("TweenService")
+local SkinData = require(ReplicatedStorage.Source.Shared.Skins)
+local RngData = require(ReplicatedStorage.Source.Shared.RNGData)
 function Shop:Start() -- knit start
 end
 
@@ -38,9 +42,10 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
 		Open = open,
 		Build = function(scope)
 
+
             local absoluteCanvasSize = scope:Value(Vector2.new(500,500))
 
-
+            local scrollerPadding = AbsoluteScaleComputed(scope, absoluteCanvasSize, UDim2.fromScale(1, 0.1))
 
             local scrollingFrame : ScrollingFrame = scope:New "ScrollingFrame" {
                 ZIndex = 3,
@@ -53,6 +58,116 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                     scope : New "UIListLayout" {
                         FillDirection = Enum.FillDirection.Vertical,
                         SortOrder = Enum.SortOrder.LayoutOrder,
+                        HorizontalAlignment = Enum.HorizontalAlignment.Center,
+                        Padding = scope:Computed(function(use)
+                            return UDim.new(use(scrollerPadding).Y.Scale, 0)
+                        end),
+                    },
+
+                    -- padding frame
+
+                    scope:New "Frame" {
+                        Size = AbsoluteScaleComputed(scope, absoluteCanvasSize, UDim2.fromScale(1, 0.12)),
+                        BackgroundTransparency = 1,
+                    },
+
+                    BigOffer(scope, {
+                        Name = "EPIC Skin Crate",
+                        Price1 = 100,
+                        Price3 = 200,
+                        Product1 = 2689668257,
+                        Product3 = 2689668970,
+                        Position = UDim2.fromScale(0.5, 0.5),
+                        Size = AbsoluteScaleComputed(scope, absoluteCanvasSize, UDim2.fromScale(1, 0.5)),
+                        Expires = DateTime.now().UnixTimestamp + 10000,
+                        Content = function(scope)
+
+
+
+                            return {
+
+                                scope:New("UIGridLayout")  {
+                                    CellSize = UDim2.fromScale(0.2, 0.5),
+                                    CellPadding = UDim2.fromOffset(0.05, 0.1),
+                                    FillDirection = Enum.FillDirection.Horizontal,
+                                    HorizontalAlignment = Enum.HorizontalAlignment.Center,
+                                    VerticalAlignment = Enum.VerticalAlignment.Top,
+                                },
+
+                                scope : ForPairs(RngData.RNGTable["Epic Skin Crate"], function(use, scope, key, value)
+
+                                    return key, scope : New "Frame" {
+                                        BackgroundTransparency = 0.5,
+                                        BackgroundColor3 = Color3.new(0.000000, 0.000000, 0.000000),
+
+                                        Size = UDim2.new(0.2, 0, 1, 0),
+                                        [Children] = {
+
+                                            scope:New "UICorner" {
+                                                CornerRadius = UDim.new(0.2, 0),
+                                            },
+
+                                            scope:New "UIStroke" {
+
+                                                Thickness = 1,
+                                                Color = SkinData.RarityColors[value.Rarity],
+                                            },
+
+                                            scope : New "ImageLabel" {
+                                                BackgroundTransparency = 1,
+                                                Image = value.Image,
+                                                Size = UDim2.fromScale(1, 1),
+                                                Position = UDim2.fromScale(0.5, 0.5),
+                                                AnchorPoint = Vector2.new(0.5, 0.5),
+
+                                                [Children] = {
+                                                    scope : New "UIAspectRatioConstraint" {
+                                                        AspectRatio = 1,
+                                                    }
+                                                }
+                                            },
+
+                                            scope : New "ImageLabel" {
+                                                BackgroundTransparency = 1,
+                                                Image = Icons.Shadow,
+                                                Size = UDim2.fromScale(2, 2),
+                                                ZIndex = 0,
+                                                ImageTransparency = 0,
+                                                Position = UDim2.fromScale(0.5, 0.5),
+                                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                                ImageColor3 = SkinData.RarityColors[value.Rarity],
+                                                [Children] = {
+                                                    scope : New "UIAspectRatioConstraint" {
+                                                        AspectRatio = 1,
+                                                    }
+                                                }
+                                            },
+
+
+                                            --[[TextLabelWithStroke(scope, {
+                                                Text = value.Name,
+                                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                                Position = UDim2.fromScale(0.5, -0.1),
+                                                Size = UDim2.fromScale(1, 0.2),
+                                            }),]]
+
+                                            TextLabelWithStroke(scope, {
+                                                Text = value.Chance * 100 .. "%",
+                                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                                Position = UDim2.fromScale(0.5, 1),
+                                                Size = UDim2.fromScale(1, 0.2),
+                                            }),
+                                        }
+                                    }
+
+                                end)
+                            }
+                        end
+                    }),
+
+                    scope:New "Frame" {
+                        Size = AbsoluteScaleComputed(scope, absoluteCanvasSize, UDim2.fromScale(1, 0.12)),
+                        BackgroundTransparency = 1,
                     },
 
                     scope:New "Frame" {
@@ -259,15 +374,18 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
 
             local listSections = {
                 {
-                    Name = "Gems",
-                    Image = Icons.Rocket,
-                    CanvasPositon = Vector2.new(0, 0),
+                    Name = "Baby Bucks",
+                    Image = Icons.BabyBucks,
+                    CanvasPositon = scope:Computed(function(use, scope)
+                        local udim2 = use(AbsoluteScaleComputed(scope, absoluteCanvasSize, UDim2.fromScale(0, 0.5)))
+                        return Vector2.new(udim2.X.Offset, udim2.Y.Offset)
+                    end),
                 },
                 {
                     Name = "Crates",
                     Image = Icons.GiftBoxes.Purple.Large,
                     CanvasPositon = scope:Computed(function(use, scope)
-                        local udim2 = use(AbsoluteScaleComputed(scope, absoluteCanvasSize, UDim2.fromScale(0, 1)))
+                        local udim2 = use(AbsoluteScaleComputed(scope, absoluteCanvasSize, UDim2.fromScale(0, 1.5)))
                         return Vector2.new(udim2.X.Offset, udim2.Y.Offset)
                     end),
 
@@ -312,7 +430,7 @@ function Shop:Build(scope : typeof(Fusion.scoped(Fusion)), open)
                             Build = function(scope)
 
                                 return {TextLabelWithStroke(scope, {
-                                    Text = "Shop",
+                                    Text = value.Name,
                                     Size = UDim2.fromScale(1, 0.3),
                                     Position = UDim2.fromScale(0.5, 0.8),
                                     ZIndex = 2,

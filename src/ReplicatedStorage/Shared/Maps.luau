@@ -11,18 +11,122 @@ module.Maps = {
     },
     {
         Name = "The Office",
-        Image = "rbxassetid://107553320442603",
+        Image = "rbxassetid://106397944537475",
     }
 }
 
 module.ItemSpawns = {
 
-    ["House"] = {
+    House = {
+        Battery = {
+            SpawnsIn = {
+                Drawer = 10,
+                TVCabinets = 5,
+            },
+        },
+
+        Soap = {
+            SpawnsIn = {
+                Drawer = 6,
+            },
+        },
+
+        Lighter = {
+            SpawnsIn = {
+                Drawer = 5,
+                TVCabinets = 3,
+            },
+        },
+
+        Taser = {
+            SpawnsIn = {
+                Drawer = 1,
+            },
+        },
+
+        Knife = {
+            SpawnsIn = {
+                KnifeHanger = 1,
+            },
+        },
+
+        Fork = {
+            SpawnsIn = {
+                KitchenCabinet = 5,
+            },
+        },
+
+        Medicine = {
+            SpawnsIn = {
+                KitchenCabinet = 2,
+                TVCabinets = 1,
+            },
+        },
+
+        Basement_Key = {
+            SpawnsIn = {
+                KitchenCabinet = 1,
+            },
+        },
+
+    },
+
+    ["The Office"] = {
+        Battery = {
+            SpawnsIn = {
+                Drawer = 15,
+                TVCabinets = 3,
+            },
+        },
+
+        Soap = {
+            SpawnsIn = {
+                Drawer = 8,
+            },
+        },
+
+        Lighter = {
+            SpawnsIn = {
+                Drawer = 5,
+                TVCabinets = 3,
+            },
+        },
+
+        Taser = {
+            SpawnsIn = {
+                Drawer = 1,
+            },
+        },
+
+        Knife = {
+            SpawnsIn = {
+                KnifeHanger = 1,
+            },
+        },
+
+        Fork = {
+            SpawnsIn = {
+                KitchenCabinet = 5,
+            },
+        },
+
+        Medicine = {
+            SpawnsIn = {
+                KitchenCabinet = 2,
+                TVCabinets = 1,
+            },
+        },
+
+
+
+    }
+
+    --[[["House"] = {
         Drawer = {
             Battery = {
                 Max = 1,
                 Min = 1,
-                Chance = 0.1,
+                Chance = 0.2,
             },
             Soap = {
                 Max = 1,
@@ -100,26 +204,26 @@ module.ItemSpawns = {
             Battery = {
                 Max = 1,
                 Min = 1,
-                Chance = 0.1,
+                Chance = 0.25,
             },
 
 
             Soap = {
                 Max = 1,
                 Min = 1,
-                Chance = 0.2,
+                Chance = 0.15,
             },
 
             Lighter = {
                 Max = 1,
                 Min = 1,
-                Chance = 0.1,
+                Chance = 0.12,
             },
 
             Taser = {
                 Max = 1,
                 Min = 1,
-                Chance = 1,
+                Chance = 0.025,
             },
 
         },
@@ -128,13 +232,13 @@ module.ItemSpawns = {
             Battery = {
                 Max = 1,
                 Min = 1,
-                Chance = 0.5,
+                Chance = 1,
             },
 
             Lighter = {
                 Max = 1,
                 Min = 1,
-                Chance = 0.2,
+                Chance = 0.5,
             },
 
 
@@ -171,7 +275,7 @@ module.ItemSpawns = {
             },
         },
 
-    },
+    },]]
 
 }
 

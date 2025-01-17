@@ -57,14 +57,22 @@ function KnifeClient.__new(self: NexusInstanceKnifeClient, itemName: string, too
         self.Server:Attack()
 
         debounce = true
-
         task.wait(0.5)
-
         debounce = false
 
     end))
 
    -- self.Server:DropItem()
+
+   self.ItemDescription = {
+        Name = "Knife",
+        Description = "Can cut babies and damage them or slow down parents",
+        Effects = {
+            Lungs = 30,
+            Heart = 30,
+            Stomach = 30,
+        }
+    }
 
    ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 

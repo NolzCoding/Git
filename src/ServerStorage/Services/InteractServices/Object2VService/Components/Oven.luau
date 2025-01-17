@@ -8,10 +8,8 @@ local Oven = Component.new({Tag = "Oven"})
 
 local AchievementService = Knit.GetService("AchievementService")
 
-print("reqiored")
 
 function Oven:Construct()
-    print("Construct Oven")
 
     self.CharacterService = Knit.GetService("CharacterService")
 

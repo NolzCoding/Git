@@ -155,6 +155,43 @@ module.Rewards = {
             Amount = 1,
             Name = "Ability Crate"
         }
+    },
+
+    ["Baby Gamer"] = {
+        Title = "Baby Gamer",
+        Description = "Play 1 game",
+        Action = "Game",
+        Exp = 25,
+        Amount = 1,
+        RewardType = "Crate",
+        Props = {
+            Amount = 1,
+            Name = "Ability Crate"
+        }
+    },
+
+    ["Sigma Gamer"] = {
+        Title = "Sigma Gamer",
+        Description = "Play 3 game",
+        Action = "Game",
+        Exp = 50,
+        Amount = 3,
+        RewardType = "Cash",
+        Props = {
+            Amount = 200
+        }
+    },
+
+    ["SIGMA SIGMA Gamer"] = {
+        Title = "SIGMA SIGMA Gamer",
+        Description = "Play 10 game",
+        Action = "Game",
+        Exp = 100,
+        Amount = 10,
+        RewardType = "Cash",
+        Props = {
+            Amount = 500
+        }
     }
 
 

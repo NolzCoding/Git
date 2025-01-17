@@ -28,6 +28,16 @@ function Vent:Construct()
 
         local character = player.Character
 
+        if self.Instance:GetAttribute("Disabled") then
+            NotificationService:NotifyPlayer("TextNImage" ,{
+                Text = "You cant vent this way, Find the other side of the vent",
+                Image = "",
+                Color = Color3.fromRGB(255, 52, 52),
+                Time = 4,
+            }, player)
+            return
+        end
+
         local characterType = character:GetAttribute("Character") :: string
         if characterType == "Parent" then
             NotificationService:NotifyPlayer("TextNImage" ,{

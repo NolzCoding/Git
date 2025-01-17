@@ -89,7 +89,7 @@ local function QuestUI(scope, props)
                         Size = UDim2.fromScale(0.2, 0.2),
                         AspectRatio = 1,
                         Rotation = scope:Tween(dropDownRotation, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)),
-                        Image = Icons.Drop,
+                        Image = Icons.DropDown,
                         ZIndex = 1,
                         ButtonUp = function()
                             dropDownRotation:set(Fusion.peek(dropDownRotation) == 180 and 0 or 180)

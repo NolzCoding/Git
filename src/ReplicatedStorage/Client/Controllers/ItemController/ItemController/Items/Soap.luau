@@ -53,17 +53,26 @@ function SoapClient.__new(self: NexusInstanceSoapClient, itemName: string, tool:
                 BackgroundColor3 = Color3.fromRGB(255, 14, 14),
                 ButtonText = "Bathe in Soap F",
                 KeyCode = Enum.KeyCode.F,
-                Image = Icons.Drop,
-                ImageSize = UDim2.new(0.5, 0, 0.5, 0),
+                ScaleType = Enum.ScaleType.Fit,
+                Image = Icons.ItemActions.Bubbles,
+                ImageSize = UDim2.new(0.8, 0, 0.8, 0),
                 ButtonUp = function()
                     self.Server:Use()
                 end,
             })
         end
 
-
-
     end
+
+    self.ItemDescription = {
+        Name = "Soap",
+        Description = "Makes baby slippery and can't be picked up",
+        Effects = {
+            Lungs = 0,
+            Heart = 0,
+            Stomach = 0,
+        }
+    }
 
     ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 

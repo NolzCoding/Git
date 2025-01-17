@@ -36,6 +36,14 @@ local templates = {
         Args = {150}
     },
 
+    {
+        Action = "Game",
+        Range = {2, 5},
+        Name = "Play %i Games",
+        Award = "Cash",
+        Args = {150}
+    },
+
 }
 
 function QuestService:NewRandomDailyQuests()
@@ -97,6 +105,7 @@ function QuestService:Claim(player : Player, index : number)
     table.remove(data.Quests.DailyQuests, index)
     self.DataService:SetData(player, "Quests", data.Quests)
     self.AwardService:GiveAward(player, quest.Award, unpack(quest.Args))
+    self.LevelService:AwardExperience(player, 50, true, " From Daily Quest")
 end
 
 function QuestService.Client:Claim(player, index)
@@ -107,6 +116,7 @@ function QuestService:KnitStart()
 
     self.DataService = Knit.GetService("DataService")
     self.AwardService = Knit.GetService("AwardService")
+    self.LevelService = Knit.GetService("LevelService")
 
     while true do
 

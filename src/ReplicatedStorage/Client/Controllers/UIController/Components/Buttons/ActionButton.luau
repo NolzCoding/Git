@@ -24,6 +24,7 @@ local function ActionButton(
         BackgroundColor3: UsedAs<Color3>?,
         Image: UsedAs<string>?,
         ImageSize: UsedAs<UDim2>?,
+        ScaleType : UsedAs<Enum.ScaleType>?,
         KeyCode : UsedAs<Enum.KeyCode>?,
         ButtonDown : UsedAs<() -> ()>?,
         ButtonUp : UsedAs<() -> ()>?,
@@ -162,6 +163,7 @@ local function ActionButton(
                 Position = UDim2.new(0.5, 0, 0.5, 0),
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 Image = props.Image or "",
+                ScaleType = props.ScaleType,
                 [Children] = {
                     scope:New "UIAspectRatioConstraint" {
                         AspectRatio = 1

@@ -49,6 +49,8 @@ function BabyClient.__new(self: NexusInstanceBabyClient, character : Model?, ign
                 ownedAbilities:set(data.OwnedAbilities)
             end)
 
+            self.Highlighted = scope:Value(false)
+
             return {
                 AbilityUI(scope, {
                     CurrentAbilities = currentAbilities,
@@ -59,7 +61,9 @@ function BabyClient.__new(self: NexusInstanceBabyClient, character : Model?, ign
                     end
 
                 }),
-                HealthBar(scope, {})
+                HealthBar(scope, {
+                    Highlighted = self.Highlighted,
+                })
             }
         end
     end
@@ -83,6 +87,10 @@ function BabyClient.__new(self: NexusInstanceBabyClient, character : Model?, ign
 
     self:SetupAbilities()
 
+end
+
+function BabyClient.HighlightHealth(self : NexusInstanceBabyClient, highlight : boolean)
+    self.Highlighted:set(highlight)
 end
 
 

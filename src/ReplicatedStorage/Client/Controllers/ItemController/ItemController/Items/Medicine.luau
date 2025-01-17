@@ -20,6 +20,17 @@ export type NexusInstanceMedicineClient = NexusInstance.NexusInstance<MedicineCl
 
 function MedicineClient.__new(self: NexusInstanceMedicineClient, itemName: string, tool: Tool, cashedVisual : Model?)
     print("MedicineClient")
+
+    self.ItemDescription = {
+        Name = "Medicine",
+        Description = "Heals the baby",
+        Effects = {
+            Lungs = 30,
+            Heart = 30,
+            Stomach = 30,
+        }
+    }
+
     ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 
     self.BuildUI = function(scope)

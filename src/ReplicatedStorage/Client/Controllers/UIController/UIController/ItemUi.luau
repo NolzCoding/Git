@@ -54,7 +54,7 @@ local function ItemUi(scope, props : {
                 ButtonText = "Drop Q",
                 KeyCode = Enum.KeyCode.Q,
                 Image = Icons.Drop,
-                ImageSize = UDim2.new(0.5, 0, 0.5, 0),
+                ImageSize = UDim2.new(1, 0, 1, 0),
                 ButtonUp = function()
                     Knit.GetService("ItemService"):DropItem(Fusion.peek(tool), Fusion.peek(tool).Name)
                 end,

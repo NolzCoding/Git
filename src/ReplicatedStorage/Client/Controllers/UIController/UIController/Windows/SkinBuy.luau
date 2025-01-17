@@ -106,7 +106,7 @@ function SkinBuy:Build(scope: typeof(Fusion.scoped(Fusion)), open)
 						TextSize = 14,
 
                         ButtonUp = function()
-                            MarketplaceService:PromptProductPurchase(game.Players.LocalPlayer, 1)
+                            MarketplaceService:PromptProductPurchase(game.Players.LocalPlayer, Fusion.peek(self.ProductId))
                         end,
 
                         ButtonDown = function()

@@ -24,6 +24,11 @@ function ItemController:KnitStart()
         local itemName = item:GetAttribute("ItemName")
         local newItemObj = self.Modules[itemName].new(itemName, item, cashedVisual)
 
+        print(CharacterController:GetCharacter(), "init")
+        task.delay(5, function()
+            print(CharacterController:GetCharacter(), "delay")
+        end)
+
         CharacterController:GetCharacter():ToolAdded(item, true)
 
         item.Destroying:Connect(function()

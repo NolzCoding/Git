@@ -14,6 +14,7 @@ type self = typeof(Component.new({Tag = "GameLobby"}))
 local GameLobby = Component.new({Tag = "GameLobby"})
 
 local MatchService = Knit.GetService("MatchService")
+local AchievementService = Knit.GetService("AchievementService")
 
 function GameLobby:Construct()
 
@@ -40,11 +41,17 @@ function GameLobby:Construct()
 
         for _, player in ipairs(players) do
             table.insert(list, player.Value)
-            AnalyticsService:LogOnboardingFunnelStepEvent(
-                    player,
+            task.spawn(function()
+
+                AchievementService:PerformedAction(player.Value, "Game", 1)
+
+                AnalyticsService:LogOnboardingFunnelStepEvent(
+                    player.Value,
                     2, -- Step number
                     "Game Start" -- Step name
             )
+
+            end)
 
         end
 

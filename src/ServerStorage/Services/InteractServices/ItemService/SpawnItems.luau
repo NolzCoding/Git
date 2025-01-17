@@ -147,36 +147,192 @@ function SpawnItems:HandleObject(object, type, ancestor, customItemSpawns)
 
 end
 
-function SpawnItems:SpawnIndividualItem(itemName, ancestor, customItemSpawns)
+function SpawnItems:SpawnIndividualItem(itemName, ancestor, customItemSpawns, amount)
 
-    local possibleObjects = {}
+    amount = amount or 1
 
-    for name, items in pairs(customItemSpawns or itemSpawns) do
-        for nameOfItem, _ in pairs(items) do
-            if nameOfItem == itemName then
-                table.insert(possibleObjects, name)
+    local newTable = {
+        Battery = {
+            SpawnsIn = {
+                Drawer = 10,
+                TVCabinets = 5,
+            },
+        },
+
+        Soap = {
+            SpawnsIn = {
+                Drawer = 6,
+            },
+        },
+
+        Lighter = {
+            SpawnsIn = {
+                Drawer = 5,
+                TVCabinets = 3,
+            },
+        },
+
+        Taser = {
+            SpawnsIn = {
+                Drawer = 1,
+            },
+        },
+
+        Knife = {
+            SpawnsIn = {
+                KnifeHanger = 1,
+            },
+        },
+
+        Fork = {
+            SpawnsIn = {
+                KitchenCabinet = 5,
+            },
+        },
+
+        Medicine = {
+            SpawnsIn = {
+                KitchenCabinet = 2,
+                TVCabinets = 1,
+            },
+        },
+
+        Basement_Key = {
+            SpawnsIn = {
+                KitchenCabinet = 1,
+            },
+        },
+
+    }
+
+    local item = newTable[itemName]
+    if not item then return end
+
+    local allPossibleSpawns = {}
+    local totalWeight = 0
+
+    -- Gather all possible spawn locations with their weights
+    for objectName, spawnWeight in pairs(item.SpawnsIn) do
+        local tagged = CollectionService:GetTagged(objectName)
+        for _, obj in ipairs(tagged) do
+            if obj:IsDescendantOf(ancestor) then
+                table.insert(allPossibleSpawns, {object = obj, weight = spawnWeight})
+                totalWeight += spawnWeight
             end
         end
     end
-    -- random object
 
-    local object = possibleObjects[math.random(1, #possibleObjects)]
-    local tagged = CollectionService:GetTagged(object)
-    local taggedInsideAncestor = {}
+    -- If we found possible spawn locations
+    if #allPossibleSpawns > 0 then
+        -- Pick one random location based on weights
+        local randomValue = math.random() * totalWeight
+        local currentWeight = 0
 
-    for _, obj in ipairs(tagged) do
-        if not obj:IsDescendantOf(ancestor) then
-            continue
+        for _, spawnInfo in ipairs(allPossibleSpawns) do
+            currentWeight += spawnInfo.weight
+            if randomValue <= currentWeight then
+                -- Spawn the items at this location
+                for _ = 1, amount do
+                    _spawnItem(itemName, spawnInfo.object, ancestor)
+                end
+                break
+            end
         end
-        table.insert(taggedInsideAncestor, obj)
     end
-    local randomObject = taggedInsideAncestor[math.random(1, #taggedInsideAncestor)]
 
-    _spawnItem(itemName, randomObject, ancestor)
 
-    print("Spawned item: ", itemName, " in ", randomObject)
 
-    return itemName
+end
+
+function SpawnItems:NewSpawn(ancestor, customItemSpawns)
+
+    local newTable = {
+        Battery = {
+            SpawnsIn = {
+                Drawer = 10,
+                TVCabinets = 5,
+            },
+        },
+
+        Soap = {
+            SpawnsIn = {
+                Drawer = 6,
+            },
+        },
+
+        Lighter = {
+            SpawnsIn = {
+                Drawer = 5,
+                TVCabinets = 3,
+            },
+        },
+
+        Taser = {
+            SpawnsIn = {
+                Drawer = 1,
+            },
+        },
+
+        Knife = {
+            SpawnsIn = {
+                KnifeHanger = 1,
+            },
+        },
+
+        Fork = {
+            SpawnsIn = {
+                KitchenCabinet = 5,
+            },
+        },
+
+        Medicine = {
+            SpawnsIn = {
+                KitchenCabinet = 2,
+                TVCabinets = 1,
+            },
+        },
+
+        Basement_Key = {
+            SpawnsIn = {
+                KitchenCabinet = 1,
+            },
+        },
+
+    }
+
+    for itemName, itemInfo in pairs(customItemSpawns or newTable) do
+        for objectName, spawnAmount in pairs(itemInfo.SpawnsIn) do
+            local spawnCount = 0
+            local tagged = CollectionService:GetTagged(objectName)
+            local taggedInsideAncestor = {}
+
+            for _, obj in ipairs(tagged) do
+                if obj:IsDescendantOf(ancestor) then
+                    table.insert(taggedInsideAncestor, obj)
+                end
+            end
+
+            if #taggedInsideAncestor > 0 then
+                local totalObjects = #taggedInsideAncestor
+                local itemsPerObject = math.ceil(spawnAmount / totalObjects)
+
+                for _, obj in ipairs(taggedInsideAncestor) do
+                    for _ = 1, itemsPerObject do
+                        if spawnCount >= spawnAmount then
+                            break
+                        end
+                        _spawnItem(itemName, obj, ancestor)
+                        spawnCount += 1
+                    end
+                    if spawnCount >= spawnAmount then
+                        break
+                    end
+                end
+            else
+                warn("No valid objects found for spawning item: " .. itemName .. " in " .. objectName)
+            end
+        end
+    end
 
 end
 

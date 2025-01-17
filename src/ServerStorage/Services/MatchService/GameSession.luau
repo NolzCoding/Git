@@ -9,7 +9,6 @@ local Maps = require(ReplicatedStorage.Source.Shared.Maps)
 
 local GameSession = {}
 GameSession.__index = GameSession
-GameSession.States = {}
 
 -- Spawn a new map for the session
 -- load the map
@@ -26,14 +25,14 @@ export type GameSession = {
     Map : typeof(ServerStorage.House),
     State : string,
     GameSlot : Part,
-    States : {
-        ChoosingMap : (self: NexusInstanceGameSession, slot : Part) -> Model,
-        Loading : (self: NexusInstanceGameSession, map : Model) -> (),
-        Starting : (self: NexusInstanceGameSession) -> (),
-        Playing : (self: NexusInstanceGameSession) -> (),
-        Ending : (self: NexusInstanceGameSession) -> (),
-        Cleanup : (self: NexusInstanceGameSession) -> (),
-    },
+    --States : {
+        --ChoosingMap : (self: NexusInstanceDefaultSession, slot : Part, votingTable : {[number] : {Name : string, Image : string, Players : {Player}}} ) -> Model,
+        --Loading : (self: NexusInstanceDefaultSession, map : Model) -> (),
+        --Starting : (self: NexusInstanceDefaultSession) -> (),
+        --Playing : (self: NexusInstanceDefaultSession) -> (),
+        --Ending : (self: NexusInstanceDefaultSession, winningTeam : {Alive : {Player}, Dead : {Player}}) -> (),
+        --Cleanup : (self: NexusInstanceDefaultSession) -> (),
+    --},
 
     OnStateUpdate: NexusInstance.TypedEvent<string, string, number>,
     OnScoreUpdate: NexusInstance.TypedEvent<any>,
@@ -54,6 +53,7 @@ export type NexusInstanceGameSession = NexusInstance.NexusInstance<GameSession>
 function GameSession.__new(self: NexusInstanceGameSession, players: {Player}): ()
     self.Players = players
     self.CharacterService = Knit.GetService("CharacterService")
+
     -- stateName : string, stateText : string, time : number
     self.OnStateUpdate = self:CreateEvent() :: NexusInstance.TypedEvent<string, string, number>
     self.OnScoreUpdate = self:CreateEvent() :: NexusInstance.TypedEvent<any>
@@ -126,13 +126,13 @@ function GameSession.Start(self: NexusInstanceGameSession): ()
         local slot = findEmptySlot()
         self.GameSlot = slot -- can be nil but who cares, i dont lol, i dont care about nils, i dont care about anything, i dont care about you, i dont care about me
         local matTable = _newVoteTable()
-        local map = self.States.ChoosingMap(self,slot, matTable)
+        local map = self.States.ChoosingMap(slot, matTable)
         self.Map = map
-        self.States.Loading(self,map)
-        self.States.Starting(self)
-        local winningTeam = self.States.Playing(self)
-        self.States.Ending(self, winningTeam)
-        self.States.Cleanup(self)
+        self.States.Loading(map)
+        self.States.Starting()
+        local winningTeam = self.States.Playing()
+        self.States.Ending( winningTeam)
+        self.States.Cleanup()
         resolve()
     end):finally(function()
         print("Destorying game session")

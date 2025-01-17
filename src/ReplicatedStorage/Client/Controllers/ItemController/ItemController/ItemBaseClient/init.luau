@@ -7,7 +7,7 @@ local ItemUi = require(script.ItemUi)
 local Promise = require(ReplicatedStorage.Packages.Knit).Util.Promise
 local Fusion = require(ReplicatedStorage.Packages.fusion)
 local Children, peek = Fusion.Children, Fusion.peek
-
+local ItemDescription = require(script.ItemDescription)
 local ItemBaseClient = {}
 ItemBaseClient.__index = ItemBaseClient
 
@@ -28,7 +28,15 @@ export type ItemBaseClient = {
     EquippedConnections: {RBXScriptConnection}?,
     OnEquipped : (() -> {RBXScriptConnection}),
     OnUnequipped : (() -> ()),
-
+    ItemDescription: {
+        Name: string,
+        Description: string,
+        Effects: {
+            Lungs: number,
+            Heart: number,
+            Stomach: number,
+        }
+    },
     Equipped: (self: ItemBaseClient) -> (),
     Unequipped: (self: ItemBaseClient) -> (),
 
@@ -44,6 +52,15 @@ function ItemBaseClient.__new(self: NexusInstanceItemBaseClient, itemName: strin
     self.CashedVisual = cashedVisual
     self.Tool = tool
     self.Connections = {}
+    self.ItemDescription = self.ItemDescription or {
+        Name = "Item",
+        Description = "This is an item",
+        Effects = {
+            Lungs = 25,
+            Heart = 25,
+            Stomach = 0,
+        }
+    }
     self.BuildUI = self.BuildUI or function()
 
     end
@@ -130,6 +147,13 @@ function ItemBaseClient.Equipped(self: NexusInstanceItemBaseClient)
                     self:DropItem()
                 end
             }),
+
+            ItemDescription(self.scope,  {
+                Name = self.ItemDescription.Name,
+                Description = self.ItemDescription.Description,
+                Effects = self.ItemDescription.Effects,
+            }),
+
             self.BuildUI(self.scope)
         }
     }

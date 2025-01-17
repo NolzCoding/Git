@@ -74,6 +74,11 @@ local StarterData =
         Claimed = {
 
         }
+    },
+    Battlepass = {
+        Passes = {
+
+        }
     }
 }
 

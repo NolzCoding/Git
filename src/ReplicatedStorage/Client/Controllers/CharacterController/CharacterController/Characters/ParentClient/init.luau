@@ -77,12 +77,14 @@ function ParentClient.__new(self: NexusInstanceParentClient, character : Model?)
 
     local babyPrompts = CollectionService:GetTagged("Baby")
 
-    for _, promptParent in ipairs(babyPrompts) do
-        local prompt = promptParent:FindFirstChild("ProximityPrompt") :: ProximityPrompt
-
-        prompt.Enabled = true
-
-    end
+    task.spawn(function()
+        for _, prompt in ipairs(babyPrompts) do
+            if not prompt then
+                continue
+            end
+            prompt.Enabled = true
+        end
+    end)
 
     table.insert(self.Connections, UserInputService.InputBegan:Connect(function(a0: InputObject, a1: boolean)
 
@@ -95,6 +97,10 @@ function ParentClient.__new(self: NexusInstanceParentClient, character : Model?)
 end
 
 function ParentClient.ServerSignal.onPlayerPickup(self : NexusInstanceParentClient, player : Player, weld)
+
+
+    if self.PickedUp then return end
+
     self.PickedUp = {
         Player = player,
         WeldConstraint = weld,
@@ -107,9 +113,13 @@ function ParentClient.ServerSignal.onPlayerPickup(self : NexusInstanceParentClie
             Text = "You can't but the baby in the bed yet",
             Image = "rbxassetid://7711634021",
             Time = 2,
-            Color = Color3.fromRGB(255, 255, 255)
+            Color = Color3.fromRGB(255, 48, 48)
         })
         return
+    end
+
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.PlatformStand = true
     end
 
     --find proximiy prompt
@@ -128,6 +138,33 @@ function ParentClient.ServerSignal.onPlayerPickup(self : NexusInstanceParentClie
 
 end
 
+function ParentClient.HighlightBabies(self :NexusInstanceParentClient, Babies : {Player})
+
+    for _, baby in ipairs(Babies) do
+        local character = baby.Character
+        if not character then
+            continue
+        end
+
+        local highlight = Instance.new("Highlight")
+        highlight.Parent = character
+        highlight.FillColor= Color3.fromRGB(255, 255, 255)
+    end
+
+    task.delay(7, function()
+        for _, baby in ipairs(Babies) do
+            local character = baby.Character
+            if not character then
+                continue
+            end
+
+            local highlight = character:FindFirstChildOfClass("Highlight") :: Highlight
+            highlight:Destroy()
+        end
+    end)
+
+end
+
 function ParentClient.ServerSignal.onPlayerDrop(self : NexusInstanceParentClient)
     self.ThrowBabyVisible:set(false)
 
@@ -135,6 +172,10 @@ function ParentClient.ServerSignal.onPlayerDrop(self : NexusInstanceParentClient
 
     local player = self.PickedUp.Player :: Player
     self.PickedUp = nil
+
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.PlatformStand = true
+    end
 
     local babyPrompt = player.Character.HumanoidRootPart:FindFirstChildOfClass("ProximityPrompt") :: ProximityPrompt
     babyPrompt.Enabled = true

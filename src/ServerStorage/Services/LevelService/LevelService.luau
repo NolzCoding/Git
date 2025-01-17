@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
-
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local CalculateLevels = require(ReplicatedStorage.Source.Shared.CalculateLevels)
 local LevelService = Knit.CreateService {
     Name = "LevelService";
@@ -10,6 +10,9 @@ local LevelService = Knit.CreateService {
 }
 
 function LevelService:KnitInit()
+
+    self.PlayerGotExperience = Signal.new()
+
 end
 
 function LevelService:KnitStart()
@@ -66,6 +69,8 @@ function LevelService:AwardExperience(player : Player, amount : number, notify :
     end
 
     self.DataService:SetData(player, "Levels" , Levels)
+
+    self.PlayerGotExperience:Fire(player, amount)
 
     self:CheckForLevelUp(player)
 

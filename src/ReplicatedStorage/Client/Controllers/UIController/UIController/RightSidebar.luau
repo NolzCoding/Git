@@ -6,19 +6,26 @@ local new = Fusion.New
 
 local TextLabelWithStroke = require(ReplicatedStorage.Source.Client.Controllers.UIController.Components.Text.TextLabelWithStroke)
 local ImageButton = require(ReplicatedStorage.Source.Client.Controllers.UIController.Components.Buttons.ImageButton)
+local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local Icons = require(ReplicatedStorage.Source.Shared.Icons)
-
+local Alerts = require(ReplicatedStorage.Source.Shared.Alerts)
+local Alert = require(ReplicatedStorage.Source.Client.Controllers.UIController.Components.UI.Alert)
 local function RightSideBar(scope : typeof(Fusion.scoped(Fusion)), props : {
     OpenWindow : (name : string) -> (),
     Cash : number,
 })
 
+    local musicison = true
+    local MusicController = Knit.GetController("MusicController")
+
+    MusicController:ChangeVolume(0.25)
+
     return scope:New "Frame" {
         BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         BackgroundTransparency = 1,
         Size = UDim2.fromScale(0.15, 0.6),
-        Position = UDim2.fromScale(0.013, 0.5),
+        Position = UDim2.fromScale(0.013, 0.45),
         AnchorPoint = Vector2.new(0, 0.5),
 
         [Children] = {
@@ -30,7 +37,7 @@ local function RightSideBar(scope : typeof(Fusion.scoped(Fusion)), props : {
                 BackgroundColor3 = Color3.fromRGB(172, 255, 37),
                 BackgroundTransparency = 0,
                 Size = UDim2.fromScale(1, 0.2),
-                Position = UDim2.fromScale(0, 0.8),
+                Position = UDim2.fromScale(0, 1),
                 AnchorPoint = Vector2.new(0, 0.5),
                 [Children] = {
                     scope:New "UIAspectRatioConstraint" {
@@ -88,8 +95,6 @@ local function RightSideBar(scope : typeof(Fusion.scoped(Fusion)), props : {
                         HorizontalAlignment = Enum.HorizontalAlignment.Right,
                         VerticalAlignment = Enum.VerticalAlignment.Top,
                     },
-
-
 
                     ImageButton(scope, {
                         Image = "",
@@ -152,6 +157,8 @@ local function RightSideBar(scope : typeof(Fusion.scoped(Fusion)), props : {
                         Size = UDim2.fromScale(0.3, 0.3),
                         ButtonUp = function()
                             props.OpenWindow("Shop", 2)
+
+                            Alerts.CratesAlert:set(false)
                         end,
 
                         Build = function(scope)
@@ -165,7 +172,14 @@ local function RightSideBar(scope : typeof(Fusion.scoped(Fusion)), props : {
                                 Thickness = 2,
                                 StrokeColor = Color3.fromRGB(20, 18, 8),
                                 TextColor = Color3.fromRGB(231, 216, 148),
-                            })}
+                            }),
+
+                            Alert(scope, {
+                                Visible = Alerts.CratesAlert,
+                                Size = UDim2.fromScale(0.7, 0.7),
+                            })
+
+                            }
 
                         end
 
@@ -230,6 +244,74 @@ local function RightSideBar(scope : typeof(Fusion.scoped(Fusion)), props : {
 
                             return {TextLabelWithStroke(scope, {
                                 Text = "Abilities",
+                                Size = UDim2.fromScale(1, 0.3),
+                                Position = UDim2.fromScale(0.5, 0.8),
+                                ZIndex = 2,
+                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                Thickness = 2,
+                                StrokeColor = Color3.fromRGB(20, 18, 8),
+                                TextColor = Color3.fromRGB(231, 216, 148),
+                            })}
+
+                        end
+
+                    }),
+
+                    ImageButton(scope, {
+                        Image = Icons.Ticket264,
+                        Size = UDim2.fromScale(0.3, 0.3),
+                        ButtonUp = function()
+                            props.OpenWindow("Babypass")
+
+                            Alerts.GamepassAlert:set(false)
+
+                        end,
+
+                        Build = function(scope)
+
+                            return {TextLabelWithStroke(scope, {
+                                Text = "Babypass",
+                                Size = UDim2.fromScale(1, 0.3),
+                                Position = UDim2.fromScale(0.5, 0.8),
+                                ZIndex = 2,
+                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                Thickness = 2,
+                                StrokeColor = Color3.fromRGB(20, 18, 8),
+                                TextColor = Color3.fromRGB(231, 216, 148),
+                            }),
+
+                            Alert(scope, {
+                                Visible = Alerts.GamepassAlert,
+                                Size = UDim2.fromScale(0.7, 0.7),
+                            })
+
+
+                        }
+
+                        end
+
+                    }),
+
+                    ImageButton(scope, {
+                        Image = Icons.Sounds,
+                        Size = UDim2.fromScale(0.3, 0.3),
+                        ButtonUp = function()
+                            local MusicController = Knit.GetController("MusicController")
+
+                            if musicison then
+                                MusicController:ChangeVolume(0)
+                                musicison = false
+                            else
+                                MusicController:ChangeVolume(0.25)
+                                musicison = true
+                            end
+
+                        end,
+
+                        Build = function(scope)
+
+                            return {TextLabelWithStroke(scope, {
+                                Text = "Music",
                                 Size = UDim2.fromScale(1, 0.3),
                                 Position = UDim2.fromScale(0.5, 0.8),
                                 ZIndex = 2,

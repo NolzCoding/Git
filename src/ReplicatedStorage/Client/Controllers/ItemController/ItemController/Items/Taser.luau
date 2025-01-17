@@ -99,6 +99,16 @@ function TaserClient.__new(self: NexusInstanceTaserClient, itemName: string, too
         connection:Disconnect()
     end)
 
+    self.ItemDescription = {
+        Name = "Taser",
+        Description = "Can tase both babies and parents",
+        Effects = {
+            Lungs = 0,
+            Heart = 0,
+            Stomach = 0,
+        }
+    }
+
    -- self.Server:DropItem()
    ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 

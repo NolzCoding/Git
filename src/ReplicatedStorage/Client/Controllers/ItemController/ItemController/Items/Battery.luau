@@ -37,8 +37,10 @@ function BatteryClient.__new(self: NexusInstanceBatteryClient, itemName: string,
                 BackgroundColor3 = Color3.fromRGB(255, 14, 14),
                 ButtonText = "Eat F",
                 KeyCode = Enum.KeyCode.F,
-                Image = Icons.Drop,
-                ImageSize = UDim2.new(0.5, 0, 0.5, 0),
+                Image = Icons.ItemActions.Eat,
+                ScaleType = Enum.ScaleType.Fit,
+
+                ImageSize = UDim2.new(0.8, 0, 0.8, 0),
                 ButtonUp = function()
                     print("clicking gui BATTERY", isBaby)
 
@@ -59,9 +61,17 @@ function BatteryClient.__new(self: NexusInstanceBatteryClient, itemName: string,
         end)}
     end
 
+    self.ItemDescription = {
+        Name = "Battery",
+        Description = "Hurts babies stomach when eaten",
+        Effects = {
+            Lungs = 0,
+            Heart = 0,
+            Stomach = 25,
+        }
+    }
+
     ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
-
-
    -- self.Server:DropItem()
 
 end

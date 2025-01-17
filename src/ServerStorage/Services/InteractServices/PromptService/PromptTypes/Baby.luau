@@ -6,11 +6,12 @@ local BaseCharacter = require(ServerStorage.Source.Services.CharacterService.Cha
 local ParentCharacter = require(ServerStorage.Source.Services.CharacterService.CharacterService.Characters.ParentServer)
 local ItemBase = require(ServerStorage.Source.Services.InteractServices.ItemService.ItemBase)
 local BabyCharacter = require(ServerStorage.Source.Services.CharacterService.CharacterService.Characters.BabyServer)
-
+local Icons = require(ReplicatedStorage.Source.Shared.Icons)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 function Baby:Init()
 
     self.CharacterService = Knit.GetService("CharacterService")
+    self.NotificationService = Knit.GetService("NotificationService")
     self.ItemService = Knit.GetService("ItemService")
 end
 
@@ -22,25 +23,43 @@ function Baby:Triggered(prompt : ProximityPrompt, player : Player)
         return
     end
 
-    if babyCharacterClass.ActiveEffects["Slippery"] then
-        print("Baby is slippery")
-        return
-    end
-
-    -- check if item has behavior that overrides default behavior
-
     if (player :: any).Character:FindFirstChildOfClass("Tool") then
         local itemClass = self.ItemService:GetItemFromTool((player :: any).Character:FindFirstChildOfClass("Tool"))
         if itemClass then
 
             if itemClass.PromptInteract then
                 itemClass:PromptInteract("Baby", parentCharacterClass, babyCharacterClass)
+
+                self.NotificationService:NotifyPlayer("TextNImage", {
+                    Text = "You used the " .. " Medicine " .. " on the baby",
+                    Image = "rbxassetid://7716784021",
+                    Color = Color3.fromRGB(129, 255, 45),
+                    Time = 5,
+                }, player)
+
                 return
 
             end
 
         end
     end
+
+    if babyCharacterClass.ActiveEffects["Slippery"] then
+        print("Baby is slippery")
+
+        self.NotificationService:NotifyPlayer("TextNImage", {
+            Text = "You can't pick up a slippery baby, because they're soaped up",
+            Image = Icons.ItemImages.Soap,
+            Color = Color3.fromRGB(255, 45, 45),
+            Time = 5,
+        }, player)
+
+        return
+    end
+
+    -- check if item has behavior that overrides default behavior
+
+
 
 
     parentCharacterClass:PickupPlayer(babyCharacterClass)

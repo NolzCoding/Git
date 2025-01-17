@@ -115,7 +115,14 @@ function MatchService:NewGameSession(players : {Player})
     newGameSession:Start():andThen(function()
         print("Game session ended")
     end):catch(function(err)
+
         warn(err)
+
+        if newGameSession.Map then
+            newGameSession.Map:Destroy()
+
+        end
+
     end)
 
     return newGameSession

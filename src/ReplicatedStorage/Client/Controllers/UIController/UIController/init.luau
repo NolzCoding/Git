@@ -1,9 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
+local MarketplaceService = game:GetService("MarketplaceService")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Fusion = require(ReplicatedStorage.Packages.fusion)
 local CalculateLevels = require(ReplicatedStorage.Source.Shared.CalculateLevels)
 local Children = Fusion.Children
+local TweenService = game:GetService("TweenService")
 local value = Fusion.Value
 local Toolbar = require(script.Toolbar)
 local ItemUi = require(script.ItemUi)
@@ -14,6 +16,8 @@ local LevelBar = require(script.LevelBar)
 local PlayerList = require(script.PlayerList)
 local TopTimer = require(script.TopTimer)
 local QuestUI = require(script.QuestUI)
+local Starterpack = require(script.Starterpack)
+local PurschaseOverlay = require(script.Parent.Components.UI.PurschaseOverlay)
 local RightSidebar = require(script.RightSidebar)
 local DefaultButton = require(script.Parent.Components.Buttons.DefaultButton)
 local UIController = Knit.CreateController {
@@ -74,7 +78,7 @@ function UIController:KnitStart()
     local parentPlayers = self.scope:Value({Alive = {}, Dead = {}})
 
     local MatchService = Knit.GetService("MatchService")
-
+    self.CharacterController = Knit.GetController("CharacterController")
     self.DataService = Knit.GetService("DataService")
     self.DataController = Knit.GetController("DataController")
     self.MusicController = Knit.GetController("MusicController")
@@ -95,9 +99,11 @@ function UIController:KnitStart()
     local loadingScreenVisible = self.scope:Value(false)
     local winVisible = self.scope:Value(false)
     local whowon = self.scope:Value("Parents")
+
+
+    local showTutorial = true
+
     MatchService.StateSignal:Connect(function(stateName : string, stateText : string, time : number, ...)
-
-
 
         if stateName == "ChoosingMap" then
             print("Opening VoteMap")
@@ -116,11 +122,45 @@ function UIController:KnitStart()
             parentPlayers:set(parents)
             babyPlayers:set(babies)
 
+            local maybeABabyClass = self.CharacterController:GetCharacter()
+
+            if maybeABabyClass and maybeABabyClass.HighlightHealth then
+
+                maybeABabyClass:HighlightHealth(true)
+
+            end
+
+
 
         else
             loadingScreenVisible:set(false)
 
+            local maybeABabyClass = self.CharacterController:GetCharacter()
 
+            if maybeABabyClass and maybeABabyClass.HighlightHealth then
+
+                task.delay(2, function()
+
+                    maybeABabyClass:HighlightHealth(false)
+
+
+                end)
+
+            end
+
+            if maybeABabyClass and maybeABabyClass.HighlightBabies then
+
+                maybeABabyClass:HighlightBabies(Fusion.peek(babyPlayers).Alive)
+
+            end
+
+        end
+
+        if stateName == "Playing" then
+            if showTutorial then
+                self:OpenWindow("Tutorial")
+                showTutorial = false
+            end
         end
 
         if stateName == "Ending" then
@@ -165,6 +205,9 @@ function UIController:KnitStart()
             LoadingScreen(self.scope, {
                 Visible = loadingScreenVisible,
             }),
+
+            Starterpack(self.scope, {}),
+
 
             QuestUI(self.scope),
 
@@ -326,6 +369,9 @@ function UIController:OpenWindow(name : string, ...)
         end
     end
 
+    --local Blur = game.Lighting:WaitForChild("Blur") :: BlurEffect
+   -- TweenService:Create(Blur, TweenInfo.new(0.25, Enum.EasingStyle.Linear, Enum.EasingDirection.In), {Size = 20}):Play()
+
 end
 
 function UIController:CloseWindow(name : string, ...)
@@ -339,6 +385,10 @@ function UIController:CloseWindow(name : string, ...)
             window.Module:OnClose(...)
         end
     end
+
+
+    --local Blur = game.Lighting:WaitForChild("Blur") :: BlurEffect
+    --TweenService:Create(Blur, TweenInfo.new(0.25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {Size = 0}):Play()
 
 end
 

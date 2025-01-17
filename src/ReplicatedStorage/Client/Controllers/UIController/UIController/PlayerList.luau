@@ -25,7 +25,8 @@ local function PlayerList(scope : typeof(Fusion:scoped()),
     end)
 
     local allPlayers = scope:Computed(function(use)
-        return {unpack(use(Alive)), unpack(use(Dead))}
+        print(use(Alive))
+        return use(Alive)
     end)
 
     return scope:New "Frame" {
@@ -41,7 +42,8 @@ local function PlayerList(scope : typeof(Fusion:scoped()),
                 HorizontalAlignment = props.HorizontalAlignment or Enum.HorizontalAlignment.Center,
                 VerticalAlignment = Enum.VerticalAlignment.Top,
             },
-            scope:ForValues(allPlayers, function(use, scope, value: Player)
+            scope:ForPairs(allPlayers, function(use, scope, key, value: Player)
+
 
 
                 local userId = value.UserId
@@ -53,7 +55,7 @@ local function PlayerList(scope : typeof(Fusion:scoped()),
                     return table.find(use(Dead), value)
                 end)
 
-                return scope:New "ImageLabel" {
+                return key, scope:New "ImageLabel" {
                     Size = UDim2.fromScale(0.1, 0.1),
                     Image = content,
                     [Children] = {

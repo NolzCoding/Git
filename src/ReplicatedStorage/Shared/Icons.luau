@@ -5,7 +5,8 @@ return {
         Computer = "rbxassetid://122034974174787",
     },
     Shadow = "rbxassetid://11953711609",
-    Drop = "rbxassetid://76666165196224",
+    DropDown = "rbxassetid://76666165196224",
+    Drop = "rbxassetid://125146112148142",
     Heart = "rbxassetid://120273220901310",
     EmptyHeart = "rbxassetid://124716582955375",
 
@@ -14,14 +15,16 @@ return {
     OrganLungs = "rbxassetid://135545228007462",
 
     Rocket = "rbxassetid://139454970111655",
-
+    Ticket264 = "rbxassetid://105784724524605",
     BrownBook264 = "rbxassetid://107861757030912",
     Robux264 = "rbxassetid://116414099004570",
     ShoppingBasket = "rbxassetid://97759546726370",
     Emojis = {
-        Skull = "rbxassetid://117743847819035"
+        Skull = "rbxassetid://117743847819035",
+        LoudlyCrying = "rbxassetid://121887397182610",
+        Mewing = "rbxassetid://118688560718296"
     },
-
+    Sounds = "rbxassetid://101291355528062",
     Skull256 = "rbxassetid://71970635502956",
     StrongArm = "rbxassetid://83504810428762",
     Frames = {
@@ -34,6 +37,9 @@ return {
     BabyBucks = "rbxassetid://122287498755342",
 
     YellowLightning = "rbxassetid://130407257711627",
+
+    Bubbles = "rbxassetid://106049071313145",
+    Fire = "rbxassetid://100183236291544",
 
     GiftBoxes = {
         Yellow = {
@@ -57,6 +63,14 @@ return {
             Group = "rbxassetid://113164810288809",
             Open = "rbxassetid://75568398191437",
         },
+    },
+
+    Lock256 = "rbxassetid://81178403784747",
+
+    ItemActions = {
+        Eat = "rbxassetid://90511935852378",
+        Bubbles = "rbxassetid://128698832819413",
+        Flame = "rbxassetid://115797832356926",
     },
 
     ItemImages = {

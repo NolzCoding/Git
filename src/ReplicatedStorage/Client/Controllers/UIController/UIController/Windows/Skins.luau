@@ -33,6 +33,9 @@ local skinsInShop = {
         "Baby Shark",
         "Emo Baby",
         "Emo Girl",
+        "Baby Ninja",
+        "Iron Baby",
+        "Cry Baby",
         "Player196",
     },
     Parent = {
@@ -41,6 +44,7 @@ local skinsInShop = {
         "Yo Mama",
         "Crazy Babysitter",
         "Squid Game",
+        "Caseoh",
         "Squid Game Doll"
     }
 }

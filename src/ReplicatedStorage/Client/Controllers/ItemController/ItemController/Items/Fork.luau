@@ -36,6 +36,17 @@ function ForkClient.__new(self: NexusInstanceForkClient, itemName: string, tool:
             end,
         })]]
     end
+
+    self.ItemDescription = {
+        Name = "Fork",
+        Description = "When put into an outlet damages the babies heart",
+        Effects = {
+            Lungs = 0,
+            Heart = 50,
+            Stomach = 0,
+        }
+    }
+
     ItemBase.__new(self, itemName, tool, cashedVisual) --Remember to call the parent constructor!
 
    -- self.Server:DropItem()

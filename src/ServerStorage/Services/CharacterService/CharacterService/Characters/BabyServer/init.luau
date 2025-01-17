@@ -313,7 +313,7 @@ function BabyServer.SetupAbilities(self : NexusInstanceBabyServer): ()
 
         local character = self.Player.Character :: Model
 
-        for _, part in ipairs(character:GetChildren()) do
+        for _, part in ipairs(character:GetDescendants()) do
             if part:IsA("BasePart") or part:IsA("Decal") then
 
                 if not part:GetAttribute("Transparency") then
@@ -349,7 +349,7 @@ function BabyServer.SetupAbilities(self : NexusInstanceBabyServer): ()
 
     self.Abilities["Speed"] = function()
 
-        local character = game.Players.LocalPlayer.Character
+        local character = self.Player.Character :: Model
         local humanoid = character:FindFirstChild("Humanoid") :: Humanoid
 
         humanoid.WalkSpeed = 50
@@ -439,6 +439,29 @@ function BabyServer.__new(self: NexusInstanceBabyServer, player : Player, charac
     self:SetupAbilities()
     print("BabyServer")
 
+    self.Client.UseAbility = function (self: NexusInstanceBabyServer,player, abilityName): ()
+        print("Ability Used server", abilityName)
+
+        local ability = self.Abilities[abilityName]
+        if not ability then
+            warn("Ability not found ", abilityName)
+            return
+        end
+
+        local data = self.DataService:GetData(self.Player)
+        local amount = data.Abilities.OwnedAbilities[abilityName] or 0
+        if amount <= 0 then
+            return
+        end
+
+        data.Abilities.OwnedAbilities[abilityName] = amount - 1
+
+        self.DataService:SetData(self.Player, "Abilities", data.Abilities)
+
+        ability()
+
+    end
+
 end
 
 function BabyServer.Destroy(self: NexusInstanceBabyServer): ()
@@ -448,27 +471,6 @@ function BabyServer.Destroy(self: NexusInstanceBabyServer): ()
 end
 
 
-function BabyServer.Client.UseAbility(self: NexusInstanceBabyServer,player, abilityName): ()
-    print("Ability Used server", abilityName)
 
-    local ability = self.Abilities[abilityName]
-    if not ability then
-        warn("Ability not found ", abilityName)
-        return
-    end
-
-    local data = self.DataService:GetData(self.Player)
-    local amount = data.Abilities.OwnedAbilities[abilityName] or 0
-    if amount <= 0 then
-        return
-    end
-
-    data.Abilities.OwnedAbilities[abilityName] = amount - 1
-
-    self.DataService:SetData(self.Player, "Abilities", data.Abilities)
-
-    ability()
-
-end
 
 return NexusInstance.ToInstance(BabyServer) :: NexusInstance.NexusInstanceClass<typeof(BabyServer), (player : Player, character : Model) -> (NexusInstanceBabyServer)>
